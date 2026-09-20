@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snake Edu 2 - Sejarah & Perubahan Sosial Gresik</title>
+    <!-- Google Fonts untuk Gaya Retro/Pixel -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'retro-bg': '#121212',
+                        'retro-card': '#1e1e1e',
+                        'retro-border': '#333333',
+                        'arcade-yellow': '#facc15',
+                        'arcade-yellow-dark': '#ca8a04',
+                        'pixel-green': '#22c55e',
+                        'pixel-red': '#ef4444',
+                    },
+                    fontFamily: {
+                        'pixel': ['"Press Start 2P"', 'cursive'],
+                        'sans': ['Rajdhani', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Kontrol aksi sentuh untuk kelancaran bermain di ponsel */
+        body {
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #0d0d0d;
+        }
+
+        /* Desain Tombol Arcade Kuning */
+        .btn-arcade {
+            background: linear-gradient(180deg, #fde047 0%, #eab308 100%);
+            border: 3px solid #713f12;
+            box-shadow: 0 4px 0 #713f12, 0 6px 8px rgba(0,0,0,0.5);
+            color: #1a1a1a;
+            font-weight: bold;
+            transition: all 0.05s ease;
+        }
+        .btn-arcade:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #713f12, 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .btn-arcade-sm {
+            background: linear-gradient(180deg, #fde047 0%, #eab308 100%);
+            border: 2px solid #713f12;
+            box-shadow: 0 2px 0 #713f12;
+            color: #1a1a1a;
+        }
+        .btn-arcade-sm:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #713f12;
+        }
+
+        /* Tombol D-Pad Arah */
+        .dpad-btn {
+            background: radial-gradient(circle at 35% 35%, #fde047, #ca8a04);
+            border: 3px solid #451a03;
+            box-shadow: inset 0 2px 3px rgba(255,255,255,0.6), inset 0 -3px 5px rgba(0,0,0,0.4), 0 5px 0 #451a03;
+            border-radius: 9999px;
+            transition: all 0.05s ease;
+        }
+        .dpad-btn:active {
+            transform: translateY(3px);
+            box-shadow: inset 0 2px 3px rgba(255,255,255,0.4), inset 0 -3px 5px rgba(0,0,0,0.4), 0 2px 0 #451a03;
+        }
+
+        /* Bingkai Bezel Layar Canvas */
+        .retro-bezel {
+            background: #18181b;
+            border: 4px solid #27272a;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Efek Lapisan Scanline CRT Retro */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        /* Animasi Pop Hitung Mundur */
+        @keyframes popIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.35s ease-out forwards;
+        }
+
+        @keyframes fadeUp {
+            0% { transform: translateY(8px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.5s ease-out forwards;
+        }
+
+        /* Input teks gaya arcade untuk Splash Screen */
+        .input-arcade {
+            background: #18181b;
+            border: 2px solid #52525b;
+            color: #facc15;
+            font-weight: 700;
+        }
+        .input-arcade:focus {
+            outline: none;
+            border-color: #facc15;
+        }
+
+        /* ===== MODE PAMERAN: teks soal & opsi diperbesar untuk booth publik ===== */
+        #app-container.mode-pameran #quiz-question {
+            font-size: 15px !important;
+            line-height: 1.5 !important;
+        }
+        #app-container.mode-pameran #quiz-options-container span.text-\[11px\],
+        #app-container.mode-pameran #quiz-options-container span {
+            font-size: 14px !important;
+            line-height: 1.4 !important;
+        }
+        #app-container.mode-pameran #quiz-explanation,
+        #app-container.mode-pameran #quiz-explanation-text,
+        #app-container.mode-pameran #quiz-hint-box,
+        #app-container.mode-pameran #quiz-hint-text {
+            font-size: 13px !important;
+            line-height: 1.5 !important;
+        }
+        #app-container.mode-pameran #quiz-title-no {
+            font-size: 13px !important;
+        }
+
+        /* Bar progres tema untuk layar refleksi */
+        .theme-bar-track {
+            background: #27272a;
+            border-radius: 999px;
+            overflow: hidden;
+            height: 8px;
+            width: 100%;
+        }
+        .theme-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen text-white font-sans overflow-x-hidden p-1 sm:p-2">
+
+    <!-- Container Utama Ponsel (Model Frame HP/Arcade) -->
+    <div id="app-container" class="w-full max-w-md bg-zinc-900 border-4 border-zinc-700 rounded-3xl p-3 sm:p-4 shadow-2xl relative flex flex-col justify-between h-[96vh] max-h-[840px] overflow-hidden">
+
+        <!-- ================= HALAMAN 0: SPLASH SCREEN (INPUT NAMA & KELAS) ================= -->
+        <div id="screen-splash" class="flex flex-col items-center justify-between h-full py-6 relative z-20">
+            <!-- Logo Game -->
+            <div class="text-center mt-4 animate-fade-up">
+                <div class="font-pixel text-3xl md:text-4xl text-yellow-400 tracking-wider mb-1 drop-shadow-[0_4px_0_#854d0e]">
+                    SNAKE
+                </div>
+                <div class="font-pixel text-3xl md:text-4xl text-green-500 tracking-wider mb-2 drop-shadow-[0_4px_0_#14532d]">
+                    EDU <span class="text-red-500">2</span>
+                </div>
+                <div class="text-xs font-bold text-gray-300 uppercase tracking-widest bg-zinc-800 px-3 py-1 rounded-full border border-zinc-700 inline-block">
+                    Sejarah Gresik Kolonial
+                </div>
+                <div class="text-[10px] text-gray-500 mt-3 px-4 leading-relaxed">
+                    Media pembelajaran mendalam berbasis kearifan sejarah lokal Gresik
+                </div>
+            </div>
+
+            <!-- Form Identitas Pemain -->
+            <div class="w-full px-3 my-auto space-y-3">
+                <div class="bg-zinc-800/80 border border-zinc-700 rounded-2xl p-4 space-y-3">
+                    <div>
+                        <label class="block font-pixel text-[9px] text-gray-400 mb-1.5 uppercase tracking-wider">Nama Peserta</label>
+                        <input id="input-player-name" type="text" maxlength="30" placeholder="Tulis nama lengkap..." class="input-arcade w-full rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block font-pixel text-[9px] text-gray-400 mb-1.5 uppercase tracking-wider">Kelas / Asal Sekolah</label>
+                        <input id="input-player-class" type="text" maxlength="30" placeholder="Contoh: XI IPS 2 - SMAN 1 Gresik" class="input-arcade w-full rounded-lg px-3 py-2 text-sm">
+                    </div>
+                </div>
+                <div id="splash-error" class="hidden text-[10px] text-red-400 text-center font-bold">Isi nama dan kelas terlebih dahulu ya!</div>
+                <button onclick="game.submitPlayerIdentity()" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm flex items-center justify-center gap-2">
+                    Masuk Arena Belajar ➔
+                </button>
+            </div>
+
+            <div class="text-[9px] text-gray-600 text-center px-4">
+                Data hanya digunakan untuk papan skor pameran, tersimpan di perangkat ini.
+            </div>
+        </div>
+
+        <!-- ================= HALAMAN 1: MENU UTAMA ================= -->
+        <div id="screen-menu" class="hidden flex-col items-center justify-between h-full py-3 relative z-10">
+            <!-- Logo Game -->
+            <div class="text-center mt-1">
+                <div class="font-pixel text-2xl md:text-3xl text-yellow-400 tracking-wider mb-1 drop-shadow-[0_4px_0_#854d0e]">
+                    SNAKE
+                </div>
+                <div class="font-pixel text-2xl md:text-3xl text-green-500 tracking-wider mb-1.5 drop-shadow-[0_4px_0_#14532d]">
+                    EDU <span class="text-red-500">2</span>
+                </div>
+                <div class="text-xs font-bold text-gray-300 uppercase tracking-widest bg-zinc-800 px-3 py-1 rounded-full border border-zinc-700 inline-block">
+                    Sejarah Gresik Kolonial
+                </div>
+                <div id="menu-player-tag" class="text-[10px] text-yellow-400 mt-2 font-bold"></div>
+            </div>
+
+            <!-- Tombol Navigasi Utama -->
+            <div class="w-full space-y-2 px-4 my-auto">
+                <button onclick="game.goToLearningGoals()" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    Mulai Bermain
+                </button>
+                <button onclick="ui.showScreen('screen-how-to')" class="btn-arcade w-full py-2.5 rounded-2xl font-pixel text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+                    Cara Bermain
+                </button>
+                <button onclick="ui.showScreen('screen-referensi')" class="btn-arcade w-full py-2.5 rounded-2xl font-pixel text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20v2H6.5a.5.5 0 0 0 0 1H20v2H6.5A2.5 2.5 0 0 1 4 19.5zM6.5 2H20v13H6.5A2.5 2.5 0 0 0 4 17.5V4.5A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    Sumber & Referensi
+                </button>
+                <button onclick="ui.showScreen('screen-settings')" class="btn-arcade w-full py-2.5 rounded-2xl font-pixel text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6-3.6z"/></svg>
+                    Pengaturan
+                </button>
+                <button onclick="ui.showScreen('screen-highscores')" class="btn-arcade w-full py-2.5 rounded-2xl font-pixel text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>
+                    Skor Tertinggi
+                </button>
+            </div>
+
+            <!-- Hiasan Dekoratif -->
+            <div class="mt-auto pt-2 flex items-center justify-center opacity-40 gap-2">
+                <div class="w-3 h-3 bg-green-500 rounded-sm"></div>
+                <div class="w-3 h-3 bg-green-500 rounded-sm"></div>
+                <div class="w-3 h-3 bg-green-500 rounded-sm"></div>
+                <div class="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+            </div>
+        </div>
+
+        <!-- ================= HALAMAN 1B: TUJUAN BELAJAR (PRINSIP BERKESADARAN) ================= -->
+        <div id="screen-tujuan" class="hidden flex-col items-center justify-between h-full py-3 z-10">
+            <h2 class="font-pixel text-yellow-400 text-sm sm:text-base mb-2 text-center">TUJUAN BELAJAR</h2>
+
+            <div class="bg-zinc-800 border border-zinc-700 rounded-xl p-3 sm:p-4 text-xs text-gray-200 space-y-2.5 overflow-y-auto max-h-[440px] w-full">
+                <p class="text-[11px] text-amber-300 leading-relaxed">Sebelum bermain, sadari dulu apa yang akan kamu capai. Setelah menyelesaikan permainan ini, kamu diharapkan mampu:</p>
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel shrink-0">1.</span>
+                    <p class="text-[11px] leading-snug"><b class="text-white">Menjelaskan keterkaitan</b> antara stratifikasi sosial, ekonomi maritim, akulturasi budaya, dan perlawanan masyarakat Gresik pada masa kolonial.</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel shrink-0">2.</span>
+                    <p class="text-[11px] leading-snug"><b class="text-white">Membandingkan dan menggeneralisasi</b> pola perubahan sosial Gresik dengan wilayah lain, termasuk memprediksi skenario sejarah alternatif.</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel shrink-0">3.</span>
+                    <p class="text-[11px] leading-snug"><b class="text-white">Menghubungkan pola sejarah kolonial</b> dengan dinamika sosial-ekonomi Gresik masa kini secara reflektif dan bermakna.</p>
+                </div>
+                <div class="mt-2 pt-2 border-t border-zinc-700">
+                    <p class="text-[10px] text-gray-400 leading-relaxed">Soal akan meningkat kedalamannya: dari memahami keterkaitan konsep (Relasional) hingga mentransfer prinsip ke konteks baru (Extended Abstract) — ditandai lencana 🔷 pada pembahasan.</p>
+                </div>
+            </div>
+
+            <button onclick="game.startNewGame()" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm mt-4">
+                Saya Siap, Mulai! 🎮
+            </button>
+        </div>
+
+        <!-- ================= HALAMAN 1C: SUMBER & REFERENSI ================= -->
+        <div id="screen-referensi" class="hidden flex-col items-center justify-between h-full py-3 z-10">
+            <h2 class="font-pixel text-yellow-400 text-sm sm:text-base mb-2 text-center">SUMBER & REFERENSI</h2>
+
+            <div class="bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-[11px] text-gray-200 space-y-2.5 overflow-y-auto max-h-[460px] w-full leading-snug">
+                <p class="text-gray-400 text-[10px] mb-1">Materi dalam permainan ini disusun berdasarkan kajian historiografi berikut:</p>
+                <ul class="space-y-2 list-disc list-inside">
+                    <li>Sutherland, Heather. <i>The Making of a Bureaucratic Elite: The Colonial Transformation of the Javanese Priyayi.</i> 1979.</li>
+                    <li>Kartodirdjo, Sartono. <i>The Peasants' Revolt of Banten in 1888.</i></li>
+                    <li>Snouck Hurgronje, C. Kajian mengenai komunitas Arab dan pesantren di pesisir Jawa pada masa kolonial.</li>
+                    <li>Arsip dan kajian sejarah lokal Pelabuhan Gresik pada masa VOC dan Cultuurstelsel.</li>
+                    <li>Kajian akulturasi Indisch culture di kawasan pesisir Jawa Timur.</li>
+                </ul>
+                <p class="text-gray-400 text-[10px] mt-3 pt-2 border-t border-zinc-700">Media ini dikembangkan mengikuti kerangka Pembelajaran Mendalam (Kemendikdasmen, 2025) dan Taksonomi SOLO (Biggs & Collis) level Relasional–Extended Abstract, untuk kebutuhan pameran edukasi Dinas Pendidikan.</p>
+            </div>
+
+            <button onclick="ui.showScreen('screen-menu')" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm mt-4">
+                Kembali
+            </button>
+        </div>
+
+        <!-- ================= HALAMAN 2: CARA BERMAIN ================= -->
+        <div id="screen-how-to" class="hidden flex-col items-center justify-between h-full py-2 z-10">
+            <h2 class="font-pixel text-yellow-400 text-base sm:text-lg mb-2">CARA BERMAIN</h2>
+            
+            <div class="bg-zinc-800 border border-zinc-700 rounded-xl p-3 sm:p-4 text-xs sm:text-sm text-gray-200 space-y-2.5 overflow-y-auto max-h-[420px] w-full">
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel">1.</span>
+                    <p>Kendalikan ular untuk memakan titik merah di arena grid. Pemain memiliki total **5 Nyawa (❤️)**.</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel">2.</span>
+                    <p>Hindari menabrak **dinding arena** atau **tubuh ular sendiri**.</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel">3.</span>
+                    <p>Sebelum soal muncul, ada **hitung mundur (3, 2, 1)** agar Anda siap membaca soal.</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel">4.</span>
+                    <p>Setelah selesai menjawab & membaca pembahasan, ada **hitung mundur (3, 2, 1)** lagi agar bersiap kembali mengendalikan ular.</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel">5.</span>
+                    <p>Ada 20 soal: sebagian besar menguji keterkaitan konsep (Relasional), dan beberapa bertanda 🔷 menguji kemampuanmu mentransfer pola sejarah ke konteks baru (Extended Abstract).</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-yellow-400 font-pixel">6.</span>
+                    <p>Setelah menjawab seluruh soal, permainan tamat dan kamu akan melihat **Refleksi Belajar** — bagian mana yang sudah kamu kuasai.</p>
+                </div>
+            </div>
+
+            <button onclick="ui.showScreen('screen-menu')" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm mt-4">
+                Kembali
+            </button>
+        </div>
+
+        <!-- ================= HALAMAN 3: PENGATURAN ================= -->
+        <div id="screen-settings" class="hidden flex-col items-center justify-between h-full py-2 z-10">
+            <h2 class="font-pixel text-yellow-400 text-base sm:text-lg mb-2">PENGATURAN</h2>
+
+            <div class="bg-zinc-800 border border-zinc-700 rounded-xl p-4 w-full space-y-4">
+                <div>
+                    <label class="block font-pixel text-xs text-gray-300 mb-2">Kecepatan Ular:</label>
+                    <select id="setting-speed" onchange="game.updateSettings()" class="w-full bg-zinc-900 border border-zinc-600 rounded-lg p-2 text-yellow-400 font-bold focus:outline-none text-xs sm:text-sm">
+                        <option value="360">Sangat Lambat (Selow Aja)</option>
+                        <option value="280">Sangat Santai (Lambat)</option>
+                        <option value="220" selected>Normal (Direkomendasikan)</option>
+                        <option value="160">Sedang</option>
+                        <option value="120">Cepat</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between py-2 border-t border-zinc-700">
+                    <span class="font-pixel text-xs text-gray-300">Efek Suara (SFX):</span>
+                    <button id="btn-toggle-sfx" onclick="audio.toggleSFX()" class="px-3 py-1 bg-green-600 rounded font-pixel text-xs text-white">ON</button>
+                </div>
+
+                <div class="flex items-center justify-between py-2 border-t border-zinc-700">
+                    <span class="font-pixel text-xs text-gray-300">Mode Pameran<br><span class="text-[9px] text-gray-500 normal-case font-sans">Teks soal diperbesar</span></span>
+                    <button id="btn-toggle-pameran" onclick="game.toggleModePameran()" class="px-3 py-1 bg-red-600 rounded font-pixel text-xs text-white">OFF</button>
+                </div>
+            </div>
+
+            <button onclick="ui.showScreen('screen-menu')" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm mt-auto">
+                Kembali
+            </button>
+        </div>
+
+        <!-- ================= HALAMAN 4: SKOR TERTINGGI ================= -->
+        <div id="screen-highscores" class="hidden flex-col items-center justify-between h-full py-2 z-10">
+            <h2 class="font-pixel text-yellow-400 text-base sm:text-lg mb-2">SKOR TERTINGGI</h2>
+
+            <div class="w-full space-y-3 overflow-y-auto max-h-[480px]">
+                <div class="bg-zinc-800 border border-zinc-700 rounded-xl p-4 w-full text-center space-y-3">
+                    <div class="font-pixel text-xs text-gray-400">REKOR TERBAIK PERANGKAT INI</div>
+                    <div id="display-best-score" class="font-pixel text-4xl text-green-400 drop-shadow-[0_2px_0_#000]">
+                        0
+                    </div>
+                    <div class="text-xs text-gray-400">Pahami sejarah dan perubahan sosial Gresik untuk meraih skor sempurna!</div>
+                </div>
+
+                <div class="bg-zinc-800 border border-zinc-700 rounded-xl p-3 w-full">
+                    <div class="font-pixel text-[10px] text-gray-400 mb-2 flex items-center justify-between">
+                        <span>PAPAN SKOR PENGUNJUNG</span>
+                        <button onclick="game.resetLeaderboard()" class="text-[9px] text-red-400 underline">reset</button>
+                    </div>
+                    <div id="leaderboard-list" class="space-y-1.5 text-[11px]">
+                        <!-- Diisi oleh JS -->
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="ui.showScreen('screen-menu')" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm mt-2">
+                Kembali
+            </button>
+        </div>
+
+        <!-- ================= HALAMAN 5: ARENA GAMEPLAY ================= -->
+        <div id="screen-game" class="hidden flex-col items-center justify-between h-full z-10">
+            
+            <!-- Dashboard Informasi Atas (Nyawa Total 5) -->
+            <div class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl px-2.5 py-1.5 flex items-center justify-between font-pixel text-[10px] sm:text-xs">
+                <!-- Kiri: Skor -->
+                <div class="flex flex-col">
+                    <span class="text-gray-400 text-[9px]">SKOR</span>
+                    <span id="game-score" class="text-yellow-400 text-xs sm:text-sm font-bold">0</span>
+                    <span class="text-[8px] text-gray-400">BEST: <span id="game-best">0</span></span>
+                </div>
+
+                <!-- Tengah: Tombol Pause & Progress Soal -->
+                <div class="flex flex-col items-center">
+                    <button onclick="game.togglePause()" class="btn-arcade-sm px-2.5 py-0.5 rounded-lg text-[9px] font-pixel uppercase tracking-wider mb-0.5">
+                        PAUSE
+                    </button>
+                    <span class="text-[9px] text-green-400 font-pixel">SOAL: <span id="quiz-progress">0/15</span></span>
+                </div>
+
+                <!-- Kanan: Level & 5 Nyawa -->
+                <div class="flex flex-col items-end">
+                    <div class="text-gray-400 text-[9px]">LVL <span id="game-level" class="text-white text-xs">1</span></div>
+                    <!-- Indikator 5 Nyawa Hati -->
+                    <div class="flex items-center gap-0.5 mt-0.5 text-[11px] sm:text-xs" id="game-lives">
+                        <span class="text-red-500">❤️</span>
+                        <span class="text-red-500">❤️</span>
+                        <span class="text-red-500">❤️</span>
+                        <span class="text-red-500">❤️</span>
+                        <span class="text-red-500">❤️</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Display Game (Arena Grid Retro CRT Style) -->
+            <div class="relative w-full my-1 flex justify-center items-center">
+                <div class="retro-bezel p-1 rounded-xl relative overflow-hidden">
+                    <canvas id="gameCanvas" width="300" height="300" class="block bg-black rounded-lg"></canvas>
+                    <!-- CRT Scanlines Overlay -->
+                    <div class="scanlines absolute inset-0 rounded-lg"></div>
+
+                    <!-- Overlay Pause Indicator -->
+                    <div id="pause-overlay" class="hidden absolute inset-0 bg-black/80 flex flex-col items-center justify-center font-pixel text-yellow-400 text-base sm:text-lg">
+                        <span>DIPAUSE</span>
+                        <span class="text-[10px] text-gray-400 mt-2">Tekan PAUSE untuk lanjut</span>
+                    </div>
+
+                    <!-- Overlay Hitung Mundur (3, 2, 1, GO!) -->
+                    <div id="countdown-overlay" class="hidden absolute inset-0 bg-black/85 flex flex-col items-center justify-center font-pixel z-40">
+                        <span id="countdown-label" class="text-[10px] sm:text-xs text-yellow-400 mb-2 uppercase tracking-widest text-center px-2">SIAP-SIAP SOAL!</span>
+                        <span id="countdown-number" class="text-5xl sm:text-6xl text-white font-black drop-shadow-[0_4px_0_#ca8a04] animate-pop">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- D-PAD / Kontrol Tombol Arah Besar Retro -->
+            <div class="w-full flex justify-center items-center py-1">
+                <div class="relative w-44 h-44 flex items-center justify-center">
+                    <!-- Cross Background Plate -->
+                    <div class="absolute w-14 h-40 bg-zinc-800/80 rounded-2xl border border-zinc-700"></div>
+                    <div class="absolute w-40 h-14 bg-zinc-800/80 rounded-2xl border border-zinc-700"></div>
+
+                    <!-- Tombol ATAS -->
+                    <button onclick="game.setDirection('UP')" class="dpad-btn absolute top-0 w-12 h-12 flex items-center justify-center text-zinc-900 font-black">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg>
+                    </button>
+                    <!-- Tombol BAWAH -->
+                    <button onclick="game.setDirection('DOWN')" class="dpad-btn absolute bottom-0 w-12 h-12 flex items-center justify-center text-zinc-900 font-black">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <!-- Tombol KIRI -->
+                    <button onclick="game.setDirection('LEFT')" class="dpad-btn absolute left-0 w-12 h-12 flex items-center justify-center text-zinc-900 font-black">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5z"/></svg>
+                    </button>
+                    <!-- Tombol KANAN -->
+                    <button onclick="game.setDirection('RIGHT')" class="dpad-btn absolute right-0 w-12 h-12 flex items-center justify-center text-zinc-900 font-black">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 7l5 5-5 5z"/></svg>
+                    </button>
+
+                    <!-- Ornamen Tengah D-Pad -->
+                    <div class="w-6 h-6 bg-zinc-900 rounded-full border border-zinc-700 z-10 flex items-center justify-center">
+                        <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= POP-UP SOAL EDUKASI ================= -->
+        <div id="modal-quiz" class="hidden absolute inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-3">
+            <div class="bg-zinc-800 border-2 sm:border-4 border-yellow-500 rounded-2xl p-3 w-full text-left shadow-2xl relative max-h-[98vh] flex flex-col justify-between">
+                
+                <!-- Header Soal -->
+                <div class="flex justify-between items-center mb-1.5 shrink-0 gap-1.5">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <div id="quiz-title-no" class="font-pixel text-[11px] sm:text-xs text-yellow-400 tracking-wide uppercase shrink-0">
+                            SOAL NO. 1
+                        </div>
+                        <span id="quiz-solo-badge" class="text-[8px] sm:text-[9px] font-pixel px-1.5 py-0.5 rounded-full shrink-0"></span>
+                    </div>
+                    <button onclick="game.toggleHint()" class="bg-amber-900 border border-amber-600 px-2 py-0.5 rounded text-[10px] font-pixel text-amber-300 hover:bg-amber-800 shrink-0">
+                        💡 HINT
+                    </button>
+                </div>
+
+                <!-- Teks Hint (Petunjuk Analisis) -->
+                <div id="quiz-hint-box" class="hidden text-[11px] bg-amber-950/90 border border-amber-700 text-amber-200 p-2 rounded-lg mb-1.5 italic shrink-0">
+                    <span class="font-bold not-italic text-yellow-400">Petunjuk:</span> <span id="quiz-hint-text"></span>
+                </div>
+
+                <!-- Teks Soal Utuh -->
+                <div id="quiz-question" class="text-[11px] sm:text-xs text-gray-100 font-sans leading-snug p-2 bg-zinc-900 rounded-lg border border-zinc-700 mb-2 shrink-0">
+                    ...
+                </div>
+
+                <!-- Pilihan Jawaban (Grid 2 Kolom pada Layar Lebar) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 my-1" id="quiz-options-container">
+                    <!-- Dihasilkan Secara Dinamis -->
+                </div>
+
+                <!-- Indikator Feedback & Rasional Pembahasan -->
+                <div id="quiz-feedback-container" class="mt-1 pt-1 border-t border-zinc-700 shrink-0">
+                    <div id="quiz-feedback" class="font-pixel text-[11px] font-bold text-center"></div>
+                    <div id="quiz-explanation" class="hidden text-[10px] sm:text-[11px] text-gray-300 bg-zinc-900 p-2 rounded-lg mt-1 border border-zinc-700 leading-tight">
+                        <span class="font-bold text-yellow-400">Pembahasan:</span> <span id="quiz-explanation-text"></span>
+                    </div>
+                </div>
+
+                <!-- Tombol Lanjut Setelah Menjawab -->
+                <button id="btn-quiz-next" onclick="game.finishQuizQuestion()" class="hidden btn-arcade w-full py-2 rounded-xl font-pixel text-[11px] mt-2 shrink-0">
+                    Lanjutkan Permainan ➔
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= HALAMAN 6: GAME OVER / AKHIR PERMAINAN ================= -->
+        <div id="screen-game-over" class="hidden flex-col items-center h-full py-3 z-10 overflow-y-auto">
+            <!-- Status Game Over / Tamat -->
+            <div class="text-center mb-2 shrink-0">
+                <div id="game-over-title-1" class="font-pixel text-xl sm:text-2xl text-red-500 tracking-wider mb-1 drop-shadow-[0_4px_0_#450a0a]">
+                    PERMAINAN
+                </div>
+                <div id="game-over-title-2" class="font-pixel text-xl sm:text-2xl text-red-500 tracking-wider drop-shadow-[0_4px_0_#450a0a]">
+                    BERAKHIR
+                </div>
+                <div id="game-over-player-tag" class="text-[10px] text-gray-400 mt-1"></div>
+            </div>
+
+            <!-- Panel Statistik Hasil Permainan -->
+            <div class="w-full bg-zinc-800 border border-zinc-700 rounded-2xl p-3 space-y-1.5 font-pixel text-[10px] sm:text-xs text-gray-300 shrink-0">
+                <div class="flex justify-between border-b border-zinc-700 pb-1.5">
+                    <span>SKOR AKHIR:</span>
+                    <span id="final-score" class="text-yellow-400 text-sm">0</span>
+                </div>
+                <div class="flex justify-between border-b border-zinc-700 pb-1.5">
+                    <span>SOAL TERJAWAB:</span>
+                    <span id="final-answered" class="text-white text-sm">0/20</span>
+                </div>
+                <div class="flex justify-between border-b border-zinc-700 pb-1.5">
+                    <span>JAWABAN BENAR:</span>
+                    <span id="final-correct" class="text-green-400 text-sm">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>JAWABAN SALAH:</span>
+                    <span id="final-wrong" class="text-red-400 text-sm">0</span>
+                </div>
+            </div>
+
+            <!-- Panel Refleksi Belajar (Berkesadaran + SOLO) -->
+            <div class="w-full bg-zinc-800 border border-amber-700/50 rounded-2xl p-3 mt-2.5 shrink-0">
+                <div class="font-pixel text-[10px] text-amber-400 mb-2 flex items-center gap-1.5">
+                    <span>🧭</span><span>REFLEKSI BELAJARMU</span>
+                </div>
+                <div id="theme-breakdown" class="space-y-2.5">
+                    <!-- Diisi oleh JS: bar per tema -->
+                </div>
+                <div id="reflection-narrative" class="text-[11px] text-gray-200 leading-relaxed mt-3 pt-2.5 border-t border-zinc-700">
+                    <!-- Diisi oleh JS -->
+                </div>
+                <div id="extended-abstract-badge" class="mt-3 pt-2.5 border-t border-zinc-700 text-center">
+                    <!-- Diisi oleh JS: lencana level Extended Abstract -->
+                </div>
+            </div>
+
+            <!-- Tombol Aksi -->
+            <div class="w-full space-y-2.5 px-1 mt-3 mb-1 shrink-0">
+                <button onclick="game.startNewGame()" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                    Main Lagi
+                </button>
+                <button onclick="ui.showScreen('screen-menu')" class="btn-arcade w-full py-3 rounded-2xl font-pixel text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    Kembali ke Menu
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= LOGIKA JAVASCRIPT ================= -->
+    <script>
+        /**
+         * BANK SOAL EDUKASI SEJARAH GRESIK (SOAL NO. 1 - 15)
+         */
+        const QUESTION_BANK = [
+            {
+                id: 1,
+                theme: 'sosial',
+                question: 'Sistem stratifikasi sosial rasial yang diperkenalkan kolonial Belanda membagi masyarakat menjadi Europeanen, Timur Asing, dan Inlanders. Manakah pernyataan berikut yang paling tepat menggambarkan dampak langsung sistem ini terhadap elite keagamaan Arab keturunan Walisongo di Gresik?',
+                options: [
+                    'Mengukuhkan posisi mereka sebagai penguasa birokrasi pemerintahan lokal.',
+                    'Mendorong integrasi hukum mutlak antara hukum adat Jawa dan hukum kolonial.',
+                    'Menggeser kedudukan sosial-keagamaan tradisional mereka menjadi sekelas pedagang biasa dalam kategori Timur Asing.',
+                    'Membebaskan mereka dari segala kewajiban pajak dan kerja paksa di wilayah pedalaman.',
+                    'Menghapuskan peran mereka sebagai pengelola lembaga pendidikan pesantren di Gresik.'
+                ],
+                answer: 'C',
+                hint: 'Cermati bagaimana sistem hukum rasial kolonial mengelompokkan Golongan Arab dan dampaknya terhadap hak istimewa tradisional mereka.',
+                explanation: 'Sistem stratifikasi rasial kolonial menempatkan komunitas Arab ke dalam golongan Timur Asing (Vreemde Oosterlingen), setara dengan pedagang Cina dan India. Hal ini mengabaikan status keistimewaan tradisional-keagamaan mereka di Gresik sebagai keturunan Walisongo dan elite spiritual, sehingga posisi hukum dan akses formal mereka disetarakan dengan pedagang asing non-Eropa.'
+            },
+            {
+                id: 2,
+                theme: 'ekonomi',
+                question: 'Perubahan fungsi Pelabuhan Gresik dari pelabuhan perdagangan bebas internasional menjadi bagian dari monopoli perdagangan VOC merepresentasikan bentuk transformasi ekonomi...',
+                options: [
+                    'Dari ekonomi agraris tradisional menuju industrialisasi manufaktur pesisir.',
+                    'Dari jaringan perdagangan maritim terbuka menjadi sistem ekstraksi dan pemisahan berbasis kontrol tunggal asing.',
+                    'Dari sistem barter antarpulau menuju digitalisasi transaksi moneter kolonial.',
+                    'Dari monopoli perdagangan lokal menuju liberalisasi pasar berbasis ekonomi rakyat.',
+                    'Dari ketergantungan bahan mentah menuju swasembada komoditas ekspor agraris.'
+                ],
+                answer: 'B',
+                hint: 'Fokus pada perubahan akses pedagang lokal dan asing sebelum dan sesudah masuknya VOC di pelabuhan Gresik.',
+                explanation: 'Sebelum kedatangan VOC, Gresik adalah pelabuhan maritim bebas di mana pedagang dari berbagai bangsa berkumpul dengan hak seimbang. Monopoli VOC membatasi gerakan pedagang lokal, menghancurkan kemakmuran pedagang pribumi, dan mengubah tatanan maritim bebas menjadi sistem ekonomi ekstraktif yang menguntungkan satu pihak (Belanda).'
+            },
+            {
+                id: 3,
+                theme: 'ekonomi',
+                question: 'Pelaksanaan Kebijakan Tanam Paksa (Cultuurstelsel) sejak 1830 menempatkan posisi Lurah di wilayah Gresik dalam situasi dilematis (posisi ganda). Faktor utama yang menyebabkan terjadinya kondisi tersebut adalah...',
+                options: [
+                    'Lurah harus membagi hasil panen secara seimbang antara pemerintah Belanda, Kesultanan, dan rakyat.',
+                    'Lurah dituntut oleh Belanda untuk memenuhi kuota hasil tanaman ekspor, sementara dari bawah menghadapi tekanan warga yang terancam kemiskinan.',
+                    'Lurah tidak lagi diakui oleh masyarakat desa karena diangkat langsung oleh Gubernur Jenderal Van den Bosch.',
+                    'Lurah kehilangan hak atas tanah bengkok akibat disita penuh oleh pengusaha swasta Eropa.',
+                    'Lurah dibebankan tugas mengumpulkan pajak perkapita sekaligus memimpin perlawanan bersenjata.'
+                ],
+                answer: 'B',
+                hint: 'Perhatikan laporan pengawas Belanda de Salis mengenai tekanan dari "atas" dan "bawah" yang dialami para lurah.',
+                explanation: 'Laporan pengawas de Salis mencatat bahwa lurah terjepit di antara dua kepentingan: sebagai perpanjangan tangan birokrasi kolonial yang ditekan untuk memenuhi target produksi tanaman ekspor, dan sebagai pemimpin komunitas lokal yang menyaksikan penderitaan rakyatnya akibat beban kerja paksa dan kehilangan lahan.'
+            },
+            {
+                id: 4,
+                theme: 'ekonomi',
+                question: 'Pembangunan jalan raya, gudang pelabuhan, jembatan, serta fasilitas administrasi oleh pemerintah kolonial di Gresik kerap dianggap sebagai bentuk modernisasi. Namun, analisis kritis menunjukkan bahwa pembangunan infrastruktur tersebut sebenarnya bertujuan untuk...',
+                options: [
+                    'Meningkatkan taraf hidup dan mobilitas sosial-ekonomi masyarakat lokal Gresik secara merata.',
+                    'Menyediakan fasilitas sarana angkutan umum gratis bagi para nelayan dan petani setempat.',
+                    'Memperjelas batas wilayah kekuasaan antara pihak pesantren dan birokrasi kolonial.',
+                    'Mempercepat dan memperlancar alur ekstraksi sumber daya komoditas dari daerah pedalaman menuju pelabuhan.',
+                    'Membuka akses pendidikan modern berbasis kurikulum Barat bagi seluruh Inlanders.'
+                ],
+                answer: 'D',
+                hint: 'Pikirkan motif utama di balik pembangunan infrastruktur dalam sistem ekonomi kolonial eksploitatif.',
+                explanation: 'Infrastruktur fisik yang dibangun kolonial bukan berorientasi pada kesejahteraan (welfare) warga lokal, melainkan untuk kepentingan efisiensi logistik (efisiensi ekstraksi). Pembangunan jalan dan gudang bertujuan mempercepat pengangkutan hasil bumi dari daerah pedalaman Jawa Timur ke Pelabuhan Gresik untuk diekspor.'
+            },
+            {
+                id: 5,
+                theme: 'akulturasi',
+                question: 'Proses interaksi dan kontak berkepanjangan antara masyarakat pesisir Gresik dengan unsur kolonial Belanda melahirkan fenomena akulturasi budaya yang dikenal sebagai Indisch culture. Pernyataan yang tepat mengenai karakter akulturasi ini adalah...',
+                options: [
+                    'Penghapusan total nilai-nilai lokal Jawa-Islam dan penggantian sepenuhnya oleh tradisi Barat.',
+                    'Penolakan secara ketat dari warga lokal terhadap seluruh kosakata dan jenis kuliner Eropa.',
+                    'Proses timbal balik di mana budaya Eropa diserap dalam bahasa dan kuliner lokal, sementara warga Belanda mempraktikkan kebiasaan lokal.',
+                    'Pemaksaan penggunaan bahasa Belanda sebagai bahasa wajib dalam interaksi keagamaan di pesantren.',
+                    'Dominasi budaya Cina dan Arab yang menghapuskan pengaruh kebudayaan kolonial Belanda.'
+                ],
+                answer: 'C',
+                hint: 'Cermati konsep "proses dua arah" dalam pembentukan kebudayaan Indische di daerah pesisir.',
+                explanation: 'Indisch culture merupakan hasil akulturasi dua arah (berjalan dua arah). Kosakata Belanda terserap ke dalam bahasa Jawa Gresik (terutama istilah teknis/dagang) dan kuliner lokal mengadopsi teknik/bahan Eropa. Sebaliknya, orang-orang Belanda yang tinggal di Gresik juga mengadopsi gaya hidup dan kebiasaan lokal.'
+            },
+            {
+                id: 6,
+                theme: 'perlawanan',
+                question: 'Dalam analisis Snouck Hurgronje, Golongan Arab di kota-kota pesisir Jawa seperti Gresik dinilai memiliki potensi tinggi menjadi sumber gerakan anti-kolonial. Hal ini terutama didorong oleh...',
+                options: [
+                    'Kepemilikan armada militer laut yang modern dan dukungan persenjataan dari Timur Tengah.',
+                    'Jaringan sosial-keagamaan yang luas, pengaruh di pesantren, serta kemandirian ekonomi dari pemerintah kolonial.',
+                    'Kedudukan resmi mereka sebagai kepala birokrasi pemerintahan sipil di tingkat karesidenan.',
+                    'Monopoli penuh atas seluruh perkebunan gula dan kopi di wilayah Jawa Timur.',
+                    'Aliansi militer terbuka antara Golongan Arab dengan pemerintah Inggris untuk mengusir VOC.'
+                ],
+                answer: 'B',
+                hint: 'Pertimbangkan instrumen pengaruh sosial dan ideologi yang dimiliki oleh Golongan Arab di luar kontrol kolonial.',
+                explanation: 'Snouck Hurgronje mengidentifikasi Golongan Arab sebagai ancaman potensial bagi stabilitas kolonial karena mereka memiliki jaringan sosial-keagamaan melintasi wilayah, menguasai lahan, berpengaruh di lembaga pesantren, serta tidak mudah dikontrol secara administratif oleh birokrasi Belanda.'
+            },
+            {
+                id: 7,
+                theme: 'perlawanan',
+                question: 'Mengapa jaringan pesantren di sekitar Gresik, dengan Sunan Giri sebagai figur referensi spiritual historis, mampu menjadi basis perlawanan kultural dan ideologis yang efektif melawan kekuasaan kolonial?',
+                options: [
+                    'Karena pesantren menerima kucuran dana pembangunan dan fasilitas lengkap dari pemerintah kolonial.',
+                    'Karena pesantren berfungsi sebagai institusi yang independen dari struktur birokrasi kolonial untuk menanamkan narasi keadilan dan martabat.',
+                    'Karena pimpinan pesantren diwajibkan menjadi anggota dewan penasihat hukum Gubernur Jenderal.',
+                    'Karena pesantren memfokuskan kegiatannya pada pelatihan militer modern bergaya Eropa.',
+                    'Karena pesantren berhasil menghapus seluruh tradisi lokal Jawa dan menggantikannya dengan tradisi Timur Tengah.'
+                ],
+                answer: 'B',
+                hint: 'Fokus pada kedudukan institusional pesantren terhadap birokrasi pemerintah kolonial.',
+                explanation: 'Pesantren berdiri di luar struktur birokrasi resmi kolonial (otoritas independen). Karakter ini memungkinkan pesantren menjadi ruang bebas bagi para ulama dan santri untuk membingkai narasi perlawanan, menyebarkan ajaran moral/keagamaan tentang keadilan, dan menggalang solidaritas sosial tanpa intervensi langsung pejabat kolonial.'
+            },
+            {
+                id: 8,
+                theme: 'sosial',
+                question: 'Studi Heather Sutherland (1979) dalam "The Making of a Bureaucratic Elite" menjelaskan fenomena kolaborasi sebagian elite lokal (bupati/lurah) dengan pemerintah kolonial. Dampak utama fenomena ini terhadap struktur sosial internal pribumi di Gresik adalah...',
+                options: [
+                    'Terciptanya kesatuan pendapat secara mutlak di antara seluruh lapisan masyarakat untuk mendukung Belanda.',
+                    'Terbentuknya kelas priyayi birokratis yang kesetiaannya terbelah antara nilai tradisi Jawa dan kepentingan dinas kolonial.',
+                    'Hilangnya stratifikasi sosial dan terciptanya masyarakat yang sama rata tanpa hierarki.',
+                    'Pengangkatan seluruh rakyat biasa menjadi pegawai birokrasi resmi pemerintahan kolonial.',
+                    'Pengalihan seluruh kekuasaan politik kolonial kepada para ulama dan pimpinan pesantren.'
+                ],
+                answer: 'B',
+                hint: 'Perhatikan istilah "birokrasi priyayi" dan dualisme loyalitas yang dialami oleh para pejabat lokal.',
+                explanation: 'Kebijakan kolonial merangkul elite lokal ke dalam sistem birokrasi formal melahirkan kelas "priyayi birokratis". Hal ini memicu polarisasi internal di kalangan pribumi: antara kelompok elit yang terikat kepentingan dinas kolonial demi posisi/keuntungan pragmatis, dengan kelompok masyarakat/pesantren yang memilih jalur resistensi.'
+            },
+            {
+                id: 9,
+                theme: 'sosial',
+                question: 'Sistem stratifikasi sosial tradisional Jawa sebelum masuknya tatanan rasial kolonial Belanda memiliki sifat yang relatif fleksibel karena...',
+                options: [
+                    'Ditentukan mutlak oleh jumlah kekayaan tunai dan pemilikan saham perusahaan.',
+                    'Didasarkan pada kombinasi dinamis antara keturunan, kekuatan fisik/keahlian, dan warisan spiritual.',
+                    'Didasarkan pada kriteria kewarganegaraan paspor internasional.',
+                    'Setiap individu diwajibkan berganti status sosial setiap lima tahun sekali.',
+                    'Hanya ditentukan oleh tingkat pendidikan formal lulusan universitas Eropa.'
+                ],
+                answer: 'B',
+                hint: 'Bandingkan sifat kaku stratifikasi berbasis ras kolonial dengan kriteria kelayakan status dalam tradisi Jawa.',
+                explanation: 'Sebelum dikristalkan oleh kategori hukum rasial Belanda yang kaku, masyarakat Jawa tradisional memiliki stratifikasi yang fleksibel. Mobilitas sosial dimungkinkan melalui pencapaian spiritual, ketauladanan, kesaktian/keahlian, serta pengakuan masyarakat, bukan semata-mata garis ras yang tidak dapat diubah.'
+            },
+            {
+                id: 10,
+                theme: 'perlawanan',
+                question: 'Perlawanan masyarakat Gresik terhadap kolonialisme tidak hanya terjadi dalam bentuk aksi militer fisik, tetapi juga melalui perlawanan tersembunyi (hidden resistance) dan kultural. Contoh nyata bentuk perlawanan kultural tersebut adalah...',
+                options: [
+                    'Membakar seluruh kapal dagang asing yang berlabuh di Pelabuhan Gresik.',
+                    'Mengirimkan surat diplomasi langsung kepada Raja Belanda di Den Haag.',
+                    'Memelihara solidaritas keagamaan, menjaga independensi nilai pesantren, dan melakukan protes kolektif atas pajak/kerja paksa.',
+                    'Mengadopsi seluruh gaya hidup dan pakaian pejabat kolonial untuk menipu pengawas Belanda.',
+                    'Melarang penggunaan bahasa Jawa di lingkungan keluarga pesisir Gresik.'
+                ],
+                answer: 'C',
+                hint: 'Pikirkan tindakan yang memanfaatkan nilai, ajaran keagamaan, dan jaringan sosial untuk menolak ketidakadilan tanpa harus selalu bertempur secara terbuka.',
+                explanation: 'Resistensi kultural dan tersembunyi mencakup perlawanan yang memanfaatkan ruang budaya/agama—seperti memperkuat solidaritas pesantren, menolak narasi legitimasi kolonial melalui pengajaran moral-keagamaan, serta aksi pemogokan pasif atau pemandekan kerja paksa dan pembayaran pajak yang memberatkan.'
+            },
+            {
+                id: 11,
+                theme: 'ekonomi',
+                question: 'Catatan salah satu ekspedisi awal Belanda di Nusantara menunjukkan bahwa para pedagang Jawa di Gresik menunjukkan sikap waspada dan cenderung menolak hadirnya kapal-kapal Eropa. Hal ini mengindikasikan bahwa sejak awal...',
+                options: [
+                    'Masyarakat Gresik telah memprediksi bahwa interaksi tersebut akan berujung pada penguasaan dan pembatasan ruang ekonomi mereka.',
+                    'Pelabuhan Gresik sudah tertutup rapat bagi seluruh pedagang asing dari Asia.',
+                    'Pedagang Jawa tidak memiliki komoditas yang dapat dijual kepada bangsa Eropa.',
+                    'Pemerintah Belanda telah menembakkan meriam ke arah Pelabuhan Gresik sebelum berlabuh.',
+                    'Pedagang Jawa telah terikat perjanjian monopoli tunggal dengan pedagang Inggris.'
+                ],
+                answer: 'A',
+                hint: 'Pikirkan firasat dan dinamika awal ketika kekuatan armada Eropa bersenjata mulai memasuki wilayah pelabuhan bebas.',
+                explanation: 'Sikap skeptis dan resah para pedagang Jawa di Gresik saat melihat kedatangan awal kapal-kapal Eropa merefleksikan kesadaran awal akan potensi ancaman terhadap kebebasan sistem perdagangan maritim yang selama ini mereka nikmati.'
+            },
+            {
+                id: 12,
+                theme: 'sintesis',
+                question: 'Perhatikan fenomena berikut!\n1) Pergeseran stratifikasi berbasis prestasi/spiritual menjadi rasial-hukum kaku.\n2) Transformasi dari perdagangan bebas maritim menjadi ekonomi ekstraktif-monopoli.\n3) Munculnya akulturasi budaya (Indisch culture) di tengah perlawanan politik.\n4) Penguatan independensi lembaga keagamaan sebagai basis perlawanan.\n\nManakah kesimpulan yang paling tepat mengenai pola perubahan sosial di Gresik abad ke-17 s.d. 19?',
+                options: [
+                    'Perubahan sosial di Gresik berjalan tunggal dan hanya dipengaruhi oleh instruksi pemerintah kolonial.',
+                    'Masyarakat Gresik bersikap pasif total dan menerima seluruh struktur baru tanpa ada upaya penyesuaian.',
+                    'Perubahan sosial berlangsung dialektis, mencakup eksploitasi struktural kolonial yang diimbangi dengan adaptasi, akulturasi, dan resistensi masyarakat.',
+                    'Kolonialisme berhasil menghapuskan seluruh identitas Islam dan Jawa di wilayah pesisir Gresik.',
+                    'Sektor ekonomi maritim Gresik makin berkembang pesat dan mengalahkan dominasi Pelabuhan Batavia.'
+                ],
+                answer: 'C',
+                hint: 'Pilihlah opsi yang merangkum keseluruhan interaksi kompleks antara hegemoni kolonial dan respons masyarakat lokal.',
+                explanation: 'Pola perubahan sosial di Gresik tidak bersifat satu arah (linier), melainkan dialektis dan kompleks. Di satu sisi terjadi penekanan/eksploitasi melalui instrumen hukum dan ekonomi kolonial, namun di sisi lain masyarakat merespons melalui adaptasi budaya, kompromi pragmatis elite, serta perlawanan ideologis-kultural.'
+            },
+            {
+                id: 13,
+                theme: 'perlawanan',
+                question: 'Perspektif teori Sartono Kartodirdjo dalam "Peasants\' Revolt of Banten" yang digunakan dalam menganalisis gerakan sosial di Gresik menekankan bahwa...',
+                options: [
+                    'Pemberontakan petani di Jawa semata-mata dipicu oleh motif perebutan kekuasaan politik antar-pangeran.',
+                    'Gerakan sosial keagamaan pada abad ke-19 sering kali mengambil inspirasi dan legitimasi dari nilai serta simbol keagamaan.',
+                    'Petani Jawa tidak memiliki kesadaran untuk melakukan perlawanan tanpa pimpinan pejabat Barat.',
+                    'Semua gerakan sosial di Jawa abad ke-19 berhasil mengusir pemerintah kolonial secara permanen.',
+                    'Agama dipraktikkan hanya sebagai instrumen formal tanpa mempengaruhi kesadaran perlawanan.'
+                ],
+                answer: 'B',
+                hint: 'Ingat kembali bagaimana simbol dan solidaritas keagamaan berfungsi dalam menggerakkan aksi protes pedesaan.',
+                explanation: 'Karya monumental Sartono Kartodirdjo membuktikan bahwa gerakan sosial dan protes petani di Jawa (termasuk Gresik) pada abad ke-19 menggunakan ideologi, simbol, dan jaringan keagamaan (Islam/pesantren) sebagai basis legitimasi moral untuk melawan penindasan kolonial.'
+            },
+            {
+                id: 14,
+                theme: 'ekonomi',
+                question: 'Kebijakan Politik Etis dan Pintu Terbuka (Open Door Policy) yang diterapkan di Jawa Timur pada perkembangannya di Gresik membawa dampak unintended consequence (dampak tak terduga), yaitu...',
+                options: [
+                    'Menghilangkan secara instan angka kemiskinan di pedesaan Gresik.',
+                    'Mempercepat perubahan sosial yang justru memperdalam penetrasi modal asing dan kemiskinan struktural petani.',
+                    'Mengubah Gresik menjadi pusat kerajaan baru pengganti Mataram.',
+                    'Menghentikan seluruh kegiatan ekspor komoditas gula dari wilayah Gresik.',
+                    'Menyadarkan pemerintah Belanda untuk segera memberikan kemerdekaan penuh.'
+                ],
+                answer: 'B',
+                hint: 'Perhatikan bagaimana masuknya modal swasta asing dalam Politik Pintu Terbuka berdampak pada rakyat pedesaan.',
+                explanation: 'Meskipun Politik Etis dan Politik Pintu Terbuka digadang-gadang membawa kemajuan, penetrasi modal swasta asing justru makin mengeksploitasi sumber daya tanah dan tenaga kerja pedesaan, sehingga mempercepat perubahan sosial yang memojokkan petani dalam kemiskinan struktural.'
+            },
+            {
+                id: 15,
+                theme: 'sintesis',
+                question: 'Gresik dikategorikan sebagai lokasi studi perubahan sosial kolonial yang unik dibandingkan Batavia atau Yogyakarta karena...',
+                options: [
+                    'Gresik merupakan satu-satunya daerah yang tidak pernah tersentuh oleh pasukan militer Belanda.',
+                    'Gresik menjadi titik temu titik lebur yang kompleks antara budaya Islam yang kuat, tradisi Jawa-Hindu, dan modernisasi kolonial Europe.',
+                    'Gresik tidak memiliki pelabuhan maritim sehingga fokus pada pertanian padi basah.',
+                    'Seluruh penduduk Gresik pada abad ke-17 terdiri atas warga keturunan Eropa.',
+                    'Gresik merupakan pusat pemerintahan tertinggi Hindia Belanda di Jawa Timur.'
+                ],
+                answer: 'B',
+                hint: 'Cermati perpaduan tiga kekuatan budaya utama yang berinteraksi di Gresik sebagaimana dijelaskan pada pendahuluan materi.',
+                explanation: 'Keunikan Gresik terletak pada posisinya sebagai arena pertemuan tiga kekuatan besar: kebudayaan Islam yang mengakar (pusat kosmopolitan & pesantren), fondasi tradisi Jawa-Hindu, serta tekanan modernisasi birokrasi/ekonomi kolonial Belanda.'
+            },
+            {
+                id: 16,
+                theme: 'transfer',
+                question: 'Sartono Kartodirdjo mencatat bahwa perlawanan petani Banten (1888) meletus sebagai pemberontakan bersenjata terbuka yang dipimpin ulama tarekat. Sementara itu, perlawanan masyarakat Gresik terhadap kolonial justru lebih banyak berwujud negosiasi kultural dan resistensi tersembunyi lewat jaringan pesantren, tanpa pemberontakan bersenjata besar. Faktor struktural apa yang paling mungkin menjelaskan perbedaan pola respons kedua wilayah tersebut?',
+                options: [
+                    'Gresik memiliki elite keagamaan dan jaringan dagang yang tetap mempertahankan otonomi ekonomi-sosial di luar struktur kolonial, sehingga tekanan struktural yang memicu ledakan kekerasan seperti di Banten tidak sebesar di wilayah agraris pedalaman yang bergantung penuh pada tanah dan kerja paksa.',
+                    'Masyarakat Gresik tidak memiliki tokoh keagamaan berpengaruh sehingga tidak mampu melakukan perlawanan terorganisir.',
+                    'Banten berada lebih dekat dengan Batavia sehingga otomatis lebih revolusioner dibanding daerah pesisir lain manapun.',
+                    'Pemerintah kolonial memang sengaja tidak pernah menerapkan kebijakan ekstraktif apa pun di wilayah Gresik.',
+                    'Perlawanan bersenjata di Banten murni disebabkan provokasi asing tanpa ada faktor struktural ekonomi kolonial sama sekali.'
+                ],
+                answer: 'A',
+                hint: 'Bandingkan basis ekonomi-sosial kedua wilayah: Gresik sebagai kota pelabuhan-dagang dengan elite yang relatif otonom, versus Banten sebagai wilayah agraris-pedalaman yang tertekan penuh oleh sistem tanam paksa.',
+                explanation: 'Level Extended Abstract: soal ini meminta transfer prinsip (basis ekonomi menentukan bentuk resistensi) ke kasus BARU (Banten) yang tidak dijelaskan dalam materi Gresik. Otonomi ekonomi elite dagang-keagamaan Gresik meredam tekanan struktural yang di Banten—wilayah agraris yang sepenuhnya bergantung pada tanah dan tenaga—meledak menjadi pemberontakan terbuka.'
+            },
+            {
+                id: 17,
+                theme: 'transfer',
+                question: 'Andaikan VOC GAGAL memperoleh hak monopoli dagang di Pelabuhan Gresik pada abad ke-17 dan pelabuhan tersebut tetap berstatus pelabuhan bebas multietnis seperti sebelumnya, prediksi paling logis mengenai struktur sosial Gresik pada abad ke-19 adalah...',
+                options: [
+                    'Stratifikasi sosial kemungkinan besar tetap bertumpu pada pencapaian spiritual-dagang yang fleksibel, tanpa terbentuknya kategori hukum rasial kaku (Europeanen–Timur Asing–Inlanders) yang lahir dari kebutuhan administrasi kolonial ekstraktif.',
+                    'Gresik pasti akan menjadi kerajaan merdeka yang menguasai seluruh Pulau Jawa.',
+                    'Struktur sosial kolonial rasial akan tetap terbentuk secara identik karena stratifikasi rasial adalah fenomena universal yang tidak terkait sistem ekonomi.',
+                    'Islam akan hilang sepenuhnya sebagai identitas dominan penduduk Gresik.',
+                    'Penduduk Gresik akan otomatis menjadi pusat industri modern setara Eropa pada abad ke-19.'
+                ],
+                answer: 'A',
+                hint: 'Ingat bahwa kategori rasial-hukum kolonial lahir sebagai instrumen kontrol ekonomi-administratif, bukan sekadar ideologi rasial yang berdiri sendiri.',
+                explanation: 'Level Extended Abstract: soal ini menuntut penalaran kontrafaktual (hipotesis atas skenario yang tidak terjadi) dengan menggeneralisasi prinsip bahwa stratifikasi rasial kaku adalah PRODUK dari kebutuhan ekstraksi monopoli VOC, bukan fenomena yang berdiri sendiri—sehingga tanpa monopoli, pola sosial fleksibel pra-kolonial kemungkinan besar bertahan lebih lama.'
+            },
+            {
+                id: 18,
+                theme: 'transfer',
+                question: 'Gresik masa kini dikenal sebagai kawasan industri besar (semen, petrokimia, migas) yang menarik migrasi pekerja dari berbagai daerah, sembari tetap mempertahankan identitas sebagai kota santri dengan jaringan pesantren yang kuat. Pola sejarah kolonial Gresik manakah yang paling relevan untuk memahami dinamika sosial-ekonomi Gresik kontemporer tersebut?',
+                options: [
+                    'Pola Gresik sebagai titik temu berbagai kekuatan—ekonomi ekstraktif/industrial, migrasi pendatang, dan basis keagamaan lokal yang kukuh—yang sudah terbentuk sejak era kolonial, di mana kepentingan ekonomi besar dan otonomi sosial-keagamaan lokal selalu berdampingan secara dinamis.',
+                    'Tidak ada keterkaitan sama sekali karena industri modern adalah fenomena yang sepenuhnya baru pasca-kemerdekaan.',
+                    'Gresik kontemporer identik dengan pola Cultuurstelsel karena pekerja migran dipaksa bekerja tanpa upah.',
+                    'Kekuatan pesantren di Gresik saat ini sudah sepenuhnya hilang akibat modernisasi industri.',
+                    'Industrialisasi Gresik saat ini murni dikendalikan oleh keturunan elite Arab kolonial.'
+                ],
+                answer: 'A',
+                hint: 'Pikirkan pola struktural (bukan detail teknis) yang berulang: pertemuan kepentingan ekonomi besar dengan basis sosial-keagamaan lokal yang tetap otonom.',
+                explanation: 'Level Extended Abstract & Bermakna: soal ini menghubungkan struktur sejarah kolonial dengan realitas Gresik hari ini—konteks yang sama sekali baru dan tidak dijelaskan di materi permainan. Pola "titik temu kekuatan ekonomi besar dan otonomi sosial-keagamaan lokal" yang terbentuk sejak era VOC ternyata masih relevan menjelaskan Gresik sebagai kota industri sekaligus kota santri hari ini.'
+            },
+            {
+                id: 19,
+                theme: 'transfer',
+                question: 'Konsep "perlawanan tersembunyi" (hidden resistance)—perlawanan lewat jalur budaya dan keagamaan, bukan konfrontasi terbuka—yang terlihat pada masyarakat Gresik era kolonial pada dasarnya adalah pola umum yang juga banyak ditemukan pada masyarakat terjajah di berbagai belahan dunia lain. Ilustrasi manakah yang paling tepat menggambarkan penerapan pola serupa di LUAR konteks Gresik?',
+                options: [
+                    'Petani di suatu wilayah kolonial memperlambat kerja secara sengaja (foot-dragging) dan menyelundupkan sebagian hasil panen, tanpa melakukan pemberontakan bersenjata terbuka terhadap pemerintah kolonial.',
+                    'Sekelompok pasukan bersenjata menyerbu markas kolonial secara terang-terangan dengan senjata modern.',
+                    'Pemerintah kolonial secara sukarela memberikan kemerdekaan penuh tanpa tekanan apa pun.',
+                    'Masyarakat lokal sepenuhnya meniru gaya hidup kolonial tanpa mempertahankan identitas apa pun.',
+                    'Elite lokal menyerahkan seluruh kekuasaan administratif kepada penjajah tanpa syarat.'
+                ],
+                answer: 'A',
+                hint: 'Cari ilustrasi yang menunjukkan penolakan diam-diam/tidak langsung, bukan konfrontasi fisik terbuka maupun penyerahan total.',
+                explanation: 'Level Extended Abstract: soal ini menguji apakah siswa mampu MENGGENERALISASI konsep "perlawanan tersembunyi" dari kasus Gresik menjadi prinsip umum yang bisa dikenali dalam konteks kolonial mana pun—bukan sekadar mengingat contohnya di Gresik. Foot-dragging dan penyelundupan adalah bentuk klasik resistensi non-konfrontatif ("weapons of the weak") yang sepola dengan strategi masyarakat Gresik.'
+            },
+            {
+                id: 20,
+                theme: 'transfer',
+                question: 'Setelah mempelajari seluruh dinamika sejarah Gresik kolonial (stratifikasi sosial, transformasi ekonomi, akulturasi budaya, dan pola perlawanan), kesimpulan metodologis apa yang paling tepat diterapkan ketika mengkaji SETIAP daerah kolonial lain di Nusantara, bukan hanya Gresik?',
+                options: [
+                    'Setiap daerah kolonial perlu dikaji secara kontekstual dengan mempertimbangkan struktur ekonomi lokal, kekuatan institusi keagamaan/adat, serta pola relasi elite-rakyat setempat, karena pola respons terhadap kolonialisme tidak seragam di semua wilayah.',
+                    'Semua daerah kolonial di Nusantara pasti mengalami pola perubahan sosial yang identik karena kebijakan Belanda bersifat seragam total.',
+                    'Kajian sejarah kolonial cukup difokuskan pada angka produksi ekspor tanpa perlu mempertimbangkan aspek sosial-budaya.',
+                    'Pola perlawanan bersenjata terbuka adalah satu-satunya bentuk resistensi yang layak dikaji dalam sejarah kolonial.',
+                    'Setiap wilayah kolonial otomatis mengikuti pola Gresik karena Gresik adalah representasi tunggal seluruh Nusantara.'
+                ],
+                answer: 'A',
+                hint: 'Pikirkan mengapa kasus Gresik menunjukkan bahwa konteks lokal (ekonomi, agama, elite) sangat menentukan pola perubahan—dan apakah kesimpulan itu bisa digeneralisasi secara metodologis ke wilayah lain.',
+                explanation: 'Level Extended Abstract tertinggi: soal ini meminta abstraksi PRINSIP METODOLOGIS dari satu studi kasus (Gresik) menjadi kerangka berpikir umum untuk mengkaji sejarah kolonial di mana pun—sebuah bentuk transfer generalisasi, bukan sekadar recall fakta tentang Gresik itu sendiri.'
+            }
+        ];
+
+        /**
+         * Web Audio Synthesizer sederhana untuk Efek Suara Retro
+         */
+        class SoundEffects {
+            constructor() {
+                this.enabled = true;
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playEat() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.1);
+            }
+
+            playCorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.1); // E5
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.25);
+            }
+
+            playWrong() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(140, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+
+            playBeep() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+
+            playGameOver() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.5);
+            }
+
+            toggleSFX() {
+                this.enabled = !this.enabled;
+                const btn = document.getElementById('btn-toggle-sfx');
+                btn.innerText = this.enabled ? 'ON' : 'OFF';
+                btn.className = this.enabled ? 'px-3 py-1 bg-green-600 rounded font-pixel text-xs text-white' : 'px-3 py-1 bg-red-600 rounded font-pixel text-xs text-white';
+            }
+        }
+
+        const audio = new SoundEffects();
+
+        /**
+         * Pengelola Halaman / Tampilan UI
+         */
+        class UIManager {
+            constructor() {
+                this.screens = [
+                    'screen-splash',
+                    'screen-menu',
+                    'screen-tujuan',
+                    'screen-referensi',
+                    'screen-how-to',
+                    'screen-settings',
+                    'screen-highscores',
+                    'screen-game',
+                    'screen-game-over'
+                ];
+            }
+
+            showScreen(screenId) {
+                this.screens.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (id === screenId) {
+                        el.classList.remove('hidden');
+                        el.classList.add('flex');
+                    } else {
+                        el.classList.add('hidden');
+                        el.classList.remove('flex');
+                    }
+                });
+
+                if (screenId === 'screen-highscores') {
+                    document.getElementById('display-best-score').innerText = game.bestScore;
+                    game.renderLeaderboard();
+                }
+
+                if (screenId === 'screen-menu') {
+                    const tag = document.getElementById('menu-player-tag');
+                    if (tag && game.playerName) {
+                        tag.innerText = `👤 ${game.playerName} — ${game.playerClass}`;
+                    }
+                }
+            }
+        }
+
+        const ui = new UIManager();
+
+        /**
+         * LOGIKA UTAMA PERMAINAN (Snake Edu Engine)
+         */
+        class SnakeEduGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                
+                // Dimensi Grid Arena
+                this.gridSize = 15; // 15x15 Grid
+                this.tileSize = this.canvas.width / this.gridSize;
+
+                // State Permainan (Total Nyawa = 5)
+                this.score = 0;
+                this.bestScore = parseInt(localStorage.getItem('snake_edu_best') || '0');
+                this.level = 1;
+                this.lives = 5;
+                this.correctAnswers = 0;
+                this.wrongAnswers = 0;
+                this.isPaused = false;
+                this.isQuizActive = false;
+                this.isCountdownActive = false;
+                this.gameInterval = null;
+
+                // Tracker Soal
+                this.askedQuestionIds = [];
+                this.currentQuestion = null;
+
+                // Identitas Pemain (untuk pameran/kelas)
+                this.playerName = '';
+                this.playerClass = '';
+
+                // Tracker capaian per Tema/Level SOLO (Berkesadaran & Refleksi)
+                this.themeStats = {};
+                this.THEME_LABELS = {
+                    sosial: 'Stratifikasi Sosial',
+                    ekonomi: 'Transformasi Ekonomi',
+                    akulturasi: 'Akulturasi Budaya',
+                    perlawanan: 'Pola Perlawanan',
+                    sintesis: 'Sintesis Relasional',
+                    transfer: 'Extended Abstract (Transfer)'
+                };
+
+                // Mode Pameran (teks besar) - simpan preferensi di perangkat
+                this.modePameran = localStorage.getItem('snake_edu_mode_pameran') === '1';
+
+                // Counter makanan acak (3-5 kali makan)
+                this.foodEatenCount = 0;
+                this.nextQuizTarget = this.getRandomQuizThreshold();
+
+                // Pengaturan Kecepatan (220ms per langkah)
+                this.speed = 220; 
+
+                // Entitas Ular & Makanan
+                this.snake = [];
+                this.direction = 'RIGHT';
+                this.nextDirection = 'RIGHT';
+                this.food = { x: 0, y: 0 };
+
+                this.initEventListeners();
+                this.applyModePameran();
+            }
+
+            /**
+             * ===== IDENTITAS PEMAIN (SPLASH SCREEN) =====
+             */
+            submitPlayerIdentity() {
+                const nameInput = document.getElementById('input-player-name');
+                const classInput = document.getElementById('input-player-class');
+                const errorEl = document.getElementById('splash-error');
+
+                const name = nameInput.value.trim();
+                const kelas = classInput.value.trim();
+
+                if (!name || !kelas) {
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                errorEl.classList.add('hidden');
+                this.playerName = name;
+                this.playerClass = kelas;
+                audio.playBeep();
+                ui.showScreen('screen-menu');
+            }
+
+            goToLearningGoals() {
+                ui.showScreen('screen-tujuan');
+            }
+
+            /**
+             * ===== MODE PAMERAN (Teks Besar untuk Booth Publik) =====
+             */
+            toggleModePameran() {
+                this.modePameran = !this.modePameran;
+                localStorage.setItem('snake_edu_mode_pameran', this.modePameran ? '1' : '0');
+                this.applyModePameran();
+            }
+
+            applyModePameran() {
+                const container = document.getElementById('app-container');
+                const btn = document.getElementById('btn-toggle-pameran');
+                if (this.modePameran) {
+                    container.classList.add('mode-pameran');
+                    if (btn) { btn.innerText = 'ON'; btn.className = 'px-3 py-1 bg-green-600 rounded font-pixel text-xs text-white'; }
+                } else {
+                    container.classList.remove('mode-pameran');
+                    if (btn) { btn.innerText = 'OFF'; btn.className = 'px-3 py-1 bg-red-600 rounded font-pixel text-xs text-white'; }
+                }
+            }
+
+            /**
+             * ===== PAPAN SKOR PENGUNJUNG (localStorage, multi-pengunjung) =====
+             */
+            saveToLeaderboard() {
+                let board = [];
+                try {
+                    board = JSON.parse(localStorage.getItem('snake_edu_leaderboard') || '[]');
+                } catch (e) { board = []; }
+
+                board.push({
+                    name: this.playerName || 'Anonim',
+                    kelas: this.playerClass || '-',
+                    score: this.score,
+                    correct: this.correctAnswers,
+                    total: this.askedQuestionIds.length,
+                    date: new Date().toISOString()
+                });
+
+                board.sort((a, b) => b.score - a.score);
+                board = board.slice(0, 20);
+
+                localStorage.setItem('snake_edu_leaderboard', JSON.stringify(board));
+            }
+
+            renderLeaderboard() {
+                let board = [];
+                try {
+                    board = JSON.parse(localStorage.getItem('snake_edu_leaderboard') || '[]');
+                } catch (e) { board = []; }
+
+                const listEl = document.getElementById('leaderboard-list');
+                if (!listEl) return;
+
+                if (board.length === 0) {
+                    listEl.innerHTML = `<div class="text-gray-500 text-center py-2 text-[10px]">Belum ada pengunjung yang bermain. Jadilah yang pertama!</div>`;
+                    return;
+                }
+
+                listEl.innerHTML = board.slice(0, 10).map((entry, idx) => {
+                    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}.`;
+                    return `
+                        <div class="flex items-center justify-between bg-zinc-900/60 rounded-lg px-2 py-1.5">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span class="shrink-0 w-5 text-center">${medal}</span>
+                                <div class="min-w-0">
+                                    <div class="text-gray-100 font-bold truncate">${this.escapeHtml(entry.name)}</div>
+                                    <div class="text-gray-500 text-[9px] truncate">${this.escapeHtml(entry.kelas)}</div>
+                                </div>
+                            </div>
+                            <span class="text-yellow-400 font-pixel shrink-0">${entry.score}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            resetLeaderboard() {
+                if (confirm('Reset papan skor pengunjung? Tindakan ini tidak bisa dibatalkan.')) {
+                    localStorage.removeItem('snake_edu_leaderboard');
+                    this.renderLeaderboard();
+                }
+            }
+
+            escapeHtml(str) {
+                const div = document.createElement('div');
+                div.innerText = str;
+                return div.innerHTML;
+            }
+
+            getRandomQuizThreshold() {
+                return Math.floor(Math.random() * 3) + 3;
+            }
+
+            initEventListeners() {
+                // Kontrol Keyboard
+                window.addEventListener('keydown', (e) => {
+                    if (this.isQuizActive || this.isCountdownActive) return;
+                    switch (e.key) {
+                        case 'ArrowUp': case 'w': case 'W':
+                            this.setDirection('UP'); break;
+                        case 'ArrowDown': case 's': case 'S':
+                            this.setDirection('DOWN'); break;
+                        case 'ArrowLeft': case 'a': case 'A':
+                            this.setDirection('LEFT'); break;
+                        case 'ArrowRight': case 'd': case 'D':
+                            this.setDirection('RIGHT'); break;
+                        case 'p': case 'P': case ' ':
+                            this.togglePause(); break;
+                    }
+                });
+
+                // Kontrol Touch Swipe pada Canvas
+                let touchStartX = 0;
+                let touchStartY = 0;
+                this.canvas.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                }, false);
+
+                this.canvas.addEventListener('touchend', (e) => {
+                    if (this.isQuizActive || this.isCountdownActive) return;
+                    let diffX = e.changedTouches[0].clientX - touchStartX;
+                    let diffY = e.changedTouches[0].clientY - touchStartY;
+
+                    if (Math.abs(diffX) > Math.abs(diffY)) {
+                        if (diffX > 30) this.setDirection('RIGHT');
+                        else if (diffX < -30) this.setDirection('LEFT');
+                    } else {
+                        if (diffY > 30) this.setDirection('DOWN');
+                        else if (diffY < -30) this.setDirection('UP');
+                    }
+                }, false);
+            }
+
+            updateSettings() {
+                this.speed = parseInt(document.getElementById('setting-speed').value);
+            }
+
+            startNewGame() {
+                this.score = 0;
+                this.level = 1;
+                this.lives = 5; // Reset ke 5 Nyawa
+                this.correctAnswers = 0;
+                this.wrongAnswers = 0;
+                this.isPaused = false;
+                this.isQuizActive = false;
+                this.isCountdownActive = false;
+                this.direction = 'RIGHT';
+                this.nextDirection = 'RIGHT';
+
+                this.askedQuestionIds = [];
+                this.foodEatenCount = 0;
+                this.nextQuizTarget = this.getRandomQuizThreshold();
+                this.themeStats = {};
+
+                // Posisi Awal Ular di Tengah Arena
+                this.snake = [
+                    { x: 5, y: 7 },
+                    { x: 4, y: 7 },
+                    { x: 3, y: 7 }
+                ];
+
+                this.spawnFood();
+                this.updateHUD();
+                ui.showScreen('screen-game');
+
+                if (this.gameInterval) clearInterval(this.gameInterval);
+                this.runLoop();
+            }
+
+            runLoop() {
+                const currentSpeed = Math.max(90, this.speed - (this.level - 1) * 15);
+                this.gameInterval = setInterval(() => {
+                    if (!this.isPaused && !this.isQuizActive && !this.isCountdownActive) {
+                        this.update();
+                        this.draw();
+                    }
+                }, currentSpeed);
+            }
+
+            setDirection(dir) {
+                if (this.isPaused || this.isQuizActive || this.isCountdownActive) return;
+                if (dir === 'UP' && this.direction !== 'DOWN') this.nextDirection = 'UP';
+                if (dir === 'DOWN' && this.direction !== 'UP') this.nextDirection = 'DOWN';
+                if (dir === 'LEFT' && this.direction !== 'RIGHT') this.nextDirection = 'LEFT';
+                if (dir === 'RIGHT' && this.direction !== 'LEFT') this.nextDirection = 'RIGHT';
+            }
+
+            togglePause() {
+                if (this.isQuizActive || this.isCountdownActive) return;
+                this.isPaused = !this.isPaused;
+                const overlay = document.getElementById('pause-overlay');
+                if (this.isPaused) {
+                    overlay.classList.remove('hidden');
+                } else {
+                    overlay.classList.add('hidden');
+                }
+            }
+
+            /**
+             * Menempatkan makanan di posisi AMAN (jauh dari tepi dinding)
+             */
+            spawnFood() {
+                let valid = false;
+                const minMargin = 1;
+                const maxMargin = this.gridSize - 2;
+
+                while (!valid) {
+                    this.food.x = Math.floor(Math.random() * (maxMargin - minMargin + 1)) + minMargin;
+                    this.food.y = Math.floor(Math.random() * (maxMargin - minMargin + 1)) + minMargin;
+
+                    valid = !this.snake.some(segment => segment.x === this.food.x && segment.y === this.food.y);
+                }
+            }
+
+            update() {
+                this.direction = this.nextDirection;
+
+                const head = { ...this.snake[0] };
+                if (this.direction === 'UP') head.y -= 1;
+                if (this.direction === 'DOWN') head.y += 1;
+                if (this.direction === 'LEFT') head.x -= 1;
+                if (this.direction === 'RIGHT') head.x += 1;
+
+                // 1. Cek Tabrakan Dinding
+                if (head.x < 0 || head.x >= this.gridSize || head.y < 0 || head.y >= this.gridSize) {
+                    this.handleCollision();
+                    return;
+                }
+
+                // 2. Cek Tabrakan Tubuh Ular
+                if (this.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                    this.handleCollision();
+                    return;
+                }
+
+                this.snake.unshift(head);
+
+                // 3. Cek Jika Memakan Makanan
+                if (head.x === this.food.x && head.y === this.food.y) {
+                    audio.playEat();
+                    this.score += 10;
+                    this.foodEatenCount++;
+                    
+                    this.level = Math.floor(this.score / 50) + 1;
+
+                    if (this.score > this.bestScore) {
+                        this.bestScore = this.score;
+                        localStorage.setItem('snake_edu_best', this.bestScore);
+                    }
+
+                    this.updateHUD();
+
+                    // Cek pemicu soal acak
+                    if (this.foodEatenCount >= this.nextQuizTarget) {
+                        this.foodEatenCount = 0;
+                        this.nextQuizTarget = this.getRandomQuizThreshold();
+                        
+                        // MULAI HITUNG MUNDUR SEBELUM SOAL MUNCUL!
+                        this.startPreQuizCountdown();
+                    } else {
+                        this.spawnFood();
+                    }
+                } else {
+                    this.snake.pop();
+                }
+            }
+
+            handleCollision() {
+                audio.playGameOver();
+                this.lives--;
+                this.updateHUD();
+
+                if (this.lives > 0) {
+                    this.snake = [
+                        { x: 5, y: 7 },
+                        { x: 4, y: 7 },
+                        { x: 3, y: 7 }
+                    ];
+                    this.direction = 'RIGHT';
+                    this.nextDirection = 'RIGHT';
+                    
+                    this.startPostQuizCountdown();
+                } else {
+                    this.endGame(false);
+                }
+            }
+
+            endGame(isCompleted = false) {
+                clearInterval(this.gameInterval);
+                
+                const title1 = document.getElementById('game-over-title-1');
+                const title2 = document.getElementById('game-over-title-2');
+                
+                if (isCompleted) {
+                    title1.innerText = "SELAMAT!";
+                    title1.className = "font-pixel text-xl sm:text-2xl text-yellow-400 tracking-wider mb-1 drop-shadow-[0_4px_0_#854d0e]";
+                    title2.innerText = "SOAL TAMAT";
+                    title2.className = "font-pixel text-xl sm:text-2xl text-green-500 tracking-wider drop-shadow-[0_4px_0_#14532d]";
+                } else {
+                    title1.innerText = "PERMAINAN";
+                    title1.className = "font-pixel text-xl sm:text-2xl text-red-500 tracking-wider mb-1 drop-shadow-[0_4px_0_#450a0a]";
+                    title2.innerText = "BERAKHIR";
+                    title2.className = "font-pixel text-xl sm:text-2xl text-red-500 tracking-wider drop-shadow-[0_4px_0_#450a0a]";
+                }
+
+                document.getElementById('final-score').innerText = this.score;
+                document.getElementById('final-answered').innerText = `${this.askedQuestionIds.length}/${QUESTION_BANK.length}`;
+                document.getElementById('final-correct').innerText = this.correctAnswers;
+                document.getElementById('final-wrong').innerText = this.wrongAnswers;
+
+                const tagEl = document.getElementById('game-over-player-tag');
+                if (tagEl) tagEl.innerText = this.playerName ? `👤 ${this.playerName} — ${this.playerClass}` : '';
+
+                this.renderReflection();
+                this.saveToLeaderboard();
+
+                ui.showScreen('screen-game-over');
+            }
+
+            /**
+             * ===== LAYAR REFLEKSI (Prinsip Berkesadaran + Peta SOLO) =====
+             */
+            renderReflection() {
+                const breakdownEl = document.getElementById('theme-breakdown');
+                const narrativeEl = document.getElementById('reflection-narrative');
+                const badgeEl = document.getElementById('extended-abstract-badge');
+
+                const themeOrder = ['sosial', 'ekonomi', 'akulturasi', 'perlawanan', 'sintesis', 'transfer'];
+                const colors = {
+                    sosial: '#38bdf8', ekonomi: '#facc15', akulturasi: '#fb923c',
+                    perlawanan: '#f87171', sintesis: '#34d399', transfer: '#c084fc'
+                };
+
+                let barsHtml = '';
+                let strongest = null, weakest = null;
+
+                themeOrder.forEach(theme => {
+                    const stat = this.themeStats[theme];
+                    if (!stat || stat.total === 0) return;
+                    const pct = Math.round((stat.correct / stat.total) * 100);
+                    const label = this.THEME_LABELS[theme];
+
+                    if (strongest === null || pct > strongest.pct) strongest = { theme, label, pct };
+                    if (weakest === null || pct < weakest.pct) weakest = { theme, label, pct };
+
+                    barsHtml += `
+                        <div>
+                            <div class="flex justify-between text-[10px] text-gray-300 mb-1">
+                                <span>${label}</span>
+                                <span class="font-bold" style="color:${colors[theme]}">${stat.correct}/${stat.total}</span>
+                            </div>
+                            <div class="theme-bar-track">
+                                <div class="theme-bar-fill" style="width:${pct}%; background:${colors[theme]}"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                breakdownEl.innerHTML = barsHtml || `<div class="text-[10px] text-gray-500 text-center">Belum ada soal yang terjawab.</div>`;
+
+                // Narasi reflektif (bermakna) — dorong siswa menyadari capaiannya, bukan sekadar angka
+                let narrative = '';
+                if (strongest && weakest) {
+                    if (strongest.theme === weakest.theme) {
+                        narrative = `Kamu menjawab tema <b class="text-white">${strongest.label}</b> dengan baik (${strongest.pct}%). Coba jawab lebih banyak soal untuk melihat peta kekuatanmu di tema lain.`;
+                    } else {
+                        narrative = `Pemahamanmu paling kuat pada tema <b class="text-green-400">${strongest.label}</b> (${strongest.pct}% benar). Sementara itu, tema <b class="text-amber-400">${weakest.label}</b> (${weakest.pct}% benar) masih perlu diperdalam — coba diskusikan dengan guru atau baca ulang sumber referensinya.`;
+                    }
+                } else {
+                    narrative = 'Mainkan lebih banyak soal untuk melihat peta pemahamanmu di setiap tema.';
+                }
+                narrativeEl.innerHTML = narrative;
+
+                // Lencana capaian Extended Abstract
+                const eaStat = this.themeStats['transfer'];
+                if (eaStat && eaStat.total > 0) {
+                    const eaPct = Math.round((eaStat.correct / eaStat.total) * 100);
+                    let msg, cls;
+                    if (eaPct >= 70) {
+                        msg = `🏆 Level Extended Abstract tercapai! (${eaStat.correct}/${eaStat.total} benar) — kamu mampu mentransfer pola sejarah Gresik ke konteks baru.`;
+                        cls = 'text-[10px] text-purple-300 font-bold';
+                    } else {
+                        msg = `🔷 Baru ${eaStat.correct}/${eaStat.total} soal Extended Abstract terjawab benar. Level ini menguji kemampuan mentransfer pola sejarah ke konteks baru — coba lagi untuk menguasainya!`;
+                        cls = 'text-[10px] text-purple-300/80';
+                    }
+                    badgeEl.innerHTML = `<div class="${cls}">${msg}</div>`;
+                } else {
+                    badgeEl.innerHTML = `<div class="text-[10px] text-gray-500">Belum mencapai soal level Extended Abstract (soal 🔷 di akhir permainan).</div>`;
+                }
+            }
+
+            draw() {
+                this.ctx.fillStyle = '#09090b';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.ctx.strokeStyle = '#18181b';
+                this.ctx.lineWidth = 1;
+                for (let i = 0; i < this.canvas.width; i += this.tileSize) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(i, 0);
+                    this.ctx.lineTo(i, this.canvas.height);
+                    this.ctx.stroke();
+
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, i);
+                    this.ctx.lineTo(this.canvas.width, i);
+                    this.ctx.stroke();
+                }
+
+                // Gambar Makanan
+                this.ctx.fillStyle = '#ef4444';
+                this.ctx.shadowColor = '#ef4444';
+                this.ctx.shadowBlur = 8;
+                this.ctx.beginPath();
+                const foodRadius = (this.tileSize / 2) - 2;
+                this.ctx.arc(
+                    this.food.x * this.tileSize + this.tileSize / 2,
+                    this.food.y * this.tileSize + this.tileSize / 2,
+                    foodRadius, 0, Math.PI * 2
+                );
+                this.ctx.fill();
+                this.ctx.shadowBlur = 0;
+
+                // Gambar Ular
+                this.snake.forEach((segment, index) => {
+                    if (index === 0) {
+                        this.ctx.fillStyle = '#4ade80';
+                        this.ctx.shadowColor = '#22c55e';
+                        this.ctx.shadowBlur = 6;
+                    } else {
+                        this.ctx.fillStyle = '#16a34a';
+                        this.ctx.shadowBlur = 0;
+                    }
+
+                    this.ctx.fillRect(
+                        segment.x * this.tileSize + 1,
+                        segment.y * this.tileSize + 1,
+                        this.tileSize - 2,
+                        this.tileSize - 2
+                    );
+
+                    if (index === 0) {
+                        this.ctx.fillStyle = '#000000';
+                        if (this.direction === 'RIGHT' || this.direction === 'LEFT') {
+                            this.ctx.fillRect(segment.x * this.tileSize + 8, segment.y * this.tileSize + 4, 3, 3);
+                            this.ctx.fillRect(segment.x * this.tileSize + 8, segment.y * this.tileSize + 13, 3, 3);
+                        } else {
+                            this.ctx.fillRect(segment.x * this.tileSize + 4, segment.y * this.tileSize + 8, 3, 3);
+                            this.ctx.fillRect(segment.x * this.tileSize + 13, segment.y * this.tileSize + 8, 3, 3);
+                        }
+                    }
+                });
+            }
+
+            updateHUD() {
+                document.getElementById('game-score').innerText = this.score;
+                document.getElementById('game-best').innerText = this.bestScore;
+                document.getElementById('game-level').innerText = this.level;
+                document.getElementById('quiz-progress').innerText = `${this.askedQuestionIds.length}/${QUESTION_BANK.length}`;
+
+                // Render Indikator Total 5 Nyawa Hati ❤️
+                const livesContainer = document.getElementById('game-lives');
+                livesContainer.innerHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    if (i < this.lives) {
+                        livesContainer.innerHTML += `<span class="text-red-500">❤️</span>`;
+                    } else {
+                        livesContainer.innerHTML += `<span class="text-gray-600 opacity-40">🖤</span>`;
+                    }
+                }
+            }
+
+            /**
+             * 1. HITUNG MUNDUR SEBELUM SOAL MUNCUL (3, 2, 1)
+             */
+            startPreQuizCountdown() {
+                this.isCountdownActive = true;
+                const overlay = document.getElementById('countdown-overlay');
+                const numEl = document.getElementById('countdown-number');
+                const labelEl = document.getElementById('countdown-label');
+                
+                labelEl.innerText = "SIAP-SIAP SOAL!";
+                overlay.classList.remove('hidden');
+
+                let count = 3;
+                numEl.innerText = count;
+                audio.playBeep();
+                this.draw();
+
+                const interval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        numEl.innerText = count;
+                        audio.playBeep();
+                        numEl.classList.remove('animate-pop');
+                        void numEl.offsetWidth;
+                        numEl.classList.add('animate-pop');
+                    } else {
+                        clearInterval(interval);
+                        overlay.classList.add('hidden');
+                        this.isCountdownActive = false;
+                        this.triggerQuiz();
+                    }
+                }, 750);
+            }
+
+            /**
+             * LOGIKA SOAL EDUKASI
+             */
+            triggerQuiz() {
+                const availableQuestions = QUESTION_BANK.filter(q => !this.askedQuestionIds.includes(q.id));
+
+                if (availableQuestions.length === 0) {
+                    this.endGame(true);
+                    return;
+                }
+
+                this.isQuizActive = true;
+
+                this.currentQuestion = availableQuestions[0];
+                this.askedQuestionIds.push(this.currentQuestion.id);
+
+                this.updateHUD();
+
+                // Render UI Modal Soal
+                document.getElementById('quiz-title-no').innerText = `SOAL NO. ${this.currentQuestion.id}`;
+
+                const badgeEl = document.getElementById('quiz-solo-badge');
+                if (this.currentQuestion.theme === 'transfer') {
+                    badgeEl.innerText = '🔷 EXTENDED ABSTRACT';
+                    badgeEl.className = 'text-[8px] sm:text-[9px] font-pixel px-1.5 py-0.5 rounded-full shrink-0 bg-purple-900 text-purple-200 border border-purple-500';
+                } else {
+                    badgeEl.innerText = 'RELASIONAL';
+                    badgeEl.className = 'text-[8px] sm:text-[9px] font-pixel px-1.5 py-0.5 rounded-full shrink-0 bg-blue-950 text-blue-300 border border-blue-700';
+                }
+
+                document.getElementById('quiz-question').innerText = this.currentQuestion.question;
+                document.getElementById('quiz-hint-text').innerText = this.currentQuestion.hint;
+                document.getElementById('quiz-hint-box').classList.add('hidden');
+                
+                document.getElementById('quiz-feedback').innerText = '';
+                document.getElementById('quiz-explanation').classList.add('hidden');
+                document.getElementById('btn-quiz-next').classList.add('hidden');
+
+                const optionsContainer = document.getElementById('quiz-options-container');
+                optionsContainer.innerHTML = '';
+
+                const labels = ['A', 'B', 'C', 'D', 'E'];
+                this.currentQuestion.options.forEach((optText, idx) => {
+                    const letter = labels[idx];
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full bg-zinc-900 border border-zinc-700 p-2 sm:p-2.5 rounded-xl text-left flex items-start gap-2 hover:border-yellow-400 transition-all group';
+                    btn.innerHTML = `
+                        <span class="bg-amber-800 text-yellow-300 font-pixel text-[10px] sm:text-xs w-5 h-5 sm:w-6 sm:h-6 shrink-0 flex items-center justify-center rounded-md group-hover:bg-yellow-400 group-hover:text-black">${letter}</span>
+                        <span class="text-[11px] sm:text-xs text-gray-200 font-sans leading-tight">${optText}</span>
+                    `;
+                    btn.onclick = () => this.checkAnswer(letter, btn);
+                    optionsContainer.appendChild(btn);
+                });
+
+                document.getElementById('modal-quiz').classList.remove('hidden');
+            }
+
+            toggleHint() {
+                const hintBox = document.getElementById('quiz-hint-box');
+                hintBox.classList.toggle('hidden');
+            }
+
+            checkAnswer(selectedLetter, buttonEl) {
+                const feedbackEl = document.getElementById('quiz-feedback');
+                const explanationEl = document.getElementById('quiz-explanation');
+                const explanationTextEl = document.getElementById('quiz-explanation-text');
+                const nextBtn = document.getElementById('btn-quiz-next');
+
+                const allButtons = document.querySelectorAll('#quiz-options-container button');
+                allButtons.forEach(btn => btn.disabled = true);
+
+                // Catat statistik per tema/level SOLO untuk layar refleksi
+                const theme = this.currentQuestion.theme || 'sintesis';
+                if (!this.themeStats[theme]) this.themeStats[theme] = { correct: 0, total: 0 };
+                this.themeStats[theme].total++;
+                if (selectedLetter === this.currentQuestion.answer) this.themeStats[theme].correct++;
+
+                if (selectedLetter === this.currentQuestion.answer) {
+                    audio.playCorrect();
+                    buttonEl.className = 'w-full bg-green-950 border-2 border-green-500 p-2 sm:p-2.5 rounded-xl text-left flex items-start gap-2';
+                    feedbackEl.className = 'font-pixel text-[11px] sm:text-xs font-bold text-center text-green-400';
+                    feedbackEl.innerText = 'BENAR! (+20 BONUS SKOR)';
+                    
+                    this.score += 20;
+                    this.correctAnswers++;
+                } else {
+                    audio.playWrong();
+                    buttonEl.className = 'w-full bg-red-950 border-2 border-red-500 p-2 sm:p-2.5 rounded-xl text-left flex items-start gap-2';
+                    feedbackEl.className = 'font-pixel text-[11px] sm:text-xs font-bold text-center text-red-400';
+                    feedbackEl.innerText = `SALAH! KUNCI: (${this.currentQuestion.answer})`;
+
+                    const labels = ['A', 'B', 'C', 'D', 'E'];
+                    const correctIdx = labels.indexOf(this.currentQuestion.answer);
+                    if (correctIdx !== -1 && allButtons[correctIdx]) {
+                        allButtons[correctIdx].className = 'w-full bg-green-900/60 border border-green-500 p-2 sm:p-2.5 rounded-xl text-left flex items-start gap-2';
+                    }
+
+                    this.score = Math.max(0, this.score - 5);
+                    this.wrongAnswers++;
+                }
+
+                explanationTextEl.innerText = this.currentQuestion.explanation;
+                explanationEl.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+
+                this.updateHUD();
+            }
+
+            finishQuizQuestion() {
+                document.getElementById('modal-quiz').classList.add('hidden');
+                this.isQuizActive = false;
+
+                if (this.askedQuestionIds.length >= QUESTION_BANK.length) {
+                    this.endGame(true);
+                } else {
+                    this.spawnFood();
+                    // MULAI HITUNG MUNDUR SETELAH MENJAWAB SOAL!
+                    this.startPostQuizCountdown();
+                }
+            }
+
+            /**
+             * 2. HITUNG MUNDUR SETELAH SELESAI MENJAWAB SOAL (3, 2, 1, GO!)
+             */
+            startPostQuizCountdown() {
+                this.isCountdownActive = true;
+                const overlay = document.getElementById('countdown-overlay');
+                const numEl = document.getElementById('countdown-number');
+                const labelEl = document.getElementById('countdown-label');
+                
+                labelEl.innerText = "KEMBALI KE GAME!";
+                overlay.classList.remove('hidden');
+
+                let count = 3;
+                numEl.innerText = count;
+                audio.playBeep();
+
+                this.draw();
+
+                const interval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        numEl.innerText = count;
+                        audio.playBeep();
+                        numEl.classList.remove('animate-pop');
+                        void numEl.offsetWidth;
+                        numEl.classList.add('animate-pop');
+                    } else if (count === 0) {
+                        numEl.innerText = "GO!";
+                        audio.playBeep();
+                    } else {
+                        clearInterval(interval);
+                        overlay.classList.add('hidden');
+                        this.isCountdownActive = false;
+                    }
+                }, 750);
+            }
+        }
+
+        // Inisialisasi Instance Game Utama
+        const game = new SnakeEduGame();
+    </script>
+</body>
+</html>
