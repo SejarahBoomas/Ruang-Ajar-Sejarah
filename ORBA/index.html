@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Akhir Orde Baru & Reformasi 1998 — MPI Sejarah Fase F</title>
+<style>
+:root {
+  --P:#B71C1C; --Ptua:#7F0000; --Pmuda:#FFEBEE;
+  --A:#FFD600; --Atua:#F9A825; --Amuda:#FFFDE7;
+  --T:#1A1A2E; --H:#1B5E20; --Hmuda:#E8F5E9;
+  --S:#C62828; --Smuda:#FFEBEE;
+  --biru:#0D47A1;
+  --garis:#FFCDD2; --krem:#FFF8F0; --krem2:#FFECEC;
+  --bayB:0 20px 40px rgba(183,28,28,.18);
+  --bayK:0 8px 20px rgba(0,0,0,.10);
+  --bayT:0 4px 10px rgba(0,0,0,.06);
+  --r40:40px; --r24:24px; --r16:16px; --r99:99px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%;width:100%;background:#263238;overflow:hidden;
+  font-family:system-ui,-apple-system,'Segoe UI Variable','Segoe UI','Nunito',Tahoma,sans-serif;color:var(--T);touch-action:manipulation}
+#viewport{position:fixed;inset:0;overflow:hidden}
+#stage{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:top left;
+  background:var(--krem2);overflow:hidden;user-select:none;border-radius:20px}
+.screen{position:absolute;inset:0;display:none;flex-direction:column}
+.screen.active{display:flex;animation:fadeIn .4s cubic-bezier(.4,0,.2,1)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
+.bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* ── Topbar ── */
+.topbar{position:relative;z-index:5;height:80px;flex:0 0 80px;display:flex;align-items:center;
+  gap:14px;padding:0 28px;background:#fff;border-bottom:2px solid var(--garis);
+  border-radius:0 0 var(--r40) var(--r40);box-shadow:var(--bayK)}
+.topbar .jbar{font-weight:800;font-size:21px;color:var(--Ptua)}
+.topbar .jbar small{display:block;font-weight:600;font-size:13px;opacity:.65}
+.spacer{flex:1}
+.pgwrap{display:flex;align-items:center;gap:10px;color:var(--Ptua)}
+.pgtrack{width:190px;height:14px;border-radius:99px;background:#E2E8F0;overflow:hidden}
+.pgfill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--P),var(--Atua));transition:width .5s ease}
+.pglabel{font-size:14px;font-weight:800}
+.skbadge{background:#FFF9E6;border:3px solid var(--A);padding:6px 18px;border-radius:var(--r99);
+  font-weight:900;font-size:17px;color:#856404;display:flex;align-items:center;gap:8px;box-shadow:var(--bayK)}
+.ibtn{width:50px;height:50px;border:none;border-radius:50%;cursor:pointer;background:var(--krem2);
+  color:var(--P);font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;box-shadow:var(--bayK)}
+.ibtn:active{transform:scale(.9)}
+.content{position:relative;z-index:4;flex:1;padding:26px 36px;overflow:hidden;display:flex;flex-direction:column}
+.col{display:flex;flex-direction:column;height:100%;min-height:0;justify-content:center}
+
+/* ── Navbar ── */
+.navbar{position:relative;z-index:5;height:88px;flex:0 0 88px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 28px;background:#fff;border-top:2px solid var(--garis);
+  border-radius:var(--r40) var(--r40) 0 0;box-shadow:0 -8px 20px rgba(0,0,0,.03)}
+.nbtn{min-width:185px;height:54px;padding:0 28px;border:none;border-radius:var(--r99);cursor:pointer;
+  font-size:17px;font-weight:800;color:#fff;display:inline-flex;align-items:center;justify-content:center;
+  gap:10px;box-shadow:var(--bayK);transition:all .2s}
+.nbtn:active{transform:translateY(2px) scale(.98)}
+.nbtn[disabled]{opacity:.38;cursor:not-allowed}
+.nb-back{background:#90A4AE}
+.nb-next{background:linear-gradient(135deg,var(--P),var(--Ptua))}
+.btn{border:none;border-radius:var(--r99);cursor:pointer;font-weight:800;color:#fff;box-shadow:var(--bayK);transition:all .2s}
+.btn:active{transform:translateY(2px) scale(.96)}
+.bM{background:linear-gradient(135deg,var(--S),#C0392B)}
+.bB{background:linear-gradient(135deg,#1A237E,#3949AB)}
+.bK{background:linear-gradient(135deg,var(--A),var(--Atua));color:#7F0000}
+.bH{background:linear-gradient(135deg,var(--H),#2E7D32)}
+
+/* ── JUDUL ── */
+#scr-judul .bg{background:var(--T)}
+#scr-judul .bg::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 55%, rgba(20,0,10,.55) 0%, rgba(20,0,10,0) 70%),
+    linear-gradient(135deg,rgba(80,0,0,.68) 0%,rgba(127,0,0,.48) 45%,rgba(15,10,20,.8) 100%)}
+#scr-judul .bg .bgimp{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9;z-index:0}
+.jtopright{position:absolute;top:22px;right:26px;z-index:6;display:flex;gap:12px}
+.jcenter{position:relative;z-index:4;flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;gap:8px;padding:20px}
+.bstrp{display:flex;border-radius:8px;overflow:hidden;box-shadow:var(--bayK);width:100px;height:18px;margin:0 auto 4px}
+.bstrp .m{flex:1;background:#CC0001}.bstrp .p{flex:1;background:#fff}
+.pita{background:#fff;color:var(--Ptua);font-weight:800;padding:8px 26px;border-radius:var(--r99);font-size:15px;box-shadow:var(--bayK)}
+.jlogo{width:110px;height:110px;border-radius:50%;background:#fff;padding:10px;
+  border:5px solid var(--A);box-shadow:0 8px 20px rgba(255,214,0,.4);object-fit:contain}
+.jutama{color:#fff;font-size:54px;font-weight:900;line-height:1.08;text-shadow:0 4px 12px rgba(0,0,0,.6);margin:2px 0 0}
+.jsub{color:var(--A);font-size:22px;font-weight:700;margin:0}
+.jmulai{margin-top:20px;height:72px;padding:0 56px;font-size:24px;font-weight:800;border-radius:var(--r99);
+  color:#7F0000;background:linear-gradient(135deg,#FFEB3B,#FBC02D);
+  box-shadow:0 8px 32px rgba(255,214,0,.5),0 0 0 0 rgba(255,214,0,.3);
+  letter-spacing:.5px;transition:all .25s;
+  animation:btnPulse 2.5s 1.5s ease-in-out infinite}
+@keyframes btnPulse{0%,100%{box-shadow:0 8px 32px rgba(255,214,0,.5),0 0 0 0 rgba(255,214,0,.3)}
+  50%{box-shadow:0 8px 32px rgba(255,214,0,.5),0 0 0 12px rgba(255,214,0,.0)}}
+.jmulai:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 14px 40px rgba(255,214,0,.65)}
+.raka-judul{position:absolute;left:28px;bottom:28px;z-index:6;display:flex;align-items:flex-end;gap:14px}
+.raka-av{width:90px;height:90px;border-radius:50%;border:4px solid var(--A);
+  box-shadow:0 8px 20px rgba(255,214,0,.4);object-fit:cover;background:var(--Ptua);flex-shrink:0}
+.raka-bub{background:#fff;border-radius:20px 20px 20px 4px;padding:12px 18px;max-width:340px;
+  box-shadow:var(--bayK);font-size:16px;font-weight:700;color:var(--T);line-height:1.5;border-left:5px solid var(--A)}
+.raka-bub b{color:var(--Ptua)}
+
+/* ── MENU — Gen Z Redesign ── */
+#scr-menu .bg{
+  background: #06060f;
+}
+#scr-menu .bg::before{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 60% at 10% 65%, rgba(183,28,28,.38) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 50% at 88% 15%, rgba(26,35,126,.32) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(255,214,0,.06) 0%, transparent 50%);
+}
+#scr-menu .bg::after{
+  content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+.mhead{position:relative;z-index:4;text-align:center;padding:24px 20px 6px}
+.mhead h2{font-size:32px;color:#fff;font-weight:800;letter-spacing:-.3px;text-shadow:0 2px 20px rgba(0,0,0,.5)}
+.mhead p{margin:6px 0 0;font-size:16px;color:rgba(255,255,255,.55);font-weight:500}
+.raka-menu{position:absolute;bottom:0;left:36px;z-index:5;display:flex;align-items:flex-end;gap:12px;pointer-events:none}
+.raka-menu-av{width:100px;height:100px;border-radius:50%;border:4px solid var(--A);box-shadow:var(--bayK);object-fit:cover;background:var(--Ptua)}
+.raka-menu-bub{background:rgba(255,255,255,.12);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-radius:20px 20px 20px 4px;padding:12px 16px;max-width:280px;
+  box-shadow:var(--bayK);font-size:15px;font-weight:700;color:#fff;line-height:1.45;
+  border:1px solid rgba(255,255,255,.2);border-left:4px solid var(--P);margin-bottom:8px}
+.mcards{position:relative;z-index:4;flex:1;display:flex;flex-wrap:wrap;gap:18px;
+  align-items:center;justify-content:center;padding:8px 40px 24px 40px}
+/* Gen Z Card Base */
+.mcard{width:240px;height:310px;border-radius:var(--r40);cursor:pointer;color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;
+  transition:all .32s cubic-bezier(.22,1,.36,1);padding:0;
+  text-align:center;border:1px solid rgba(255,255,255,.18);
+  position:relative;overflow:hidden;background-size:cover;background-position:center;
+  box-shadow:0 20px 50px rgba(0,0,0,.45)}
+/* Dark photo overlay */
+.mcard::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.18) 55%, transparent 100%);
+  transition:all .32s}
+/* Glow border on hover */
+.mcard::after{
+  content:'';position:absolute;inset:0;z-index:0;border-radius:var(--r40);
+  opacity:0;transition:opacity .32s;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
+.mcard:hover{transform:translateY(-10px) scale(1.04);box-shadow:0 32px 64px rgba(0,0,0,.55)}
+.mcard:hover::before{background:linear-gradient(to top, rgba(0,0,0,.60) 0%, rgba(0,0,0,.08) 55%, transparent 100%)}
+.mcard:hover::after{opacity:1}
+.mcard:active{transform:scale(.97);transition-duration:.12s}
+/* Card inner layout */
+.mcard-body{position:relative;z-index:2;padding:20px;width:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
+.mcard .mikon{font-size:52px;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5));margin-bottom:2px}
+.mcard .mjudul{font-size:24px;font-weight:800;line-height:1.1;letter-spacing:-.2px}
+.mcard .msub{font-size:13px;font-weight:600;background:rgba(255,255,255,.18);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding:5px 14px;border-radius:var(--r99);border:1px solid rgba(255,255,255,.25);
+  letter-spacing:.2px}
+/* Card icon accent strip at top */
+.mcard-accent{position:absolute;top:0;left:0;right:0;z-index:2;height:5px;border-radius:var(--r40) var(--r40) 0 0}
+/* ═══ OFFLINE: CSS pattern backgrounds — tanpa internet, tanpa file gambar ═══ */
+/* mc1 Belajar — silang manuskrip (hatch pattern, merah tua) */
+.mc1{
+  background-color:#800000;
+  background-image:
+    repeating-linear-gradient(-45deg,transparent,transparent 15px,rgba(255,255,255,.07) 15px,rgba(255,255,255,.07) 16px),
+    repeating-linear-gradient( 45deg,transparent,transparent 15px,rgba(255,255,255,.07) 15px,rgba(255,255,255,.07) 16px);
+}
+.mc1 .mcard-accent{background:linear-gradient(90deg,#FF5252,#FF1744)}
+
+/* mc2 Kronologi — cincin konsentris / jam (navy) */
+.mc2{
+  background-color:#1A237E;
+  background-image:
+    repeating-radial-gradient(circle at 120px 95px,
+      transparent 0,transparent 24px,
+      rgba(255,255,255,.09) 24px,rgba(255,255,255,.09) 25px);
+}
+.mc2 .mcard-accent{background:linear-gradient(90deg,#536DFE,#82B1FF)}
+
+/* mc3 Bermain — grid pixel / game (oranye gelap) */
+.mc3{
+  background-color:#BF360C;
+  background-image:
+    radial-gradient(circle at 1px 1px,rgba(255,255,255,.18) 1.5px,transparent 0);
+  background-size:20px 20px;
+}
+.mc3 .mcard-accent{background:linear-gradient(90deg,#FF6D00,#FFD740)}
+
+/* mc4 Berlatih — garis notebook / buku latihan (amber-coklat) */
+.mc4{
+  background-color:#6D3200;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.09) 0,rgba(255,255,255,.09) 1px,transparent 1px,transparent 26px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0,rgba(255,255,255,.04) 1px,transparent 1px,transparent 80px);
+}
+.mc4 .mcard-accent{background:linear-gradient(90deg,#FFD600,#FFAB00)}
+/* Staggered card entrance animation */
+@keyframes cardIn{from{opacity:0;transform:translateY(32px) scale(.94)}to{opacity:1;transform:none}}
+.mcards .mcard:nth-child(1){animation:cardIn .5s .05s cubic-bezier(.22,1,.36,1) both}
+.mcards .mcard:nth-child(2){animation:cardIn .5s .15s cubic-bezier(.22,1,.36,1) both}
+.mcards .mcard:nth-child(3){animation:cardIn .5s .25s cubic-bezier(.22,1,.36,1) both}
+.mcards .mcard:nth-child(4){animation:cardIn .5s .35s cubic-bezier(.22,1,.36,1) both}
+/* Topbar on dark menu */
+#scr-menu .topbar{background:rgba(6,6,15,.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.1);border-radius:0}
+#scr-menu .topbar .jbar{color:#fff}
+#scr-menu .topbar .jbar small{color:rgba(255,255,255,.5)}
+#scr-menu .topbar .ibtn{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
+
+/* ── BELAJAR ── */
+.bframe{flex:1;display:flex;min-height:0;background:#fff;border-radius:var(--r40);
+  box-shadow:var(--bayB);overflow:hidden;border:3px solid var(--garis)}
+.bimg{flex:0 0 34%;display:flex;flex-direction:column;align-items:stretch;border-right:3px solid var(--garis);overflow:hidden}
+.bimg .hero-img{width:100%;height:62%;object-fit:cover}
+.bimg .rstrip{padding:14px;background:#fff;flex:1;display:flex;gap:12px;align-items:flex-start;border-top:2px dashed var(--garis)}
+.bimg .rstrip .rav{width:50px;height:50px;border-radius:50%;border:3px solid var(--A);object-fit:cover;flex-shrink:0;background:var(--Ptua)}
+.bimg .rstrip .rbub{flex:1;background:var(--Amuda);border-radius:12px 12px 12px 4px;padding:9px 13px;
+  font-size:13px;font-weight:700;color:var(--T);line-height:1.5;border-left:4px solid var(--A)}
+.bteks{flex:1;padding:26px 32px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.bteks h2{font-size:28px;color:var(--Ptua);font-weight:900;line-height:1.15}
+.bintro{background:linear-gradient(135deg,var(--P),var(--Ptua));color:#fff;padding:13px 18px;
+  border-radius:var(--r16);font-size:19px;font-weight:800;line-height:1.3}
+.bisi{font-size:18px;line-height:1.65;color:var(--T)}
+.bisi ul{margin:8px 0 0;padding-left:20px}
+.bisi li{margin-bottom:7px}
+.bisi b{color:var(--Ptua)}
+.bkuis{padding:14px 16px;background:var(--Amuda);border:2px dashed var(--Atua);border-radius:var(--r16)}
+.bkuis .bktanya{font-weight:800;color:var(--Ptua);font-size:16px;margin:0 0 9px}
+.bkuis .bkopsi{display:flex;gap:9px;flex-wrap:wrap}
+.refbox{padding:14px 18px;background:linear-gradient(135deg,#EDE7F6,#D1C4E9);
+  border-radius:var(--r16);border-left:6px solid #5E35B1}
+.refbox .rlabel{font-size:13px;font-weight:800;color:#4527A0;margin-bottom:7px}
+.refbox .rq{font-size:16px;font-weight:700;color:#311B92;line-height:1.5}
+.refbox textarea{width:100%;margin-top:8px;padding:9px 12px;font-size:14px;font-family:inherit;
+  border:2px solid #9575CD;border-radius:10px;resize:none;height:58px;color:var(--T);
+  background:#FAF5FF;outline:none;transition:border .2s}
+.refbox textarea:focus{border-color:#5E35B1}
+
+/* ── KRONOLOGI ── */
+.kwrap{flex:1;display:flex;min-height:0;border-radius:var(--r40);overflow:hidden;box-shadow:var(--bayB);border:3px solid var(--garis)}
+.kpanel{flex:0 0 52%;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column}
+.kitem{display:flex;gap:13px;align-items:flex-start;margin-bottom:13px}
+.kdot{flex:0 0 56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:11px;color:#fff;text-align:center;line-height:1.2;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.kteks{flex:1;border-radius:var(--r16);padding:11px 14px;line-height:1.5}
+.kteks b{font-size:14px;display:block;margin-bottom:3px}
+.kteks span{font-size:13px;opacity:.92}
+.klin{width:4px;height:12px;margin:0 auto 0 26px;border-radius:2px}
+.kinfo{flex:1;background:#fff;padding:26px 30px;display:flex;flex-direction:column;gap:13px;border-left:3px solid var(--garis)}
+.kinfo h2{font-size:25px;color:var(--Ptua);font-weight:900;line-height:1.2}
+.kinfo .kiintro{padding:13px 17px;border-radius:var(--r16);font-size:18px;font-weight:800;color:#fff;line-height:1.3}
+.kinfo .kibody{font-size:17px;line-height:1.65;color:var(--T)}
+.kinfo .kibody ul{padding-left:20px;margin-top:8px}
+.kinfo .kibody li{margin-bottom:7px}
+.kinfo .kibody b{color:var(--Ptua)}
+.kraka{display:flex;gap:10px;align-items:flex-start;margin-top:auto;padding:13px 15px;
+  background:var(--Amuda);border-radius:var(--r16);border-left:4px solid var(--A)}
+.kraka .krav{width:40px;height:40px;border-radius:50%;border:3px solid var(--A);object-fit:cover;flex-shrink:0;background:var(--Ptua)}
+.kraka .krb{flex:1;font-size:14px;font-weight:700;color:var(--T);line-height:1.5}
+
+/* ── BERMAIN — shared ── */
+.ains{font-size:20px;margin:0 0 16px;background:#fff;padding:11px 20px;border-radius:var(--r16);
+  display:inline-block;box-shadow:var(--bayK);text-align:center;border:2px solid var(--A)}
+.soal{background:#fff;border-radius:var(--r24);padding:20px 26px;font-size:21px;font-weight:800;
+  line-height:1.4;margin-bottom:16px;box-shadow:var(--bayT);color:var(--Ptua);border-left:10px solid var(--P)}
+.ogrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.opsi{background:#fff;border:3px solid var(--garis);border-radius:var(--r24);padding:15px 18px;
+  font-size:19px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:12px;
+  box-shadow:var(--bayT);transition:all .2s;color:var(--T)}
+.opsi:hover{border-color:var(--P);background:var(--Pmuda)}
+.opsi .bul{width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:var(--garis);
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;color:var(--Ptua);transition:all .2s}
+.opsi:hover .bul{background:var(--P);color:#fff}
+.opsi.benar{border-color:var(--H);background:var(--Hmuda);color:var(--H)}
+.opsi.benar .bul{background:var(--H);color:#fff}
+.opsi.salah{border-color:var(--S);background:var(--Smuda);color:var(--S)}
+.opsi.salah .bul{background:var(--S);color:#fff}
+.okomp{cursor:pointer;border:4px solid var(--garis);background:#fff}
+.okomp.tp{border-color:var(--P);background:var(--Pmuda)}
+.okomp.tp .bul{background:var(--P);color:#fff}
+.kdrag{font-size:23px;line-height:2.1;font-weight:700;background:#fff;padding:24px;border-radius:var(--r24);box-shadow:var(--bayK);border:2px solid var(--garis)}
+.bslot{display:inline-block;min-width:108px;height:38px;border-bottom:4px dashed var(--Atua);
+  margin:0 8px;vertical-align:middle;text-align:center;color:var(--Ptua);font-weight:900;
+  cursor:pointer;background:var(--Amuda);border-radius:8px 8px 0 0}
+.bslot.ti{border-bottom-style:solid;background:#FFECB3;border-bottom-color:var(--Ptua)}
+.wpool{display:flex;gap:13px;margin-top:18px;flex-wrap:wrap;justify-content:center}
+.wbtn{background:linear-gradient(135deg,var(--P),var(--Ptua));border:none;padding:10px 18px;
+  font-size:19px;font-weight:800;border-radius:var(--r16);cursor:pointer;color:#fff;box-shadow:var(--bayK);transition:transform .2s}
+.wbtn:active{transform:scale(.95)}
+.wbtn.dp{opacity:0;pointer-events:none}
+.jwrap{position:relative;display:flex;gap:24px;flex:1;min-height:0;justify-content:center;z-index:1}
+.jkol{flex:1;display:flex;flex-direction:column;gap:11px;justify-content:center;z-index:2}
+.pitem{position:relative;z-index:2;border:3px solid var(--garis);background:#fff;border-radius:var(--r24);
+  padding:12px 16px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;
+  gap:14px;box-shadow:var(--bayT);min-height:74px;text-align:left;color:var(--T);transition:all .2s}
+.pitem:hover{border-color:var(--P);background:var(--Pmuda)}
+.pitem img.pip{width:44px;height:44px;object-fit:contain;flex-shrink:0}
+.pitem.sel{border-color:var(--P);background:var(--Pmuda);transform:scale(1.02);box-shadow:var(--bayK);color:var(--Ptua)}
+.pitem.locked{border-color:var(--H);background:var(--Hmuda);cursor:default;color:var(--H)}
+.pitem.salah{border-color:var(--S);background:var(--Smuda);animation:shake .4s;color:var(--S)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+.jline{stroke-dasharray:1000;stroke-dashoffset:1000;animation:drawLine .5s ease-in-out forwards}
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;flex:1}
+.ocard{background:#fff;border:3px solid var(--garis);border-radius:var(--r24);padding:16px;
+  font-size:19px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:11px;text-align:center;box-shadow:var(--bayK);transition:all .2s;color:var(--T)}
+.ocard:hover{border-color:var(--P);background:var(--Pmuda)}
+.ocard img.oi{height:105px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.12))}
+.ocard.benar{border-color:var(--H);background:var(--Hmuda);color:var(--H)}
+.ocard.salah{border-color:var(--S);background:var(--Smuda);color:var(--S)}
+.uitem{background:#fff;border:2px solid var(--garis);border-radius:var(--r24);padding:10px 16px;
+  font-size:18px;font-weight:700;display:flex;align-items:center;gap:13px;box-shadow:var(--bayT);margin-bottom:9px;min-height:64px;color:var(--T)}
+.uitem .num{background:var(--P);color:#fff;border-radius:50%;width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:800;flex-shrink:0}
+.uitem>span:nth-child(2){flex:1;line-height:1.3}
+.uitem .bK{flex:0 0 auto;width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:16px;color:#7F0000}
+.bsgrid{display:flex;gap:20px}
+.bsbtn{flex:1;height:108px;border-radius:var(--r40);border:none;font-size:32px;font-weight:900;color:#fff;cursor:pointer;box-shadow:var(--bayK);transition:all .2s}
+.bsbtn:active{transform:scale(.95)}
+.bsB{background:linear-gradient(135deg,var(--H),#1B5E20)}
+.bsS{background:linear-gradient(135deg,var(--S),#C0392B)}
+.sb-lirik{background:linear-gradient(135deg,var(--P),var(--Ptua));color:#fff;padding:22px 26px;
+  border-radius:var(--r24);font-size:24px;font-weight:800;text-align:center;line-height:1.4;box-shadow:var(--bayB)}
+.sb-opsi{display:flex;flex-direction:column;gap:11px;margin-top:18px}
+.sbbtn{background:#fff;border:3px solid var(--garis);border-radius:var(--r16);padding:15px 20px;
+  font-size:21px;font-weight:700;cursor:pointer;color:var(--T);transition:all .2s;box-shadow:var(--bayT)}
+.sbbtn:hover{border-color:var(--P);background:var(--Pmuda)}
+.sbbtn.benar{border-color:var(--H);background:var(--Hmuda);color:var(--H)}
+.sbbtn.salah{border-color:var(--S);background:var(--Smuda);color:var(--S)}
+.fb{border-radius:var(--r24);padding:14px 20px;font-size:18px;font-weight:700;line-height:1.5;display:none;text-align:center;margin-top:12px}
+.fb.show{display:block}
+.fb.ok{background:var(--Hmuda);border:3px solid var(--H);color:var(--H)}
+.fb.no{background:var(--Smuda);border:3px solid var(--S);color:var(--S)}
+.fb.info{background:var(--Amuda);border:3px solid var(--Atua);color:#856404}
+
+/* ── KUMPUL ── */
+.khud{display:flex;justify-content:center;gap:16px;align-items:center;margin-bottom:11px}
+.khud .hbox{background:#fff;padding:6px 20px;border-radius:var(--r99);font-weight:900;font-size:20px;box-shadow:var(--bayK);border:3px solid var(--garis)}
+.khud .ht{color:var(--S);border-color:var(--S)}
+.khud .hc{color:var(--H);border-color:var(--H)}
+.karea{position:relative;width:100%;flex:1;min-height:0;background:radial-gradient(circle at 50% 40%,#FFF5F5,#FFECEC);
+  border:4px dashed var(--P);border-radius:var(--r24);overflow:hidden;box-shadow:inset 0 4px 12px rgba(0,0,0,.04)}
+.kflag{position:absolute;width:86px;cursor:pointer;animation:floatUp .22s ease}
+.kflag:active{transform:scale(.85)}
+@keyframes floatUp{from{transform:scale(0) rotate(-14deg)}to{transform:scale(1) rotate(0)}}
+.kflag img{width:100%;height:auto;pointer-events:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.22));border-radius:4px}
+
+/* ── ANALISIS DOKUMEN HOTS ── */
+.dok-wrap{flex:1;display:flex;gap:18px;min-height:0}
+.dok-kiri{flex:0 0 46%;background:linear-gradient(160deg,#1A237E,#283593);border-radius:var(--r24);
+  padding:20px;overflow-y:auto;color:#fff;display:flex;flex-direction:column;gap:11px}
+.dok-hdr{display:flex;align-items:center;gap:10px}
+.dok-hdr .di{font-size:28px}
+.dok-hdr .dj{font-size:16px;font-weight:900;color:var(--A)}
+.dok-tags{display:flex;gap:7px;flex-wrap:wrap}
+.dok-tag{background:rgba(255,214,0,.2);border:1px solid rgba(255,214,0,.5);color:var(--A);
+  padding:3px 11px;border-radius:var(--r99);font-size:12px;font-weight:700}
+.dok-teks{font-size:14px;line-height:1.75;color:rgba(255,255,255,.92);
+  border-left:4px solid var(--A);padding-left:13px;font-style:italic}
+.dok-teks b{color:var(--A);font-style:normal}
+.dok-meta{font-size:12px;color:rgba(255,255,255,.55)}
+.dok-raka{display:flex;gap:9px;align-items:flex-start;padding:11px 14px;
+  background:rgba(255,214,0,.12);border-radius:var(--r16);border-left:4px solid var(--A);margin-top:auto}
+.dok-raka .dra{width:36px;height:36px;border-radius:50%;border:2px solid var(--A);object-fit:cover;flex-shrink:0;background:var(--Ptua)}
+.dok-raka .drb{flex:1;font-size:13px;font-weight:700;line-height:1.5}
+.dok-kanan{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.dok-pert{background:#fff;border-radius:var(--r16);padding:16px 20px;border-left:6px solid var(--P);
+  font-size:19px;font-weight:800;color:var(--Ptua);line-height:1.4}
+.dok-opsi-wrap{display:flex;flex-direction:column;gap:9px}
+.dok-opsi{background:#fff;border:3px solid var(--garis);border-radius:var(--r16);padding:12px 16px;
+  font-size:17px;font-weight:700;cursor:pointer;color:var(--T);transition:all .2s;
+  box-shadow:var(--bayT);display:flex;align-items:flex-start;gap:11px;line-height:1.4}
+.dok-opsi:hover{border-color:var(--P);background:var(--Pmuda)}
+.dok-opsi .db{width:30px;height:30px;flex-shrink:0;border-radius:50%;background:var(--garis);
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:var(--Ptua)}
+.dok-opsi.benar{border-color:var(--H);background:var(--Hmuda);color:var(--H)}
+.dok-opsi.benar .db{background:var(--H);color:#fff}
+.dok-opsi.salah{border-color:var(--S);background:var(--Smuda);color:var(--S)}
+.dok-opsi.salah .db{background:var(--S);color:#fff}
+.dok-dots{display:flex;gap:7px;justify-content:center;margin-top:4px}
+.dok-dot{width:11px;height:11px;border-radius:50%;background:var(--garis);transition:all .3s}
+.dok-dot.ak{background:var(--P);transform:scale(1.3)}
+.dok-dot.dn{background:var(--H)}
+
+/* ── MODAL ── */
+.mbg{position:absolute;inset:0;z-index:50;background:rgba(26,26,46,.86);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center}
+.mbg.show{display:flex}
+.modal{width:800px;max-width:92%;max-height:86%;overflow:auto;background:#fff;border-radius:var(--r40);
+  padding:36px;position:relative;box-shadow:0 28px 56px rgba(0,0,0,.4);border:3px solid var(--P)}
+.modal h3{margin:0 0 13px;font-size:28px;color:var(--Ptua);font-weight:900}
+.modal p,.modal li,.itabel td{font-size:18px;line-height:1.6;color:var(--T)}
+.modal .tutup{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;
+  font-weight:bold;background:var(--krem2);color:var(--S);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border:2px solid var(--garis);font-size:18px}
+.iform{width:100%;padding:14px 17px;font-size:20px;font-family:inherit;font-weight:700;color:var(--T);
+  border:3px solid var(--garis);border-radius:var(--r16);margin-bottom:13px;outline:none;transition:border .3s;background:#fff}
+.iform:focus{border-color:var(--P);background:var(--Pmuda)}
+.itabel{width:100%;border-collapse:collapse;margin-top:10px}
+.itabel td{border:2px solid var(--garis);padding:10px 13px}
+.itabel td:first-child{font-weight:800;background:var(--krem2);width:40%;color:var(--Ptua)}
+
+/* ── AKHIR / SKOR ── */
+.akhir{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center}
+.akhir h2{font-size:40px;color:var(--Ptua);font-weight:900}
+.snum{font-size:66px;font-weight:900;color:var(--P);margin:3px 0;text-shadow:0 4px 10px rgba(183,28,28,.3)}
+.idtag{font-size:20px;font-weight:700;background:var(--Amuda);padding:8px 20px;border-radius:var(--r99);color:#856404;border:2px solid var(--A);box-shadow:var(--bayK)}
+.sertif{background:linear-gradient(135deg,#FFF9C4,#FFF3E0);border:3px solid var(--A);border-radius:var(--r24);padding:18px 28px;text-align:center;box-shadow:var(--bayK);max-width:520px}
+.sertif h4{font-size:17px;font-weight:900;color:var(--Ptua);margin:0 0 5px}
+.sertif .sn{font-size:26px;font-weight:900;color:var(--P);margin:3px 0}
+.sertif .sk{font-size:15px;color:#555;margin:0}
+
+/* ── PERCABANGAN — Remedial & Bonus ── */
+/* Layar hasil dengan cabang */
+.cabang-wrap{flex:1;display:flex;gap:20px;min-height:0}
+.cabang-kiri{flex:0 0 46%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:20px;text-align:center}
+.cabang-kanan{flex:1;display:flex;flex-direction:column;gap:14px;overflow-y:auto;justify-content:center}
+/* Kartu pilihan cabang */
+.cabang-card{border-radius:var(--r24);padding:22px 26px;cursor:pointer;display:flex;gap:18px;
+  align-items:center;box-shadow:var(--bayK);transition:all .25s;border:3px solid transparent}
+.cabang-card:hover{transform:translateY(-3px) scale(1.01);box-shadow:var(--bayB)}
+.cabang-card:active{transform:scale(.98)}
+.cabang-card .cc-ikon{font-size:48px;flex-shrink:0;line-height:1}
+.cabang-card .cc-body{flex:1;text-align:left}
+.cabang-card .cc-judul{font-size:20px;font-weight:900;margin-bottom:5px}
+.cabang-card .cc-desc{font-size:15px;font-weight:600;line-height:1.5;opacity:.85}
+.cc-remedial{background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-color:#FF6F00}
+.cc-remedial .cc-judul{color:#E65100}
+.cc-bonus{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border-color:#2E7D32}
+.cc-bonus .cc-judul{color:#1B5E20}
+.cc-ulang{background:linear-gradient(135deg,var(--Pmuda),#FFCDD2);border-color:var(--P)}
+.cc-ulang .cc-judul{color:var(--Ptua)}
+.cc-menu{background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border-color:#1565C0}
+.cc-menu .cc-judul{color:#0D47A1}
+/* Skor besar di cabang */
+.skor-besar{font-size:86px;font-weight:900;line-height:1;text-shadow:0 6px 16px rgba(0,0,0,.15)}
+.skor-besar.tinggi{color:var(--H)}
+.skor-besar.sedang{color:#E65100}
+.skor-besar.rendah{color:var(--S)}
+.predikat-badge{padding:10px 24px;border-radius:var(--r99);font-size:20px;font-weight:900;
+  box-shadow:var(--bayK);display:inline-block}
+.predikat-badge.tinggi{background:var(--Hmuda);color:var(--H);border:3px solid var(--H)}
+.predikat-badge.sedang{background:#FFF3E0;color:#E65100;border:3px solid #FF6F00}
+.predikat-badge.rendah{background:var(--Smuda);color:var(--S);border:3px solid var(--S)}
+/* Layar Remedial */
+#scr-remedial .bg{background:linear-gradient(135deg,#FFF3E0,#FFE0B2)}
+.rem-wrap{flex:1;display:flex;gap:20px;min-height:0}
+.rem-kiri{flex:0 0 38%;background:linear-gradient(160deg,#E65100,#BF360C);border-radius:var(--r24);
+  padding:24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.rem-kiri h3{color:#fff;font-size:22px;font-weight:900;margin:0}
+.rem-poin{background:rgba(255,255,255,.15);border-radius:var(--r16);padding:13px 16px;
+  border-left:4px solid var(--A)}
+.rem-poin .rp-judul{font-size:14px;font-weight:900;color:var(--A);margin-bottom:5px}
+.rem-poin .rp-isi{font-size:13px;color:rgba(255,255,255,.92);line-height:1.55}
+.rem-kanan{flex:1;display:flex;flex-direction:column;gap:13px;overflow-y:auto}
+.rem-soal{background:#fff;border-radius:var(--r16);padding:16px 20px;font-size:19px;font-weight:800;
+  color:var(--Ptua);border-left:8px solid #FF6F00;box-shadow:var(--bayT);line-height:1.4}
+.rem-opsi{background:#fff;border:3px solid var(--garis);border-radius:var(--r16);padding:13px 17px;
+  font-size:17px;font-weight:700;cursor:pointer;color:var(--T);transition:all .2s;
+  display:flex;align-items:center;gap:12px;box-shadow:var(--bayT)}
+.rem-opsi:hover{border-color:#FF6F00;background:#FFF3E0}
+.rem-opsi .rb{width:32px;height:32px;border-radius:50%;background:var(--garis);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:var(--Ptua)}
+.rem-opsi.benar{border-color:var(--H);background:var(--Hmuda);color:var(--H)}
+.rem-opsi.benar .rb{background:var(--H);color:#fff}
+.rem-opsi.salah{border-color:var(--S);background:var(--Smuda);color:var(--S)}
+.rem-opsi.salah .rb{background:var(--S);color:#fff}
+/* Layar Bonus HOTS */
+#scr-bonus .bg{background:linear-gradient(135deg,#E8F5E9,#F1F8E9)}
+.bonus-wrap{flex:1;display:flex;gap:20px;min-height:0}
+.bonus-kiri{flex:0 0 42%;background:linear-gradient(160deg,#1B5E20,#2E7D32);border-radius:var(--r24);
+  padding:22px;display:flex;flex-direction:column;gap:13px;overflow-y:auto}
+.bonus-kiri h3{color:#fff;font-size:21px;font-weight:900;margin:0}
+.bonus-konteks{background:rgba(255,255,255,.14);border-radius:var(--r16);padding:13px 16px;
+  border-left:4px solid var(--A);font-size:14px;color:rgba(255,255,255,.92);line-height:1.65}
+.bonus-konteks b{color:var(--A)}
+.bonus-kanan{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.bonus-soal{background:#fff;border-radius:var(--r16);padding:16px 20px;font-size:19px;font-weight:800;
+  color:var(--H);border-left:8px solid var(--H);box-shadow:var(--bayT);line-height:1.4}
+.bonus-opsi{background:#fff;border:3px solid var(--garis);border-radius:var(--r16);padding:12px 16px;
+  font-size:17px;font-weight:700;cursor:pointer;color:var(--T);transition:all .2s;
+  display:flex;align-items:flex-start;gap:11px;box-shadow:var(--bayT);line-height:1.4}
+.bonus-opsi:hover{border-color:var(--H);background:var(--Hmuda)}
+.bonus-opsi .bb{width:30px;height:30px;border-radius:50%;background:var(--garis);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--Ptua)}
+.bonus-opsi.benar{border-color:var(--H);background:var(--Hmuda);color:var(--H)}
+.bonus-opsi.benar .bb{background:var(--H);color:#fff}
+.bonus-opsi.salah{border-color:var(--S);background:var(--Smuda);color:var(--S)}
+.bonus-opsi.salah .bb{background:var(--S);color:#fff}
+.bonus-badge{background:linear-gradient(135deg,#FFF9C4,#FFF3E0);border:3px solid var(--A);
+  border-radius:var(--r24);padding:16px 22px;text-align:center;box-shadow:var(--bayK)}
+.bonus-badge h4{font-size:17px;font-weight:900;color:var(--Ptua);margin:0 0 5px}
+.bonus-badge .bn{font-size:44px;font-weight:900;color:var(--H);margin:3px 0}
+.bonus-badge p{font-size:14px;color:#555;margin:0}
+/* Animasi masuk layar percabangan */
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.slide-up{animation:slideUp .5s cubic-bezier(.4,0,.2,1)}
+/* Progress remedial */
+.rem-progress{display:flex;gap:6px;justify-content:center;margin-bottom:4px}
+.rem-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s}
+.rem-dot.ak{background:#fff;transform:scale(1.3)}
+.rem-dot.dn{background:var(--A)}
+/* ── EFEK ── */
+#efek-salah{position:absolute;inset:0;z-index:45;pointer-events:none;background:rgba(198,40,40,0);transition:background .6s ease-out}
+#efek-salah.ny{background:rgba(198,40,40,.38);transition:none}
+.cnf{position:absolute;width:11px;height:11px;z-index:45;opacity:1;pointer-events:none;animation:cnfpop 1.5s cubic-bezier(.25,1,.5,1) forwards}
+@keyframes cnfpop{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(0) rotate(720deg);opacity:0}}
+#awid{position:absolute;top:648px;left:540px;z-index:60;background:#fff;padding:5px 13px;border-radius:var(--r99);display:none;align-items:center;gap:8px;box-shadow:var(--bayT);border:2px solid var(--garis)}
+.ibsm{width:28px;height:28px;border:none;border-radius:50%;background:var(--krem2);color:var(--P);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* ── VIDEO KRONOLOGI ── */
+.kvideo-wrap{border-radius:var(--r16);overflow:hidden;box-shadow:var(--bayK);background:#000;flex-shrink:0;max-height:200px;display:flex;align-items:center;justify-content:center}
+.kvideo{width:100%;max-height:200px;display:block;object-fit:contain;border-radius:var(--r16)}
+.kvideo-err{background:linear-gradient(135deg,#1A237E,#283593);color:#fff;padding:20px 24px;border-radius:var(--r16);text-align:center;font-size:16px;font-weight:700;line-height:1.6}
+.kvideo-err small{display:block;margin-top:6px;opacity:.7;font-size:13px}
+.kvideo-err code{background:rgba(255,255,255,.2);padding:2px 8px;border-radius:6px;font-family:monospace;font-size:12px}
+/* Saat ada video, kinfo flex layout disesuaikan */
+.kinfo.has-video{gap:10px}
+.kinfo.has-video .kibody{font-size:15px;line-height:1.55}
+#vslider{-webkit-appearance:none;width:90px;height:5px;background:#DFE6E9;border-radius:5px;outline:none;cursor:pointer}
+#vslider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--P);cursor:pointer;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+
+/* ── FOKUS KEYBOARD (aksesibilitas) ── */
+.btn:focus-visible,.nbtn:focus-visible,.ibtn:focus-visible,.ibsm:focus-visible,
+.mcard:focus-visible,.cabang-card:focus-visible,.pitem:focus-visible,
+.dok-opsi:focus-visible,.opsi:focus-visible,.rem-opsi:focus-visible,
+.bonus-opsi:focus-visible,#vslider:focus-visible{
+  outline:3px solid var(--A);outline-offset:3px;box-shadow:0 0 0 5px rgba(255,214,0,.35)!important;
+}
+.cabang-card:focus-visible,.pitem:focus-visible,.dok-opsi:focus-visible,
+.opsi:focus-visible,.rem-opsi:focus-visible,.bonus-opsi:focus-visible{border-radius:var(--r16)}
+
+/* ── ROTASI LAYAR (mode potret HP) ── */
+#rotate-overlay{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;text-align:center;padding:32px;
+  background:linear-gradient(135deg,var(--Ptua),var(--T));color:#fff}
+#rotate-overlay .ric{font-size:64px;animation:putar 1.6s ease-in-out infinite}
+@keyframes putar{0%,100%{transform:rotate(0deg)}50%{transform:rotate(90deg)}}
+#rotate-overlay h3{font-size:22px;font-weight:800}
+#rotate-overlay p{font-size:15px;opacity:.85;max-width:320px;line-height:1.5}
+
+/* ── BADGE PERINGATAN REFRESH ── */
+.warn-refresh{display:flex;align-items:center;gap:6px;background:#FFF3E0;border:2px solid #FFA000;
+  color:#7A4A00;font-weight:800;font-size:12px;padding:5px 12px;border-radius:var(--r99);
+  box-shadow:var(--bayT);cursor:default;white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="rotate-overlay">
+  <div class="ric">📱</div>
+  <h3>Putar Layarmu ke Mode Landscape</h3>
+  <p>Media pembelajaran ini dirancang untuk tampilan mendatar (landscape) agar teks dan tombol tetap nyaman dibaca dan disentuh.</p>
+</div>
+<div id="viewport"><div id="stage">
+<div id="efek-salah"></div>
+
+<!-- ══ JUDUL ══ -->
+<section id="scr-judul" class="screen active">
+  <div class="bg">
+    <img class="bgimp" id="cfg-bgjudul" src="./asset/img/bg_reform.jpg" alt="bg" onerror="imgErr(this)">
+  </div>
+  <div class="jtopleft" style="position:absolute;top:22px;left:26px;z-index:6">
+    <button class="ibtn" data-sfx onclick="openModal('modal-referensi')" title="Daftar Referensi" style="background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:18px">📚</button>
+  </div>
+  <div class="jtopright">
+    <button class="ibtn" data-sfx onclick="openModal('modal-info')">i</button>
+    <button class="ibtn" data-sfx onclick="openModal('modal-dev')">★</button>
+  </div>
+  <div class="jcenter">
+    <div class="bstrp"><div class="m"></div><div class="p"></div></div>
+    <img id="cfg-logo" class="jlogo" src="./asset/img/logo_sekolah.png" alt="Logo" onerror="imgErr(this)">
+    <div class="pita">📚 Media Pembelajaran Interaktif · Sejarah · Fase F · Kelas XII</div>
+    <h1 class="jutama" id="cfg-judul">Akhir Orde Baru &amp; Reformasi 1998</h1>
+    <p class="jsub" id="cfg-subjudul">Krisis, Perjuangan Mahasiswa &amp; Kelahiran Demokrasi</p>
+    <button class="btn jmulai" data-sfx onclick="openModal('modal-login')">▶ MULAI BELAJAR</button>
+  </div>
+  <div class="raka-judul">
+    <img class="raka-av" id="cfg-raka" src="./asset/img/raka.png" alt="Raka" onerror="imgErr(this)">
+    <div class="raka-bub">Hei! Aku <b>Raka</b>, mahasiswa angkatan 98. Aku akan menemanimu menjelajahi masa paling mengguncang sejarah Indonesia — krisis, keberanian, dan kelahiran demokrasi. Siap?</div>
+  </div>
+</section>
+
+<!-- ══ MENU ══ -->
+<section id="scr-menu" class="screen">
+  <div class="bg"></div>
+  <div class="topbar">
+    <div class="jbar" id="cfg-judul-menu">Akhir Orde Baru &amp; Reformasi 1998<small>Pilih kegiatan belajarmu</small></div>
+    <div class="spacer"></div>
+    <button class="ibtn" data-sfx onclick="goJudul()">⌂</button>
+  </div>
+  <div class="mhead">
+    <h2>Mau Belajar Apa Hari Ini?</h2>
+    <p>Telusuri sejarah yang penuh gejolak — belajar, jelajahi, bermain, dan buktikan pemahamanmu!</p>
+  </div>
+  <div class="mcards">
+    <button class="mcard mc1" data-sfx onclick="startBelajar()">
+      <div class="mcard-accent"></div>
+      <div class="mcard-body">
+        <div class="mikon">📖</div><div class="mjudul">Belajar</div><div class="msub">4 Materi Inti</div>
+      </div>
+    </button>
+    <button class="mcard mc2" data-sfx onclick="startKronologi()">
+      <div class="mcard-accent"></div>
+      <div class="mcard-body">
+        <div class="mikon">🗓️</div><div class="mjudul">Kronologi</div><div class="msub">Linimasa Peristiwa</div>
+      </div>
+    </button>
+    <button class="mcard mc3" data-sfx onclick="startBermain()">
+      <div class="mcard-accent"></div>
+      <div class="mcard-body">
+        <div class="mikon">🎮</div><div class="mjudul">Bermain</div><div class="msub">9 Aktivitas + HOTS</div>
+      </div>
+    </button>
+    <button class="mcard mc4" data-sfx onclick="startBerlatih()">
+      <div class="mcard-accent"></div>
+      <div class="mcard-body">
+        <div class="mikon">✏️</div><div class="mjudul">Berlatih</div><div class="msub">10 Soal Uji Kompetensi</div>
+      </div>
+    </button>
+  </div>
+  <div class="raka-menu">
+    <img class="raka-menu-av" src="./asset/img/raka.png" alt="Raka" onerror="imgErr(this)">
+    <div class="raka-menu-bub">💬 Mulai dari <b>Belajar</b> dulu ya — telusuri krisis dan perjuangan 1998 sebelum bermain dan berlatih!</div>
+  </div>
+</section>
+
+<!-- ══ BELAJAR ══ -->
+<section id="scr-belajar" class="screen">
+  <div class="bg"></div>
+  <div class="topbar">
+    <div class="jbar">📖 Belajar<small id="belajar-sub">Materi</small></div>
+    <div class="spacer"></div>
+    <div class="pgwrap"><span class="pglabel" id="belajar-pl">1/4</span><div class="pgtrack"><div class="pgfill" id="belajar-pf"></div></div></div>
+    <button class="ibtn" data-sfx onclick="goMenu()">☰</button>
+  </div>
+  <div class="content" id="belajar-content"></div>
+  <div class="navbar">
+    <button class="nbtn nb-back" id="belajar-prev" data-sfx onclick="belajarPrev()">◀ Sebelumnya</button>
+    <button class="nbtn nb-next" id="belajar-next" data-sfx onclick="belajarNext()">Selanjutnya ▶</button>
+  </div>
+</section>
+
+<!-- ══ KRONOLOGI ══ -->
+<section id="scr-kronologi" class="screen">
+  <div class="bg"></div>
+  <div class="topbar">
+    <div class="jbar">🗓️ Kronologi<small id="kron-sub">Linimasa</small></div>
+    <div class="spacer"></div>
+    <div class="pgwrap"><span class="pglabel" id="kron-pl">1/3</span><div class="pgtrack"><div class="pgfill" id="kron-pf"></div></div></div>
+    <button class="ibtn" data-sfx onclick="goMenu()">☰</button>
+  </div>
+  <div class="content" id="kron-content"></div>
+  <div class="navbar">
+    <button class="nbtn nb-back" id="kron-prev" data-sfx onclick="kronPrev()">◀ Sebelumnya</button>
+    <button class="nbtn nb-next" id="kron-next" data-sfx onclick="kronNext()">Selanjutnya ▶</button>
+  </div>
+</section>
+
+<!-- ══ BERMAIN ══ -->
+<section id="scr-bermain" class="screen">
+  <div class="bg"></div>
+  <div class="topbar">
+    <div class="jbar">🎮 Bermain<small id="bermain-sub">Aktivitas</small></div>
+    <div class="spacer"></div>
+    <div class="skbadge">🏆 <span id="sk-angka">0</span></div>
+    <div class="pgwrap" style="margin-left:10px"><span class="pglabel" id="bermain-pl">1/9</span><div class="pgtrack" style="width:110px"><div class="pgfill" id="bermain-pf"></div></div></div>
+    <button class="ibtn" data-sfx onclick="goMenu()">☰</button>
+  </div>
+  <div class="content" id="bermain-content"></div>
+  <div class="navbar">
+    <button class="nbtn nb-back" data-sfx onclick="bermainPrev()">◀ Sebelumnya</button>
+    <button class="nbtn nb-next" id="bermain-next" data-sfx onclick="bermainNext()" disabled>Selanjutnya ▶</button>
+  </div>
+</section>
+
+<!-- ══ BERLATIH ══ -->
+<section id="scr-berlatih" class="screen">
+  <div class="bg"></div>
+  <div class="topbar">
+    <div class="jbar">✏️ Berlatih<small id="berlatih-sub">Uji Pemahaman</small></div>
+    <div class="spacer"></div>
+    <div class="pgwrap"><span class="pglabel" id="berlatih-pl">1/10</span><div class="pgtrack" style="width:150px"><div class="pgfill" id="berlatih-pf"></div></div></div>
+    <button class="ibtn" data-sfx onclick="goMenu()">☰</button>
+  </div>
+  <div class="content" id="berlatih-content"></div>
+  <div class="navbar">
+    <button class="nbtn nb-back" data-sfx onclick="berlatihPrev()">◀ Sebelumnya</button>
+    <button class="nbtn nb-next" id="berlatih-next" data-sfx onclick="berlatihNext()" disabled>Selanjutnya ▶</button>
+  </div>
+</section>
+
+<!-- ══ MODAL LOGIN ══ -->
+<div class="mbg" id="modal-login">
+  <div class="modal" style="width:540px;text-align:center;padding:46px">
+    <button class="tutup" data-sfx onclick="closeModal('modal-login')">✕</button>
+    <h3>Selamat Datang, Pejuang Reformasi!</h3>
+    <p style="margin-bottom:20px;color:#555;font-size:17px">Isi identitasmu sebelum memulai perjalanan sejarah ini.</p>
+    <input type="text" id="in-nama" class="iform" placeholder="Nama Lengkap" required>
+    <input type="text" id="in-sek" class="iform" placeholder="Asal Sekolah / Kelas">
+    <div id="login-pesan" style="color:var(--S);font-weight:700;margin-bottom:12px;display:none">⚠️ Nama belum diisi!</div>
+    <button class="btn bK" style="width:100%;height:60px;font-size:22px;margin-top:6px" data-sfx onclick="simpanId()">🚀 Mulai Belajar</button>
+  </div>
+</div>
+
+<!-- MODAL INFO -->
+<div class="mbg" id="modal-info">
+  <div class="modal">
+    <button class="tutup" data-sfx onclick="closeModal('modal-info')">✕</button>
+    <h3>📋 Informasi Media Pembelajaran</h3>
+    <table class="itabel">
+      <tr><td>Mata Pelajaran</td><td id="cfg-mapel">Sejarah</td></tr>
+      <tr><td>Fase / Kelas</td><td id="cfg-fase">Fase F · Kelas XII</td></tr>
+      <tr><td>Unit</td><td id="cfg-unit">Reformasi</td></tr>
+      <tr><td>Sub Unit</td><td id="cfg-subunit">Akhir Orde Baru</td></tr>
+      <tr><td>Tujuan Pembelajaran</td><td id="cfg-tp">Menganalisis faktor-faktor keruntuhan Orde Baru, dinamika gerakan mahasiswa 1998, dan proses transisi menuju era Reformasi serta dampaknya bagi kehidupan berbangsa dan bernegara.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL DEV -->
+<div class="mbg" id="modal-dev">
+  <div class="modal" style="width:720px;padding:36px">
+    <button class="tutup" data-sfx onclick="closeModal('modal-dev')">✕</button>
+    <h3 style="text-align:center;margin-bottom:20px">🏫 Profil Pengembang</h3>
+    <div style="display:flex;gap:26px;align-items:center;background:#F8FAFC;padding:26px;border-radius:var(--r24);border:2px solid var(--garis)">
+      <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div style="position:relative">
+          <img id="cfg-foto" src="./asset/img/profil_guru.jpg" alt="Foto" style="width:150px;height:190px;border-radius:var(--r16);object-fit:cover;box-shadow:var(--bayB);background:var(--P);border:4px solid #fff" onerror="imgErr(this)">
+          <div style="position:absolute;bottom:-8px;right:-8px;background:var(--H);color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:3px solid #fff">✓</div>
+        </div>
+        <div id="cfg-nama2" style="background:var(--P);color:#fff;font-weight:900;padding:5px 14px;border-radius:var(--r99);font-size:13px">Nama Pengembang</div>
+      </div>
+      <div style="flex:1">
+        <table class="itabel" style="margin-top:0;border-radius:var(--r16);overflow:hidden">
+          <tr><td style="width:35%">Nama</td><td id="cfg-nama" style="font-weight:800;color:var(--Ptua);font-size:20px">Nama Pengembang</td></tr>
+          <tr><td>Jenis</td><td id="cfg-jenis">Media Pembelajaran Interaktif (MPI)</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REFERENSI -->
+<div class="mbg" id="modal-referensi">
+  <div class="modal" style="width:720px;padding:38px">
+    <button class="tutup" data-sfx onclick="closeModal('modal-referensi')">✕</button>
+    <h3 style="margin-bottom:6px">📚 Daftar Referensi & Sumber</h3>
+    <p style="font-size:15px;color:#888;margin-bottom:20px">Sumber pustaka, aset, dan media yang digunakan dalam pembelajaran ini.</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="background:var(--Pmuda);border-left:5px solid var(--P);border-radius:var(--r16);padding:14px 18px">
+        <div style="font-size:12px;font-weight:800;color:var(--Ptua);letter-spacing:.5px;margin-bottom:5px">📖 BUKU REFERENSI</div>
+        <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px">
+          <li style="font-size:15px;font-weight:700;color:var(--T);line-height:1.55">Ricklefs, M.C. (2008). <em>Sejarah Indonesia Modern 1200–2008</em>. Jakarta: Serambi.</li>
+          <li style="font-size:15px;font-weight:700;color:var(--T);line-height:1.55">Jenkins, David. (2010). <em>Soeharto dan Barisan Jenderal: Kudeta 1-Oktober 1965</em>. Depok: Komunitas Bambu.</li>
+          <li style="font-size:15px;font-weight:700;color:var(--T);line-height:1.55">Habibie, B.J. (2006). <em>Detik-Detik Yang Menentukan: Jalan Panjang Indonesia Menuju Demokrasi</em>. Jakarta: THC Mandiri.</li>
+        </ol>
+      </div>
+      <div style="background:var(--Amuda);border-left:5px solid var(--Atua);border-radius:var(--r16);padding:14px 18px">
+        <div style="font-size:12px;font-weight:800;color:#856404;letter-spacing:.5px;margin-bottom:5px">🎨 ASET VISUAL & MEDIA</div>
+        <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px">
+          <li style="font-size:15px;font-weight:700;color:var(--T);line-height:1.55">Asset gambar dan ikon dibuat dengan AI-Generate.</li>
+          <li style="font-size:15px;font-weight:700;color:var(--T);line-height:1.55">Sumber video dari klip koran dan arsip video sejarah.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REMEDIAL ══ -->
+<section id="scr-remedial" class="screen">
+  <div class="bg"></div>
+  <div class="topbar">
+    <div class="jbar">📚 Remedial<small id="rem-sub">Ringkasan &amp; Latihan Ulang</small></div>
+    <div class="spacer"></div>
+    <div class="pgwrap"><span class="pglabel" id="rem-pl">1/3</span><div class="pgtrack" style="width:130px"><div class="pgfill" id="rem-pf"></div></div></div>
+    <button class="ibtn" data-sfx onclick="goMenu()">☰</button>
+  </div>
+  <div class="content" id="rem-content"></div>
+  <div class="navbar">
+    <button class="nbtn nb-back" data-sfx onclick="goMenu()">☰ Menu</button>
+    <button class="nbtn nb-next" id="rem-next" data-sfx onclick="remNext()" disabled>Selanjutnya ▶</button>
+  </div>
+</section>
+
+<!-- ══ BONUS HOTS ══ -->
+<section id="scr-bonus" class="screen">
+  <div class="bg"></div>
+  <div class="topbar">
+    <div class="jbar">🏆 Tantangan Bonus<small id="bonus-sub">Soal HOTS Ekstra</small></div>
+    <div class="spacer"></div>
+    <div class="pgwrap"><span class="pglabel" id="bonus-pl">1/3</span><div class="pgtrack" style="width:130px"><div class="pgfill" id="bonus-pf"></div></div></div>
+    <button class="ibtn" data-sfx onclick="goMenu()">☰</button>
+  </div>
+  <div class="content" id="bonus-content"></div>
+  <div class="navbar">
+    <button class="nbtn nb-back" data-sfx onclick="goMenu()">☰ Menu</button>
+    <button class="nbtn nb-next" id="bonus-next" data-sfx onclick="bonusNext()" disabled>Selanjutnya ▶</button>
+  </div>
+</section>
+
+<div id="awid">
+  <div class="warn-refresh" id="warn-refresh" title="Progres belajarmu tersimpan sementara di sesi ini saja">⚠️ Jangan refresh — progres hilang</div>
+  <button class="ibsm" id="snd-tog" data-sfx="no" onclick="toggleSnd()">🔊</button>
+  <input type="range" id="vslider" min="0" max="1" step="0.05" value="1" oninput="changeVol(this.value)">
+</div>
+</div></div>
+<script>
+/* ══════════════════════════════════════════════════
+   KONFIGURASI — ubah sesuai kebutuhan
+   ══════════════════════════════════════════════════ */
+const CFG = {
+  judul:'Akhir Orde Baru & Reformasi 1998', subjudul:'Krisis, Perjuangan Mahasiswa & Kelahiran Demokrasi',
+  fase:'Fase F · Kelas XII', mapel:'Sejarah', unit:'Reformasi', subunit:'Akhir Orde Baru',
+  tp:'Menganalisis faktor-faktor keruntuhan Orde Baru, dinamika gerakan mahasiswa 1998, dan proses transisi menuju era Reformasi serta dampaknya bagi kehidupan berbangsa dan bernegara.',
+  logo:'./asset/img/logo_sekolah.png', bgJudul:'./asset/img/bg_reform.jpg', raka:'./asset/img/raka.png',
+  profil:{ nama:'Ahmad Ali Murtadho, S.Pd', jenis:'Media Pembelajaran Interaktif (MPI)', foto:'./asset/img/profil_guru.jpg' }
+};
+
+/* ══════════════════════════════════════════════════
+   DATA BELAJAR — 4 slide + narasi Raka + refleksi
+   FOKUS: Akhir Orde Baru & Transisi Reformasi 1997–1999
+   ══════════════════════════════════════════════════ */
+const MATERI = [
+  { judul:'1. Fondasi yang Retak: KKN & Krisis Legitimasi Orde Baru',
+    img:'./asset/img/repelita.jpg',
+    raka:'Bapakku punya cerita: di proyek SD Inpres desanya, kontraktor pemenang tender adalah saudara Bupati. Dana negara, koneksi keluarga. Itulah KKN yang tak pernah ditulis di koran mana pun — tapi dirasakan oleh semua orang.',
+    intro:'Di balik angka pertumbuhan ekonomi yang memukau, Orde Baru membangun fondasi yang retak: KKN sistemik, kesenjangan yang melebar, dan represi yang menumpuk kemarahan rakyat.',
+    isi:`<p>Menjelang akhir kekuasaannya, Orde Baru menghadapi krisis legitimasi yang dalam. Pertumbuhan ekonomi tidak lagi mampu menutupi borok-borok sistemik:</p>
+    <ul>
+      <li><b>KKN sistemik:</b> Keluarga Cendana dan kroni Soeharto menguasai lebih dari 50 perusahaan strategis — minyak, semen, telekomunikasi, perbankan, dan pangan nasional.</li>
+      <li><b>Kesenjangan melebar:</b> Pertumbuhan 7% per tahun hanya dinikmati segelintir elite. Petani kecil dan buruh tetap terpinggirkan sementara kekayaan menumpuk di Cendana.</li>
+      <li><b>Represi politik:</b> Aktivis, jurnalis, dan akademisi yang kritis bisa dilabeli "PKI" atau "subversif" — dan hilang tanpa proses hukum yang jelas.</li>
+      <li><b>Dwifungsi ABRI:</b> Militer menduduki kursi DPR dan jabatan sipil tanpa Pemilu, menciptakan negara polisional yang mengawasi setiap lapisan masyarakat.</li>
+    </ul>
+    <p>Fondasi yang rapuh ini tinggal menunggu satu guncangan besar untuk runtuh. Guncangan itu datang dari Asia, pada Juli 1997.</p>`,
+    refleksi:'Menurutmu, mengapa KKN yang sudah berlangsung puluhan tahun baru meledak menjadi krisis pada 1998? Faktor apa yang menjadi "batas kesabaran" rakyat?',
+    kuis:{ t:'Konsep yang memungkinkan militer menduduki kursi DPR tanpa Pemilu disebut?', o:['Dwifungsi ABRI','Repelita'], j:0 } },
+
+  { judul:'2. Badai Krisis Moneter 1997: Rupiah Jatuh, Rakyat Sengsara',
+    img:'./asset/img/bankrupt.png',
+    raka:'Akhir 1997. Bapak kena PHK minggu ketiga Desember. Mie instan naik tiga kali lipat dalam sebulan. SPP adikku menunggak berbulan-bulan. Krisis itu bukan angka di koran — itu soal makan atau tidak makan setiap hari.',
+    intro:'Krisis moneter Asia 1997 menghantam Indonesia dengan brutal. Rupiah jatuh bebas, harga sembako meledak, jutaan orang kehilangan pekerjaan. Inilah bahan bakar yang menyulut api Reformasi.',
+    isi:`<p>Pertengahan 1997, krisis keuangan melanda Asia — dan Indonesia menjadi yang paling parah terpukul:</p>
+    <ul>
+      <li><b>Rupiah anjlok dahsyat:</b> Dari Rp2.500/dolar (mid-1997) menjadi <b>Rp17.000/dolar</b> (puncak krisis, Januari 1998) — jatuh lebih dari 600% hanya dalam enam bulan.</li>
+      <li><b>Inflasi dan kelangkaan pangan:</b> Harga beras naik lebih dari 300%. Minyak goreng dan gula raib dari pasaran. Antrian panjang terjadi di depan toko-toko sembako di seluruh kota.</li>
+      <li><b>PHK massal:</b> Lebih dari 20 juta orang kehilangan pekerjaan dalam hitungan bulan. Angka kemiskinan yang sudah turun 30 tahun lenyap dalam satu tahun saja.</li>
+      <li><b>IMF & paket penyelamatan:</b> Indonesia meminjam USD 43 miliar dari IMF — namun syaratnya (mencabut subsidi, menaikkan harga BBM) justru memperparah penderitaan rakyat kecil.</li>
+    </ul>
+    <p>Rakyat yang selama 32 tahun menahan diri kini tidak punya alasan untuk terus diam. Krisis mengubah ketidakpuasan yang terpendam menjadi kemarahan yang siap meledak.</p>`,
+    refleksi:'Bagaimana krisis ekonomi bisa menjadi katalisator perubahan politik? Apakah krisis selalu harus terjadi lebih dulu sebelum perubahan bisa datang?',
+    kuis:{ t:'Nilai kurs rupiah terburuk saat puncak krisis moneter 1998 mencapai sekitar…', o:['Rp17.000 per dolar','Rp5.000 per dolar'], j:0 } },
+
+  { judul:'3. Mahasiswa Bangkit: Demonstrasi & Tragedi Trisakti',
+    img:'./asset/img/trisakti_demo.jpg',
+    raka:'12 Mei 1998. Aku ada di kampus saat tembakan itu terdengar. Empat kawanku — Elang, Heri, Hendriawan, Hafidin — tidak pulang. Hari itu mengubah segalanya dalam hidupku. Kemarahan yang sudah lama tertahan akhirnya tidak bisa dibendung lagi.',
+    intro:'Gerakan mahasiswa 1998 adalah perjuangan sipil terbesar dalam sejarah Indonesia modern — dari kampus-kampus seluruh nusantara hingga Gedung DPR dan akhirnya Istana Negara.',
+    isi:`<p>Krisis ekonomi menjadi katalisator bagi perlawanan yang sudah lama menunggu momentumnya:</p>
+    <ul>
+      <li><b>Januari–April 1998:</b> Ribuan mahasiswa dari seluruh Indonesia mulai turun ke jalan. Tuntutan pokok: <b>Soeharto mundur, cabut Dwifungsi ABRI, berantas KKN, otonomi daerah, tegakkan supremasi hukum</b>.</li>
+      <li><b>12 Mei 1998 — Tragedi Trisakti:</b> Aparat menembaki mahasiswa yang berunjuk rasa damai. Empat mahasiswa gugur: <b>Elang Mulia Lesmana, Heri Hertanto, Hendriawan Sie, Hafidin Royan</b>. Tragedi ini mengguncang seluruh Indonesia.</li>
+      <li><b>13–15 Mei 1998 — Kerusuhan Jakarta:</b> Kemarahan publik meledak menjadi kerusuhan massal. Lebih dari <b>1.000 orang tewas</b>, ribuan bangunan terbakar — salah satu tragedi kemanusiaan terbesar pascakemerdekaan.</li>
+      <li><b>18–19 Mei 1998:</b> Ribuan mahasiswa menduduki Gedung DPR/MPR. Ratusan anggota DPR melarikan diri. Soeharto kehilangan dukungan dari kabinet dan pimpinan militer.</li>
+    </ul>
+    <p>Gerakan mahasiswa membuktikan: ketika rakyat bersatu menyuarakan kebenaran dengan tekad yang bulat, bahkan kekuasaan 32 tahun pun bisa goyah.</p>`,
+    refleksi:'Apa yang membuat Tragedi Trisakti menjadi titik balik — bukan hanya tragedi yang berlalu? Mengapa kematian empat mahasiswa itu justru mempercepat Reformasi?',
+    kuis:{ t:'Tanggal berapa Tragedi Trisakti yang menewaskan empat mahasiswa terjadi?', o:['12 Mei 1998','21 Mei 1998'], j:0 } },
+
+  { judul:'4. Soeharto Mundur & Fajar Reformasi: Era Habibie',
+    img:'./asset/img/reformasi1.jpg',
+    raka:'21 Mei 1998. Aku berdiri di depan TV ketika Soeharto membacakan pidato mundurnya. Air mata mengalir sendiri — bukan karena sedih, tapi karena tidak percaya. Tiga puluh dua tahun berakhir dalam sembilan menit. Habibie kemudian melakukan banyak perubahan lebih cepat dari yang siapa pun bayangkan.',
+    intro:'21 Mei 1998: Soeharto mundur. Era Orde Baru berakhir. B.J. Habibie memimpin transisi paling dramatis dalam sejarah Indonesia — membuka pintu demokrasi yang selama 32 tahun tertutup rapat.',
+    isi:`<p>Setelah kehilangan dukungan dari kabinet, pimpinan DPR, dan jenderal-jenderal seniornya, Soeharto akhirnya menyerah:</p>
+    <ul>
+      <li><b>21 Mei 1998:</b> Soeharto menyatakan berhenti dari jabatan Presiden RI setelah 32 tahun berkuasa. Wakil Presiden <b>B.J. Habibie</b> langsung dilantik sebagai Presiden ke-3 RI.</li>
+      <li><b>Kebebasan pers:</b> Dalam hitungan minggu, Habibie mencabut peraturan sensor pers. Ratusan media baru bermunculan. Rakyat untuk pertama kalinya bebas membaca dan mengungkapkan pendapat secara terbuka.</li>
+      <li><b>Multipartai & Pemilu 1999:</b> Habibie membuka sistem multipartai. <b>Pemilu Juni 1999</b> — diikuti 48 partai — berlangsung relatif bebas dan adil, pertama kalinya sejak 1955.</li>
+      <li><b>Referendum Timor Timur (Agustus 1999):</b> Keputusan berani: menggelar referendum kemerdekaan. Hasilnya — 78,5% memilih merdeka. Timor-Leste lahir sebagai negara baru.</li>
+      <li><b>Pembebasan tahanan politik:</b> Aktivis dan tokoh yang dipenjara Orde Baru mulai dibebaskan satu per satu.</li>
+    </ul>
+    <p>Masa transisi Habibie hanya 17 bulan — singkat, penuh gejolak, namun mengubah wajah Indonesia secara fundamental dan membuka jalan bagi demokrasi yang sesungguhnya.</p>`,
+    refleksi:'Apakah Habibie layak disebut "arsitek Reformasi" atau sekadar "warisan Orde Baru yang bertobat"? Berikan argumenmu dari dua sisi!',
+    kuis:{ t:'Presiden RI yang langsung menggantikan Soeharto pada 21 Mei 1998 adalah?', o:['B.J. Habibie','Abdurrahman Wahid'], j:0 } }
+];
+
+/* ══════════════════════════════════════════════════
+   DATA KRONOLOGI — 2 linimasa fokus akhir Orba & Reformasi
+   ══════════════════════════════════════════════════ */
+const KRONOLOGI = [
+  { judul:'Keruntuhan Orde Baru (1997–1998)', sub:'Dari Krisis Moneter ke Reformasi Berdarah',
+    warna:'#7F0000', dotBg:'#B71C1C', lineBg:'rgba(255,214,0,.4)',
+    rakaKata:'Aku ingat, harga mie instan naik tiga kali lipat dalam sebulan. Bapak kena PHK. Adikku tidak bisa bayar SPP. Krisis bukan angka di koran — itu soal makan atau tidak makan setiap hari.',
+    info:`<p>Reformasi 1998 bukan sekadar gerakan mahasiswa — ini adalah ledakan dari puluhan tahun tekanan yang menumpuk. Rakyat dari semua lapisan masyarakat ikut merasakan kesakitan akibat krisis dan ketidakadilan yang sudah lama ada.</p>
+    <ul><li>Tragedi Trisakti memicu kerusuhan 13–15 Mei — salah satu tragedi kemanusiaan terbesar pascakemerdekaan Indonesia.</li>
+    <li>Lebih dari 1.000 orang tewas dalam kerusuhan Mei 1998 di Jakarta dan beberapa kota besar lainnya.</li></ul>`,
+    events:[
+      {thn:'Jul\n1997',judul:'Krisis Moneter Asia',info:'Rupiah terjun bebas dari Rp2.500 ke Rp17.000/dolar. Inflasi melonjak, harga sembako naik drastis, PHK massal melanda jutaan pekerja di seluruh Indonesia.'},
+      {thn:'Jan–Apr\n1998',judul:'Demo Mahasiswa Meluas',info:'Ribuan mahasiswa dari seluruh Indonesia turun ke jalan. Tuntutan utama: Soeharto mundur, cabut Dwifungsi ABRI, berantas KKN, otonomi daerah.'},
+      {thn:'12 Mei\n1998',judul:'Tragedi Trisakti',info:'Aparat menembaki mahasiswa yang berdemo damai. Empat mahasiswa gugur: Elang Mulia Lesmana, Heri Hertanto, Hendriawan Sie, dan Hafidin Royan.'},
+      {thn:'13–15 Mei\n1998',judul:'Kerusuhan Massal Jakarta',info:'Lebih dari 1.000 tewas, ribuan bangunan terbakar, penjarahan massal. Salah satu tragedi terbesar dalam sejarah Indonesia modern.'},
+      {thn:'18–19 Mei\n1998',judul:'Mahasiswa Duduki DPR',info:'Ribuan mahasiswa menduduki Gedung DPR/MPR. Soeharto kehilangan dukungan dari kabinet, pimpinan DPR, dan jenderal-jenderal senior TNI.'},
+      {thn:'21 Mei\n1998',judul:'Soeharto Mundur',info:'Soeharto menyatakan mundur setelah 32 tahun berkuasa. Habibie langsung dilantik. Era Reformasi resmi dimulai.'} ] },
+
+  { judul:'Fajar Reformasi & Transisi (1998–1999)', sub:'Dari Otoritarianisme ke Demokrasi Pertama',
+    warna:'#E65100', dotBg:'#F57F17', lineBg:'rgba(255,255,255,.3)',
+    rakaKata:'Reformasi memberi kita kebebasan yang 32 tahun dirampas. Tapi kebebasan itu harus dijaga dan diperjuangkan setiap hari. — bukan hanya sekali lalu ditinggalkan. Itu tugas kalian, generasi berikutnya.',
+    info:`<p>Era Habibie adalah transisi paling intens dalam sejarah Indonesia, hanya 17 bulan yang mengubah hampir segalanya. Kebebasan yang lama dirindukan akhirnya datang.</p>
+    <ul><li>Pemilu 1999 adalah pertama kali rakyat bebas memilih setelah 44 tahun sejak Pemilu 1955.</li>
+    <li>Keputusan referendum Timor Timur menjadi keputusan paling kontroversial Habibie.</li></ul>`,
+    events:[
+      {thn:'21 Mei\n1998',judul:'Habibie Dilantik',info:'B.J. Habibie menjadi Presiden ke-3 RI. Orde Baru resmi berakhir. Era Reformasi dimulai dengan penuh ketidakpastian sekaligus harapan yang besar.'},
+      {thn:'Jun\n1998',judul:'Kebebasan Pers Dibuka',info:'Habibie mencabut peraturan sensor pers. Dalam hitungan minggu, ratusan media baru bermunculan. Rakyat pertama kali bebas mengungkapkan pendapat secara terbuka.'},
+      {thn:'Jan\n1999',judul:'Sistem Multipartai Dibuka',info:'UU Pemilu baru memperbolehkan banyak partai. Dari tiga kekuatan politik Orde Baru, tiba-tiba bermunculan 48 partai peserta Pemilu dalam waktu singkat.'},
+      {thn:'Jun\n1999',judul:'Pemilu Bebas Pertama',info:'Pemilu diikuti 48 partai; berlangsung damai dan demokratis — pertama kalinya sejak 1955. PDI-P (Megawati) meraih suara terbanyak secara nasional.'},
+      {thn:'Agu\n1999',judul:'Referendum Timor Timur',info:'78,5% warga Timor Timur memilih merdeka. Timor-Leste lahir sebagai negara baru. Keputusan Habibie ini menuai pujian internasional namun kontroversi di dalam negeri.'} ] },
+
+  { judul:'Saksi Sejarah: Arsip Video 1998', sub:'Dokumen Visual Peristiwa Reformasi',
+    warna:'#1A237E', dotBg:'#283593', lineBg:'rgba(255,214,0,.35)',
+    video:'./asset/video/reformasi_1998.mp4',
+    videoPoster:'./asset/img/bg_reformasi.jpg',
+    rakaKata:'Video kumpulan koran dan video menuju Reformasi adalah bukti otentik.',
+    info:`<p>Arsip video ini merekam momen-momen paling menentukan dalam sejarah Indonesia modern — dari demonstrasi mahasiswa di depan Gedung DPR hingga detik-detik mundurnya Soeharto.</p>
+    <ul><li>Video merupakan dokumen primer yang tak ternilai karena rekaman nyata dari peristiwa yang mengubah Indonesia selamanya.</li></ul>`,
+    events:[
+      {thn:'Jan–Apr\n1998',judul:'Demonstrasi Meluas',info:'Ribuan mahasiswa dari berbagai kota turun ke jalan. Kamera merekam semangat dan keberanian yang menolak untuk padam meski dihadang represi.'},
+      {thn:'12 Mei\n1998',judul:'Tragedi Trisakti',info:'Rekaman detik-detik penembakan di Universitas Trisakti. Empat mahasiswa gugur; footage ini menjadi bukti yang mengguncang nurani bangsa.'},
+      {thn:'18–19 Mei\n1998',judul:'Gedung DPR Diduduki',info:'Ribuan mahasiswa memanjat pagar dan memenuhi atap Gedung DPR/MPR — simbol kemenangan rakyat atas tirani yang diabadikan kamera jurnalis dunia.'},
+      {thn:'21 Mei\n1998',judul:'Pidato Mundur Soeharto',info:'Siaran langsung TVRI: Soeharto membacakan pernyataan pengunduran diri. Tiga puluh dua tahun kekuasaan berakhir dalam sembilan menit di depan kamera.'} ] }
+];
+
+/* ══════════════════════════════════════════════════
+   DATA BERMAIN — 9 aktivitas (8 game + 1 HOTS dok)
+   FOKUS: Akhir Orde Baru & Transisi Reformasi
+   ══════════════════════════════════════════════════ */
+const BERMAIN = [
+  { t:'jodoh', sub:'Tokoh & Perannya', ins:'Jodohkan tokoh dengan era/perannya yang tepat!',
+    pairs:[{n:1,teks:'Soeharto'},{n:2,teks:'B.J. Habibie'},{n:3,teks:'Mahasiswa 1998'}],
+    imgs:[{n:1,i:'./asset/img/icon_orba.png',name:'Presiden Orde Baru (1966–1998)'},
+          {n:2,i:'./asset/img/icon_ref1.png',name:'Pemimpin Transisi Reformasi (1998–1999)'},
+          {n:3,i:'./asset/img/icon_demo.png',name:'Motor Gerakan Reformasi 1998'}] },
+
+  { t:'urut', sub:'Kronologi Mei 1998', ins:'Urutkan peristiwa Mei 1998 dari yang paling awal!',
+    urut:['Demo mahasiswa besar-besaran di berbagai kota',
+          'Tragedi Trisakti (12 Mei 1998)',
+          'Kerusuhan 13–15 Mei 1998 di Jakarta',
+          'Mahasiswa menduduki Gedung DPR/MPR (18–19 Mei)',
+          'Soeharto menyatakan mundur (21 Mei 1998)',
+          'B.J. Habibie dilantik sebagai Presiden'] },
+
+  { t:'sambung', sub:'Tuntutan Pokok Reformasi 1998', ins:'Lengkapi kalimat tentang tuntutan yang diperjuangkan mahasiswa 1998!',
+    hasil:'Mahasiswa 1998 menuntut: Soeharto turun, cabut Dwifungsi ABRI, berantas KKN, otonomi daerah, dan tegakkan supremasi hukum.',
+    steps:[
+      {prev:'Tuntutan agar militer meninggalkan jabatan sipil dan kursi DPR disebut mencabut…',benar:'Dwifungsi ABRI',salah:['Repelita','Supersemar']},
+      {prev:'Tuntutan pemberantasan Korupsi, Kolusi, dan Nepotisme disingkat…',benar:'KKN',salah:['HAM','PKI']},
+      {prev:'Tuntutan agar kekuasaan tidak lagi terpusat di Jakarta disebut…',benar:'Otonomi Daerah',salah:['Fusi Parpol','Golkarisasi']} ] },
+
+  { t:'dok', sub:'Analisis Sumber Primer: Supersemar', ins:'Baca kutipan dokumen sejarah, lalu jawab pertanyaan analitisnya!',
+    dokumen:{
+      ikon:'📜', judul:'Isi Inti Supersemar (11 Maret 1966)',
+      tags:['Sumber Primer','1966','Surat Mandat','Kontroversial'],
+      teks:'Presiden/Panglima Tertinggi Angkatan Bersenjata/Pemimpin Besar Revolusi/Mandataris MPRS memberi wewenang kepada Letnan Jenderal <b>Soeharto</b>… untuk atas nama Presiden/Panglima Tertinggi/Pemimpin Besar Revolusi/Mandataris MPRS, mengambil segala tindakan yang dianggap perlu, untuk terjaminnya keamanan dan ketenangan serta kestabilan jalannya Pemerintahan dan jalannya Revolusi…',
+      meta:'Sumber: Arsip Nasional RI · Catatan: Keaslian dokumen asli masih diperdebatkan — tiga versi berbeda pernah ditemukan oleh para sejarawan.',
+      rakaInsight:'Coba perhatikan frasa ini — "segala tindakan yang dianggap perlu"… Siapa yang menentukan mana yang dianggap perlu? Itulah celah kekuasaannya — dan awal dari 32 tahun Orde Baru.'
+    },
+    langkah:[
+      { q:'Frasa "segala tindakan yang dianggap perlu" dalam Supersemar menunjukkan bahwa dokumen ini bersifat…',
+        o:['Sangat spesifik, hanya berlaku untuk tindakan keamanan tertentu',
+           'Sangat luas dan berpotensi disalahgunakan untuk konsolidasi kekuasaan',
+           'Hanya berlaku satu hari sebagai tindakan darurat semata',
+           'Tidak memiliki kekuatan hukum yang nyata secara konstitusional'],
+        j:1, ket:'Frasa tersebut sangat ambigu dan terbuka lebar, memberi Soeharto legitimasi untuk tindakan apa pun dengan alasan "keamanan dan stabilitas".' },
+      { q:'Fakta bahwa tiga versi Supersemar yang berbeda pernah ditemukan mengungkap masalah apa dalam penulisan sejarah?',
+        o:['Pemerintah memang sengaja membuat beberapa versi agar lebih fleksibel',
+           'Betapa sulitnya memverifikasi sumber primer — sejarah bisa dimanipulasi oleh pihak yang berkuasa',
+           'Supersemar tidak pernah benar-benar ada dan hanya sebuah mitos belaka',
+           'Ini adalah hal yang biasa dan wajar dalam penulisan dokumen negara'],
+        j:1, ket:'Ini pelajaran kritis: sejarawan harus selalu memverifikasi sumber, mempertanyakan siapa yang menulis, kapan, di mana, dan untuk kepentingan apa dokumen itu dibuat.' },
+      { q:'Mengapa memahami Supersemar penting untuk menganalisis KERUNTUHAN Orde Baru 32 tahun kemudian?',
+        o:['Karena Supersemar berisi rencana rahasia Soeharto untuk memerintah selama 32 tahun',
+           'Karena kekuasaan yang dibangun di atas dokumen berlegitimasi lemah menjadi rapuh secara moral saat krisis datang',
+           'Karena Supersemar secara hukum otomatis kadaluarsa setelah 30 tahun',
+           'Karena mahasiswa 1998 menemukan Supersemar dan membuktikan kepalsuan Soeharto kepada publik'],
+        j:1, ket:'Kekuasaan yang dibangun di atas legitimasi yang dipertanyakan menjadi rapuh ketika krisis datang — rakyat lebih mudah menolak hak berkuasa pemimpin yang fondasi kekuasaannya sendiri tidak kokoh.' }
+    ] },
+
+  { t:'klik', sub:'Tokoh Tragedi Trisakti', ins:'Pilih mahasiswa yang merupakan korban Tragedi Trisakti 12 Mei 1998!',
+    opsi:[
+      {imgPath:'./asset/img/elang.png',t:'Elang Mulia Lesmana',b:true,msg:'Benar! Ia salah satu dari empat mahasiswa Trisakti yang gugur ditembak 12 Mei 1998.'},
+      {imgPath:'./asset/img/budiman.png',t:'Budiman Sudjatmiko',b:false,msg:'Bukan. B.J. Habibie adalah Presiden RI ke-3 yang menggantikan Soeharto pada 21 Mei 1998.'},
+      {imgPath:'./asset/img/widji.png',t:'Widji Thukul',b:false,msg:'Bukan. Megawati adalah pemimpin PDI-P yang menang Pemilu 1999, lalu menjadi Presiden RI ke-5.'},
+      {imgPath:'./asset/img/gie.png',t:'Soe Hok Gie',b:false,msg:'Bukan. Gus Dur adalah tokoh NU yang terpilih menjadi Presiden RI ke-4 oleh MPR pada Oktober 1999.'} ] },
+
+  { t:'sambung', sub:'Kebijakan Reformasi Habibie', ins:'Lengkapi kalimat tentang kebijakan penting B.J. Habibie di era transisi!',
+    hasil:'Habibie melakukan: kebebasan pers, pemilu multipartai 1999 dengan 48 partai, dan referendum kemerdekaan Timor Timur.',
+    steps:[
+      {prev:'Habibie mencabut sensor pers sehingga rakyat mendapat jaminan…',benar:'Kebebasan Pers',salah:['Dwifungsi ABRI','Fusi Parpol']},
+      {prev:'Pemilu pertama era Reformasi (Juni 1999) diikuti sebanyak…',benar:'48 partai',salah:['3 partai','12 partai']},
+      {prev:'Keputusan berani Habibie yang menggelar suara rakyat di Timor Timur disebut…',benar:'Referendum',salah:['Pemilu','Musyawarah Nasional']} ] },
+
+  { t:'jodoh', sub:'Konsep & Definisi Kunci', ins:'Jodohkan istilah dengan artinya yang tepat!',
+    pairs:[{n:1,teks:'Krisis Moneter 1997'},{n:2,teks:'Dwifungsi ABRI'},{n:3,teks:'Tragedi Trisakti'}],
+    imgs:[{n:1,i:'./asset/img/icon_krismon.png',name:'Rupiah jatuh ke Rp17.000/dolar; PHK massal (1997–1998)'},
+          {n:2,i:'./asset/img/icon_militer.png',name:'Peran ganda militer: hankam & sosial-politik'},
+          {n:3,i:'./asset/img/icon_mahasiswa.png',name:'Penembakan 4 mahasiswa pada 12 Mei 1998'}] },
+
+  { t:'kumpul', sub:'Kumpulkan Tuntutan Reformasi 1998', ins:'Ketuk hanya TUNTUTAN REFORMASI 1998 yang valid! Hindari yang bukan tuntutan.',
+    benar:'./asset/img/reformasi_tuntutan.png',
+    salah:['./asset/img/bukan_tuntutan1.png','./asset/img/bukan_tuntutan2.png'] },
+
+  { t:'sambung', sub:'Fakta Tragedi & Kronologi', ins:'Lengkapi fakta-fakta sejarah berikut dengan pilihan yang tepat!',
+    hasil:'Tragedi Trisakti 12 Mei 1998 menewaskan 4 mahasiswa; kerusuhan berlanjut 13–15 Mei; Soeharto mundur 21 Mei 1998.',
+    steps:[
+      {prev:'Tragedi penembakan mahasiswa pada Mei 1998 terjadi di Universitas…',benar:'Trisakti',salah:['UI','UGM']},
+      {prev:'Jumlah mahasiswa yang gugur dalam Tragedi Trisakti adalah…',benar:'4 (empat) orang',salah:['2 (dua) orang','10 (sepuluh) orang']},
+      {prev:'Soeharto menyerahkan kekuasaan kepada Wakil Presiden…',benar:'B.J. Habibie',salah:['Try Sutrisno','Megawati']} ] },
+];
+
+/* ══════════════════════════════════════════════════
+   DATA BERLATIH — 10 soal multi-tipe
+   FOKUS: Akhir Orde Baru & Transisi Reformasi
+   ══════════════════════════════════════════════════ */
+const LATIH = [
+  { t:'pg', soal:'Surat Perintah 11 Maret 1966 yang memberikan mandat kekuasaan kepada Soeharto dikenal dengan nama…',
+    opsi:['Supersemar','Tritura','Dekon','Nasakom'], j:0,
+    msg:'Supersemar = Surat Perintah Sebelas Maret. Inilah tonggak peralihan kekuasaan dari Soekarno ke Soeharto yang memulai 32 tahun Orde Baru.' },
+  { t:'bs', soal:'Konsep Dwifungsi ABRI memungkinkan militer menduduki kursi di DPR/MPR tanpa melalui pemilihan umum selama era Orde Baru.',
+    j:true, msg:'Benar. Militer mendapat jatah kursi otomatis di lembaga legislatif — inilah instrumen kontrol politik terkuat Orde Baru yang menjadi tuntutan utama gerakan mahasiswa 1998.' },
+  { t:'drag', soal:'Tragedi penembakan mahasiswa pada <span class="bslot" data-id="1">___</span> Mei 1998 terjadi di Universitas Trisakti dan menewaskan <span class="bslot" data-id="2">___</span> mahasiswa.',
+    w:['12','4','21','6'], j:['12','4'],
+    msg:'12 Mei 1998 adalah hari Tragedi Trisakti; empat mahasiswa gugur: Elang Mulia, Heri Hertanto, Hendriawan Sie, dan Hafidin Royan.' },
+  { t:'pgk', soal:'Pilih DUA faktor utama yang menyebabkan jatuhnya Orde Baru! (Pilih 2)',
+    opsi:['Krisis moneter Asia 1997 yang melumpuhkan ekonomi Indonesia',
+          'Invasi militer dari negara tetangga',
+          'Gerakan mahasiswa yang menuntut reformasi total',
+          'Bencana alam berskala besar di seluruh nusantara'],
+    j:[0,2], msg:'Krisis moneter 1997 dan gerakan mahasiswa 1998 adalah dua faktor utama yang meruntuhkan legitimasi Orde Baru.' },
+  { t:'jodoh', soal:'Jodohkan tokoh dengan jabatan/perannya dalam sejarah!',
+    pairs:[{n:1,t:'Soeharto'},{n:2,t:'B.J. Habibie'}],
+    imgs:[{n:1,i:'./asset/img/icon_orba.png',name:'Presiden RI ke-2, berkuasa 32 tahun (1966–1998)'},
+          {n:2,i:'./asset/img/icon_ref1.png',name:'Presiden RI ke-3, pemimpin transisi Reformasi (1998–1999)'}] },
+  { t:'pg', soal:'Pada puncak krisis moneter (awal 1998), kurs rupiah terhadap dolar AS sempat mencapai sekitar…',
+    opsi:['Rp5.000/dolar','Rp8.000/dolar','Rp17.000/dolar','Rp25.000/dolar'], j:2,
+    msg:'Rupiah jatuh dari sekitar Rp2.500/dolar (mid-1997) ke hampir Rp17.000/dolar (Januari 1998) — penurunan lebih dari 600% yang menghancurkan daya beli jutaan rakyat.' },
+  { t:'bs', soal:'Referendum kemerdekaan Timor Timur 1999 adalah keputusan kebijakan Presiden Soeharto semasa Orde Baru masih berkuasa.',
+    j:false, msg:'Salah. Referendum Timor Timur 1999 adalah keputusan berani Presiden B.J. Habibie di era awal Reformasi — bukan kebijakan Orde Baru.' },
+  { t:'pgk', soal:'Pilih DUA tuntutan pokok gerakan mahasiswa Reformasi 1998! (Pilih 2)',
+    opsi:['Soeharto mundur dari jabatan Presiden',
+          'Mengembalikan sistem pemerintahan seperti era Soekarno',
+          'Pencabutan Dwifungsi ABRI dari kehidupan politik',
+          'Pembentukan negara federal di Indonesia'],
+    j:[0,2], msg:'Dua tuntutan utama mahasiswa 1998 adalah: (1) Soeharto mundur dan (2) pencabutan Dwifungsi ABRI — selain juga pemberantasan KKN, otonomi daerah, dan supremasi hukum.' },
+  { t:'drag', soal:'Soeharto menyatakan mundur pada tanggal <span class="bslot" data-id="1">___</span> Mei 1998, digantikan oleh <span class="bslot" data-id="2">___</span> sebagai Presiden RI ke-3.',
+    w:['21','B.J. Habibie','12','Megawati'], j:['21','B.J. Habibie'],
+    msg:'21 Mei 1998 adalah tanggal bersejarah: Soeharto membacakan pidato pengunduran diri setelah 32 tahun berkuasa, dan B.J. Habibie langsung dilantik sebagai penggantinya.' },
+  { t:'pg', soal:'Pemilu multipartai pertama Indonesia di era Reformasi, yang diikuti 48 partai, diselenggarakan pada tahun…',
+    opsi:['1998','1999','2001','2004'], j:1,
+    msg:'Pemilu Juni 1999 adalah pemilu bebas dan multipartai pertama sejak Pemilu 1955 — 44 tahun lamanya. PDI-P (Megawati) menjadi partai pemenang suara terbanyak secara nasional.' }
+];
+
+/* ══════════════════════════════════════════════════
+   SVG PLACEHOLDER GENERATOR — built-in, tanpa file eksternal
+   ══════════════════════════════════════════════════ */
+const SVG_MAP = {
+  'bg_reformasi':{e:'🔥',l:'Reformasi 1998',c1:'#B71C1C',c2:'#7F0000'},
+  'supersemar':{e:'📜',l:'Supersemar 1966',c1:'#1A237E',c2:'#283593'},
+  'dwifungsi':{e:'⚔️',l:'Dwifungsi ABRI',c1:'#1B5E20',c2:'#2E7D32'},
+  'repelita':{e:'🏗️',l:'Repelita & Pembangunan',c1:'#E65100',c2:'#BF360C'},
+  'trisakti_demo':{e:'✊',l:'Demo Mahasiswa 1998',c1:'#B71C1C',c2:'#7F0000'},
+  'habibie_pemilu':{e:'🗳️',l:'Pemilu 1999',c1:'#1565C0',c2:'#0D47A1'},
+  'pilpres_langsung':{e:'🗳️',l:'Pilpres 2004',c1:'#1B5E20',c2:'#2E7D32'},
+  'raka':{e:'🎓',l:'Raka – Mahasiswa 98',c1:'#37474F',c2:'#263238'},
+  'profil_guru':{e:'👤',l:'Pengembang',c1:'#4527A0',c2:'#311B92'},
+  'logo_sekolah':{e:'🏫',l:'Logo Sekolah',c1:'#B71C1C',c2:'#7F0000'},
+  'elang':{e:'✊',l:'Elang Mulia Lesmana',c1:'#B71C1C',c2:'#7F0000'},
+  'habibie_muda':{e:'👔',l:'B.J. Habibie',c1:'#1A237E',c2:'#283593'},
+  'megawati_muda':{e:'👔',l:'Megawati',c1:'#E65100',c2:'#BF360C'},
+  'gus_dur':{e:'👔',l:'Gus Dur',c1:'#1B5E20',c2:'#2E7D32'},
+  'reformasi_tuntutan':{e:'📋',l:'Tuntutan Reformasi',c1:'#B71C1C',c2:'#7F0000'},
+  'bukan_tuntutan1':{e:'❌',l:'Bukan Tuntutan',c1:'#546E7A',c2:'#37474F'},
+  'bukan_tuntutan2':{e:'❌',l:'Bukan Tuntutan',c1:'#546E7A',c2:'#37474F'},
+  'icon_orba':{e:'🏛️',l:'Orde Baru',c1:'#37474F',c2:'#263238'},
+  'icon_ref1':{e:'🌅',l:'Reformasi Awal',c1:'#1A237E',c2:'#283593'},
+  'icon_ref2':{e:'🌄',l:'Reformasi',c1:'#1B5E20',c2:'#2E7D32'},
+  'icon_dok':{e:'📜',l:'Dokumen',c1:'#F57F17',c2:'#E65100'},
+  'icon_bangunan':{e:'🏗️',l:'Pembangunan',c1:'#1B5E20',c2:'#2E7D32'},
+  'icon_militer':{e:'⚔️',l:'Militer',c1:'#37474F',c2:'#263238'},
+  'icon_pres3':{e:'👔',l:'Presiden ke-3',c1:'#1A237E',c2:'#283593'},
+  'icon_pres5':{e:'👔',l:'Presiden ke-5',c1:'#E65100',c2:'#BF360C'},
+  'default':{e:'🖼️',l:'Gambar',c1:'#546E7A',c2:'#37474F'}
+};
+
+function makeSVG(key, w, h) {
+  const sc = SVG_MAP[key] || SVG_MAP['default'];
+  return `<svg xmlns='http://www.w3.org/2000/svg' width='${w||220}' height='${h||160}'>` +
+    `<defs><linearGradient id='g${key.replace(/[^a-z0-9]/gi,'_')}' x1='0' y1='0' x2='1' y2='1'>` +
+    `<stop offset='0%' stop-color='${sc.c1}'/><stop offset='100%' stop-color='${sc.c2}'/></linearGradient></defs>` +
+    `<rect width='100%' height='100%' rx='14' fill='url(#g${key.replace(/[^a-z0-9]/gi,'_')})'/>` +
+    `<text x='50%' y='43%' font-size='48' text-anchor='middle'>${sc.e}</text>` +
+    `<text x='50%' y='77%' font-size='13' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='rgba(255,255,255,.85)'>${sc.l}</text></svg>`;
+}
+
+function imgErr(el) {
+  el.onerror = null;
+  const src = el.src || el.getAttribute('src') || '';
+  let key = 'default';
+  for (const k in SVG_MAP) { if (src.includes(k)) { key = k; break; } }
+  const w = el.naturalWidth || el.width || 220;
+  const h = el.naturalHeight || el.height || 160;
+  el.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(makeSVG(key, w || 220, h || 160));
+}
+
+function svgPH(key, w, h) {
+  return `<div style="width:${w||'100%'};height:${h||'100%'};display:flex;align-items:center;justify-content:center;
+    border-radius:12px;overflow:hidden;background:linear-gradient(135deg,${(SVG_MAP[key]||SVG_MAP.default).c1},${(SVG_MAP[key]||SVG_MAP.default).c2})">
+    <div style="text-align:center"><div style="font-size:44px">${(SVG_MAP[key]||SVG_MAP.default).e}</div>
+    <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.8);margin-top:6px">${(SVG_MAP[key]||SVG_MAP.default).l}</div></div></div>`;
+}
+
+/* ══════════════════════════════════════════════════
+   RESIZE / SCALE
+   ══════════════════════════════════════════════════ */
+const stage = document.getElementById('stage');
+function resize() {
+  const sc = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+  stage.style.transform = `scale(${sc})`;
+  stage.style.left = ((window.innerWidth - 1280 * sc) / 2) + 'px';
+  stage.style.top = ((window.innerHeight - 720 * sc) / 2) + 'px';
+  checkOrientation(sc);
+}
+/* Layar sempit + potret (umumnya HP) akan membuat skala < 0.5 sehingga
+   teks & tombol jadi terlalu kecil untuk disentuh — minta putar ke landscape. */
+function checkOrientation(sc) {
+  const ov = document.getElementById('rotate-overlay');
+  if (!ov) return;
+  const potretSempit = window.innerWidth < window.innerHeight && sc < 0.5;
+  ov.style.display = potretSempit ? 'flex' : 'none';
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', resize);
+resize();
+
+/* ══════════════════════════════════════════════════
+   PERINGATAN KEHILANGAN DATA SAAT REFRESH/TUTUP
+   ══════════════════════════════════════════════════ */
+let sesiMulai = false;
+window.addEventListener('beforeunload', function (e) {
+  if (!sesiMulai) return;
+  e.preventDefault();
+  e.returnValue = 'Progres belajarmu belum tersimpan permanen dan akan hilang jika halaman ini ditutup atau dimuat ulang. Yakin ingin keluar?';
+  return e.returnValue;
+});
+
+/* ══════════════════════════════════════════════════
+   NAVIGASI KEYBOARD UNTUK KARTU/OPSI (role="button")
+   ══════════════════════════════════════════════════ */
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const el = document.activeElement;
+  if (el && el.getAttribute && el.getAttribute('role') === 'button') {
+    e.preventDefault();
+    el.click();
+  }
+});
+
+/* ══════════════════════════════════════════════════
+   AUDIO
+   ══════════════════════════════════════════════════ */
+let sndOn = true, vol = 1;
+const AU = {};
+function loadAu(k, src) { try { const a = new Audio(src); a.preload = 'auto'; AU[k] = a; } catch(e){} }
+loadAu('bgm','./asset/audio/bgm.mp3');
+loadAu('klik','./asset/audio/sfx_klik.mp3');
+loadAu('trns','./asset/audio/sfx_transisi.mp3');
+loadAu('bint','./asset/audio/sfx_bintang.mp3');
+if (AU.bgm) AU.bgm.loop = true;
+
+function play(k) {
+  if (!sndOn || vol === 0) return;
+  const a = AU[k]; if (!a) return;
+  try { a.volume = vol; if (k !== 'bgm') a.currentTime = 0; const p = a.play(); if (p && p.catch) p.catch(() => {}); } catch(e) {}
+}
+function changeVol(v) {
+  vol = parseFloat(v);
+  const btn = document.getElementById('snd-tog');
+  if (vol === 0) { sndOn = false; btn.textContent = '🔇'; }
+  else { sndOn = true; btn.textContent = vol < .5 ? '🔉' : '🔊'; if (AU.bgm && AU.bgm.paused) play('bgm'); }
+  for (const k in AU) if (AU[k]) AU[k].volume = vol;
+}
+function toggleSnd() {
+  const sl = document.getElementById('vslider'), btn = document.getElementById('snd-tog');
+  if (sndOn) { sndOn = false; sl.value = 0; btn.textContent = '🔇'; for (const k in AU) { if (AU[k]) { AU[k].volume = 0; if (k === 'bgm') AU[k].pause(); } } }
+  else { sndOn = true; vol = vol === 0 ? 1 : vol; sl.value = vol; btn.textContent = '🔊'; for (const k in AU) if (AU[k]) AU[k].volume = vol; play('bgm'); }
+}
+document.addEventListener('click', e => { const t = e.target.closest('[data-sfx]'); if (t && t.getAttribute('data-sfx') !== 'no') play('klik'); });
+
+/* ══════════════════════════════════════════════════
+   EFEK VISUAL
+   ══════════════════════════════════════════════════ */
+function flash() { const el = document.getElementById('efek-salah'); if(el){el.classList.add('ny'); setTimeout(()=>el.classList.remove('ny'),50);} }
+function confetti() {
+  const C = document.getElementById('stage');
+  const cols = ['#B71C1C','#FFD600','#FFFFFF','#1A237E','#CC0001'];
+  for (let i = 0; i < 60; i++) {
+    const d = document.createElement('div'); d.className = 'cnf';
+    d.style.left = '50%'; d.style.top = '50%';
+    d.style.backgroundColor = cols[Math.floor(Math.random() * cols.length)];
+    const a = Math.random() * Math.PI * 2, v = 100 + Math.random() * 400;
+    d.style.setProperty('--tx', (Math.cos(a) * v) + 'px');
+    d.style.setProperty('--ty', (Math.sin(a) * v - 200) + 'px');
+    if (Math.random() > .5) d.style.borderRadius = '50%';
+    C.appendChild(d); setTimeout(() => d.remove(), 1500);
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   IDENTITAS MURID
+   ══════════════════════════════════════════════════ */
+let murid = { nama: 'Murid Hebat', sek: '-' };
+function simpanId() {
+  const nm = document.getElementById('in-nama').value.trim();
+  const sk = document.getElementById('in-sek').value.trim();
+  const ps = document.getElementById('login-pesan');
+  if (!nm) { ps.style.display = 'block'; return; }
+  murid.nama = nm; murid.sek = sk || '-';
+  sesiMulai = true;
+  closeModal('modal-login'); play('bgm'); goMenu();
+}
+
+/* ══════════════════════════════════════════════════
+   NAVIGASI
+   ══════════════════════════════════════════════════ */
+function showScr(id) {
+  clearKumpul();
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const aw = document.getElementById('awid'); if (aw) aw.style.display = (id === 'scr-judul') ? 'none' : 'flex';
+  if (id !== 'scr-judul') play('trns'); resize();
+}
+function goJudul() { showScr('scr-judul'); }
+function goMenu() { if(typeof stopKronVideo==='function') stopKronVideo(); showScr('scr-menu'); }
+function openModal(id) { document.getElementById(id).classList.add('show'); play('trns'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); play('klik'); }
+document.querySelectorAll('.mbg').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); }));
+
+/* ══════════════════════════════════════════════════
+   UTILITAS
+   ══════════════════════════════════════════════════ */
+function shuffle(a) { a = a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function setPg(fi, li, cur, tot) { document.getElementById(fi).style.width=(cur/tot*100)+'%'; document.getElementById(li).textContent=cur+'/'+tot; }
+function fb(id, kind, msg) { const el=document.getElementById(id); if(!el)return; el.className='fb show '+kind; el.innerHTML=msg; }
+function getOff(el, par) { let t=0,l=0; while(el&&el!==par){t+=el.offsetTop;l+=el.offsetLeft;el=el.offsetParent;} return{t,l}; }
+function drawLine(e1, e2, cid) {
+  const w=document.getElementById(cid); if(!w) return;
+  let sv=w.querySelector('.jsvg');
+  if(!sv){sv=document.createElementNS('http://www.w3.org/2000/svg','svg');sv.setAttribute('class','jsvg');
+    sv.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';w.appendChild(sv);}
+  const o1=getOff(e1,w), o2=getOff(e2,w);
+  const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+  ln.setAttribute('x1',o1.l+e1.offsetWidth); ln.setAttribute('y1',o1.t+e1.offsetHeight/2);
+  ln.setAttribute('x2',o2.l); ln.setAttribute('y2',o2.t+e2.offsetHeight/2);
+  ln.setAttribute('stroke','#1B5E20'); ln.setAttribute('stroke-width','5'); ln.setAttribute('stroke-linecap','round'); ln.setAttribute('class','jline');
+  sv.appendChild(ln);
+}
+
+/* ══════════════════════════════════════════════════
+   BELAJAR
+   ══════════════════════════════════════════════════ */
+const blj = { step: 0 };
+function startBelajar() { blj.step = 0; showScr('scr-belajar'); renderBlj(); }
+function renderBlj() {
+  const tot = MATERI.length; setPg('belajar-pf','belajar-pl',blj.step+1,tot);
+  const m = MATERI[blj.step];
+  document.getElementById('belajar-sub').textContent = m.judul;
+  document.getElementById('belajar-prev').textContent = blj.step===0 ? '☰ Menu' : '◀ Sebelumnya';
+  document.getElementById('belajar-next').textContent = blj.step===tot-1 ? 'Selesai ✔' : 'Selanjutnya ▶';
+  const kuisH = m.kuis ? `<div class="bkuis"><p class="bktanya">✨ Ayo Tebak! ${m.kuis.t}</p>
+    <div class="bkopsi">
+      <button class="btn bK" style="padding:9px 16px;font-size:16px" onclick="cekKuisMini(this,${m.kuis.j===0})">${m.kuis.o[0]}</button>
+      <button class="btn bK" style="padding:9px 16px;font-size:16px" onclick="cekKuisMini(this,${m.kuis.j===1})">${m.kuis.o[1]}</button>
+    </div></div>` : '';
+  const refH = m.refleksi ? `<div class="refbox"><div class="rlabel">💭 Refleksi Kritis</div>
+    <div class="rq">${m.refleksi}</div>
+    <textarea placeholder="Tuliskan pendapatmu di sini…"></textarea></div>` : '';
+  document.getElementById('belajar-content').innerHTML = `
+    <div class="bframe">
+      <div class="bimg">
+        <img class="hero-img" src="${m.img}" alt="${m.judul}" onerror="imgErr(this)">
+        <div class="rstrip">
+          <img class="rav" src="${CFG.raka}" alt="Raka" onerror="imgErr(this)">
+          <div class="rbub">💬 <b>Raka:</b> ${m.raka}</div>
+        </div>
+      </div>
+      <div class="bteks">
+        <h2>${m.judul}</h2>
+        <div class="bintro">${m.intro}</div>
+        <div class="bisi">${m.isi}</div>
+        ${kuisH}${refH}
+      </div>
+    </div>`;
+}
+function cekKuisMini(btn, ok) {
+  play('klik'); btn.parentNode.querySelectorAll('button').forEach(b=>b.disabled=true);
+  if(ok){btn.style.background='var(--H)';btn.style.color='#fff';btn.innerHTML+=' ✔️';confetti();}
+  else{btn.style.background='var(--S)';btn.style.color='#fff';btn.innerHTML+=' ❌';flash();}
+}
+function belajarNext() { if(blj.step<MATERI.length-1){blj.step++;renderBlj();}else goMenu(); }
+function belajarPrev() { if(blj.step>0){blj.step--;renderBlj();}else goMenu(); }
+
+/* ══════════════════════════════════════════════════
+   KRONOLOGI
+   ══════════════════════════════════════════════════ */
+const kron = { step: 0 };
+function startKronologi() { kron.step=0; showScr('scr-kronologi'); renderKron(); }
+function renderKron() {
+  const tot = KRONOLOGI.length; setPg('kron-pf','kron-pl',kron.step+1,tot);
+  const K = KRONOLOGI[kron.step];
+  document.getElementById('kron-sub').textContent = K.judul;
+  document.getElementById('kron-prev').textContent = kron.step===0 ? '☰ Menu' : '◀ Sebelumnya';
+  document.getElementById('kron-next').textContent = kron.step===tot-1 ? 'Selesai ✔' : 'Selanjutnya ▶';
+  let evH = '';
+  K.events.forEach((ev,i)=>{
+    evH += (i>0?`<div class="klin" style="background:${K.lineBg}"></div>`:'');
+    evH += `<div class="kitem">
+      <div class="kdot" style="background:${K.dotBg}">${ev.thn}</div>
+      <div class="kteks" style="background:rgba(255,255,255,.12)">
+        <b style="color:var(--A)">${ev.judul}</b>
+        <span style="color:rgba(255,255,255,.92)">${ev.info}</span>
+      </div></div>`;
+  });
+  document.getElementById('kron-content').innerHTML = `
+    <div class="kwrap">
+      <div class="kpanel" style="background:linear-gradient(160deg,${K.warna},${K.dotBg})">${evH}</div>
+      <div class="kinfo">
+        <h2>${K.judul}</h2>
+        <div class="kiintro" style="background:linear-gradient(135deg,${K.warna},${K.dotBg})">${K.sub}</div>
+        ${K.video ? `<div class="kvideo-wrap">
+          <video id="kron-video" class="kvideo" controls preload="auto"
+            ${K.videoPoster ? `poster="${K.videoPoster}"` : ''}
+            onerror="this.parentNode.innerHTML='<div class=\\'kvideo-err\\'>🎬 Video belum tersedia.<br><small>Tempatkan file di: <code>${K.video}</code></small></div>'">
+            <source src="${K.video}" type="video/mp4">
+            Browser tidak mendukung video HTML5.
+          </video>
+        </div>` : `<div class="kibody">${K.info}</div>`}
+        ${!K.video ? '' : `<div class="kibody" style="font-size:15px">${K.info}</div>`}
+        <div class="kraka">
+          <img class="krav" src="${CFG.raka}" alt="Raka" onerror="imgErr(this)">
+          <div class="krb">💬 <b>Raka:</b> ${K.rakaKata}</div>
+        </div>
+      </div>
+    </div>`;
+  if (K.video) {
+    const vid = document.getElementById('kron-video');
+    if (vid) { vid.volume = vol; const p = vid.play(); if (p && p.catch) p.catch(()=>{}); }
+  }
+}
+function stopKronVideo() {
+  const vid = document.getElementById('kron-video');
+  if (vid) { vid.pause(); vid.currentTime = 0; }
+}
+function kronNext() { stopKronVideo(); if(kron.step<KRONOLOGI.length-1){kron.step++;renderKron();}else goMenu(); }
+function kronPrev() { stopKronVideo(); if(kron.step>0){kron.step--;renderKron();}else goMenu(); }
+
+/* ══════════════════════════════════════════════════
+   BERMAIN — engine utama
+   ══════════════════════════════════════════════════ */
+let skBermain=0, mn={step:0}, aGame=null;
+function addSk(v){skBermain=Math.max(0,skBermain+v);document.getElementById('sk-angka').textContent=skBermain;}
+function startBermain(){mn.step=0;skBermain=0;addSk(0);showScr('scr-bermain');renderMain();}
+function bermainNext(){if(mn.step<BERMAIN.length-1){mn.step++;renderMain();}else{clearKumpul();renderSkorMain();}}
+function bermainPrev(){clearKumpul();if(mn.step>0){mn.step--;renderMain();}else goMenu();}
+function renderMain(){
+  clearKumpul(); setPg('bermain-pf','bermain-pl',mn.step+1,BERMAIN.length);
+  document.getElementById('bermain-next').disabled = true;
+  const g = BERMAIN[mn.step];
+  document.getElementById('bermain-sub').textContent = 'Aktivitas '+(mn.step+1)+': '+g.sub;
+  if(g.t==='jodoh') initJodoh(g,'bermain-content',false);
+  else if(g.t==='urut') initUrut(g);
+  else if(g.t==='sambung') initSambung(g);
+  else if(g.t==='klik') initKlik(g);
+  else if(g.t==='kumpul') initKumpul(g);
+  else if(g.t==='dok') initDok(g);
+}
+
+/* --- JODOH --- */
+function initJodoh(g, cid, isLatih) {
+  aGame = { s:null, c:0, tot:g.pairs.length };
+  let kH='', rH='';
+  (isLatih?shuffle(g.pairs):g.pairs).forEach(p=>{
+    kH += `<div class="pitem" data-side="ki" data-n="${p.n}" tabindex="0" role="button" onclick="${isLatih?'latJodoh':'handleJodoh'}(this)">${p.teks||p.t}</div>`;
+  });
+  shuffle(g.imgs).forEach(p=>{
+    rH += `<div class="pitem" data-side="ka" data-n="${p.n}" tabindex="0" role="button" onclick="${isLatih?'latJodoh':'handleJodoh'}(this)">
+      <img src="${p.i}" class="pip" alt="${p.name}" onerror="imgErr(this)"><span>${p.name}</span></div>`;
+  });
+  document.getElementById(cid).innerHTML = `<div class="col" style="z-index:10"><p class="ains">${g.ins||g.soal}</p>
+    <div class="jwrap" id="jw-${cid}"><div class="jkol">${kH}</div><div class="jkol">${rH}</div></div>
+    <div class="fb" id="${isLatih?'bl':'pl'}-fb"></div></div>`;
+}
+function handleJodoh(el) {
+  if(el.classList.contains('locked'))return;
+  const fbid='pl-fb';
+  if(el.dataset.side==='ki'){
+    document.querySelectorAll('#bermain-content [data-side="ki"]').forEach(x=>x.classList.remove('sel'));
+    el.classList.add('sel'); aGame.s=el; play('klik'); return;
+  }
+  if(!aGame.s){fb(fbid,'no','❌ Pilih kotak kiri dahulu!');return;}
+  if(el.dataset.n===aGame.s.dataset.n){
+    addSk(10); confetti(); el.classList.add('locked'); aGame.s.classList.add('locked');
+    drawLine(aGame.s,el,'jw-bermain-content'); aGame.s.classList.remove('sel'); aGame.s=null; aGame.c++;
+    fb(fbid,'ok','✅ <b>Cocok! (+10 poin)</b>');
+    if(aGame.c===aGame.tot){document.getElementById('bermain-next').disabled=false;fb(fbid,'ok','🎉 <b>Semua berhasil dicocokkan!</b>');}
+  } else { addSk(-5); flash(); el.classList.add('salah'); setTimeout(()=>el.classList.remove('salah'),400); fb(fbid,'no','❌ <b>Belum tepat (-5 poin)</b>'); }
+}
+
+/* --- KLIK --- */
+function initKlik(g) {
+  const ops=shuffle(g.opsi); aGame={c:0,tot:g.opsi.filter(o=>o.b).length};
+  let h='';
+  ops.forEach((o,i)=>h+=`<div class="ocard" id="oc${i}"><img src="${o.imgPath}" class="oi" alt="${o.t}" onerror="imgErr(this)"><span>${o.t}</span></div>`);
+  document.getElementById('bermain-content').innerHTML=`<div class="col"><p class="ains">${g.ins}</p><div class="sgrid">${h}</div><div class="fb" id="pl-fb"></div></div>`;
+  ops.forEach((o,i)=>{document.getElementById('oc'+i).onclick=()=>handleKlik(document.getElementById('oc'+i),o.b,o.msg);});
+}
+function handleKlik(el,ok,msg) {
+  if(el.classList.contains('benar')||el.classList.contains('salah'))return;
+  if(ok){addSk(20);confetti();el.classList.add('benar');aGame.c++;fb('pl-fb','ok',`✅ <b>Tepat! (+20)</b><br>${msg}`);if(aGame.c===aGame.tot)document.getElementById('bermain-next').disabled=false;}
+  else{addSk(-5);el.classList.add('salah');flash();fb('pl-fb','no',`❌ <b>Kurang tepat (-5)</b><br>${msg}`);setTimeout(()=>el.classList.remove('salah'),500);}
+}
+
+/* --- URUT --- */
+function initUrut(g){aGame={g};do{aGame.now=shuffle(g.urut);}while(aGame.now.join('|')===g.urut.join('|'));drawUrut();}
+function drawUrut(){
+  let it='';
+  aGame.now.forEach((t,i)=>{
+    it+=`<div class="uitem"><span class="num">${i+1}</span><span>${t}</span>
+      <button class="btn bK" style="width:38px;height:38px;padding:0;font-size:15px" onclick="mvUrut(${i},-1)" ${i===0?'disabled':''}>▲</button>
+      <button class="btn bK" style="width:38px;height:38px;padding:0;font-size:15px" onclick="mvUrut(${i},1)" ${i===aGame.now.length-1?'disabled':''}>▼</button></div>`;
+  });
+  document.getElementById('bermain-content').innerHTML=`<div class="col" style="justify-content:flex-start;overflow-y:auto">
+    <p class="ains" style="margin-bottom:10px">${aGame.g.ins}</p><div>${it}</div>
+    <button class="btn bB" style="height:50px;margin-top:10px;font-size:18px" onclick="cekUrut()">⚖️ Periksa Urutan</button>
+    <div class="fb" id="pl-fb"></div></div>`;
+}
+function mvUrut(i,d){play('klik');const j=i+d;if(j<0||j>=aGame.now.length)return;[aGame.now[i],aGame.now[j]]=[aGame.now[j],aGame.now[i]];drawUrut();}
+function cekUrut(){
+  if(aGame.now.join('|')===aGame.g.urut.join('|')){addSk(20);confetti();fb('pl-fb','ok','✅ <b>Urutan tepat! (+20)</b>');document.getElementById('bermain-next').disabled=false;}
+  else{addSk(-5);flash();fb('pl-fb','no','❌ <b>Belum tepat (-5). Coba lagi!</b>');}
+}
+
+/* --- SAMBUNG --- */
+let sbStep=0, sbGame=null;
+function initSambung(g){sbStep=0;sbGame=g;drawSambung();}
+function drawSambung(){
+  const g=sbGame;
+  if(sbStep>=g.steps.length){
+    document.getElementById('bermain-content').innerHTML=`<div class="col"><div class="akhir" style="flex:none">
+      <div style="font-size:52px">🎯</div><h2 style="font-size:28px">Lengkap!</h2>
+      <div class="sb-lirik" style="font-size:18px;margin-top:12px">${g.hasil}</div>
+      <p style="font-size:18px;margin-top:14px">Tekan <b>Selanjutnya ▶</b></p></div></div>`;
+    return;
+  }
+  const s=g.steps[sbStep];
+  let btns=''; shuffle([s.benar,...s.salah]).forEach(o=>btns+=`<button class="sbbtn" onclick="cekSambung(this,${o===s.benar})">${o}</button>`);
+  document.getElementById('bermain-content').innerHTML=`<div class="col"><p class="ains">${g.ins} (${sbStep+1}/${g.steps.length})</p>
+    <div class="sb-lirik">${s.prev}</div><div class="sb-opsi">${btns}</div><div class="fb" id="pl-fb"></div></div>`;
+}
+function cekSambung(btn,ok){
+  document.querySelectorAll('.sbbtn').forEach(b=>b.style.pointerEvents='none');
+  if(ok){btn.classList.add('benar');addSk(10);confetti();fb('pl-fb','ok','✅ <b>Tepat! (+10)</b>');sbStep++;
+    setTimeout(()=>{if(sbStep>=sbGame.steps.length)document.getElementById('bermain-next').disabled=false;drawSambung();},900);}
+  else{btn.classList.add('salah');addSk(-5);flash();fb('pl-fb','no','❌ <b>Belum tepat (-5). Coba lagi!</b>');
+    setTimeout(()=>document.querySelectorAll('.sbbtn').forEach(b=>{b.style.pointerEvents='auto';b.classList.remove('salah');}),800);}
+}
+
+/* --- KUMPUL --- */
+let ktmr=null, kspwn=null, kColl=0, kTime=0, kAkt={b:'',s:[]};
+function clearKumpul(){if(ktmr){clearInterval(ktmr);ktmr=null;}if(kspwn){clearInterval(kspwn);kspwn=null;}}
+function initKumpul(g){
+  clearKumpul();kColl=0;kTime=30;kAkt={b:g.benar,s:g.salah||[]};
+  document.getElementById('bermain-content').innerHTML=`<div class="col" style="justify-content:flex-start">
+    <p class="ains">${g.ins}</p>
+    <div class="khud"><div class="hbox ht">⏱️ <span id="kt">30</span> dtk</div><div class="hbox hc">⭐ Terkumpul: <span id="kc">0</span></div></div>
+    <div class="karea" id="karea"></div><div class="fb" id="pl-fb"></div></div>`;
+  ktmr=setInterval(()=>{kTime--;const t=document.getElementById('kt');if(t)t.textContent=kTime;if(kTime<=0)endKumpul();},1000);
+  kspwn=setInterval(spawnFlag,650);spawnFlag();spawnFlag();spawnFlag();
+}
+function spawnFlag(){
+  const area=document.getElementById('karea');if(!area)return;
+  const ok=Math.random()<.6;
+  const f=document.createElement('div');f.className='kflag';
+  const imgSrc=ok?kAkt.b:(kAkt.s.length?kAkt.s[Math.floor(Math.random()*kAkt.s.length)]:kAkt.b);
+  f.innerHTML=`<img src="${imgSrc}" alt="obj" onerror="imgErr(this)">`;
+  f.style.left=(Math.random()*Math.max(0,document.getElementById('karea').clientWidth-100))+'px';
+  f.style.top=(Math.random()*Math.max(0,document.getElementById('karea').clientHeight-110))+'px';
+  f.onclick=()=>tapFlag(f,ok);document.getElementById('karea').appendChild(f);
+  setTimeout(()=>{if(f.parentNode)f.remove();},1700);
+}
+function tapFlag(f,ok){
+  if(!f.parentNode)return;
+  if(ok){kColl++;addSk(5);const c=document.getElementById('kc');if(c)c.textContent=kColl;f.remove();}
+  else{addSk(-3);flash();f.style.filter='grayscale(1) brightness(.7)';setTimeout(()=>{if(f.parentNode)f.remove();},200);}
+}
+function endKumpul(){
+  clearKumpul();const area=document.getElementById('karea');
+  if(area)area.innerHTML=`<div style="display:flex;height:100%;align-items:center;justify-content:center;flex-direction:column;gap:10px"><div style="font-size:58px">🎉</div><div style="font-size:24px;font-weight:900;color:var(--Ptua)">Waktu Habis!</div></div>`;
+  confetti();play('bint');fb('pl-fb','ok',`⭐ <b>Kamu mengumpulkan ${kColl} item benar!</b>`);document.getElementById('bermain-next').disabled=false;
+}
+
+/* --- ANALISIS DOKUMEN HOTS --- */
+let dokStep=0, dokGame=null;
+function initDok(g){dokStep=0;dokGame=g;drawDok();}
+function drawDok(){
+  const g=dokGame, d=g.dokumen;
+  const dots=g.langkah.map((_,i)=>`<div class="dok-dot ${i===dokStep?'ak':i<dokStep?'dn':''}"></div>`).join('');
+  if(dokStep>=g.langkah.length){
+    document.getElementById('bermain-content').innerHTML=`<div class="col"><div class="akhir" style="flex:none">
+      <div style="font-size:50px">🔍</div><h2 style="font-size:26px">Analisis Selesai!</h2>
+      <p style="font-size:18px;max-width:540px;text-align:center;line-height:1.6;color:#555;margin-top:10px">
+        Kamu telah berhasil menganalisis sumber primer sejarah secara kritis. Itulah yang disebut <b>berpikir historis!</b></p>
+      <p style="font-size:17px;margin-top:12px">Tekan <b>Selanjutnya ▶</b></p></div></div>`;
+    document.getElementById('bermain-next').disabled=false; return;
+  }
+  const lk=g.langkah[dokStep], H=['A','B','C','D'];
+  const tagH=d.tags.map(t=>`<span class="dok-tag">${t}</span>`).join('');
+  let opH='';
+  lk.o.forEach((o,i)=>opH+=`<div class="dok-opsi" tabindex="0" role="button" onclick="cekDok(this,${i===lk.j},'${lk.ket.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
+    <div class="db">${H[i]}</div><span>${o}</span></div>`);
+  document.getElementById('bermain-content').innerHTML=`
+    <div class="col" style="flex:1;min-height:0">
+      <p class="ains" style="margin-bottom:12px">${g.ins}</p>
+      <div class="dok-dots">${dots}</div>
+      <div class="dok-wrap" style="margin-top:10px">
+        <div class="dok-kiri">
+          <div class="dok-hdr"><span class="di">${d.ikon}</span><span class="dj">${d.judul}</span></div>
+          <div class="dok-tags">${tagH}</div>
+          <div class="dok-teks">${d.teks}</div>
+          <div class="dok-meta">${d.meta}</div>
+          <div class="dok-raka">
+            <img class="dra" src="${CFG.raka}" alt="Raka" onerror="imgErr(this)">
+            <div class="drb">💬 <b>Raka:</b> ${d.rakaInsight}</div>
+          </div>
+        </div>
+        <div class="dok-kanan">
+          <div class="dok-pert">Pertanyaan ${dokStep+1}/${g.langkah.length}: ${lk.q}</div>
+          <div class="dok-opsi-wrap">${opH}</div>
+          <div class="fb" id="pl-fb" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </div>`;
+}
+function cekDok(el,ok,ket){
+  document.querySelectorAll('.dok-opsi').forEach(d=>d.style.pointerEvents='none');
+  if(ok){el.classList.add('benar');addSk(15);confetti();fb('pl-fb','ok',`✅ <b>Analisis tepat! (+15)</b><br><i>${ket}</i>`);
+    dokStep++;setTimeout(()=>{if(dokStep>=dokGame.langkah.length)document.getElementById('bermain-next').disabled=false;drawDok();},1400);}
+  else{el.classList.add('salah');addSk(-5);flash();fb('pl-fb','no',`❌ <b>Belum tepat (-5).</b><br><i>${ket}</i>`);
+    setTimeout(()=>document.querySelectorAll('.dok-opsi').forEach(d=>{d.style.pointerEvents='auto';d.classList.remove('salah');}),900);}
+}
+
+function renderSkorMain(){
+  document.getElementById('bermain-sub').textContent='Selesai!'; play('bint');
+  const lvl=skBermain>=120?'🏆 Analis Sejarah Kelas Satu!':skBermain>=60?'👍 Bagus! Terus asah pemahamanmu.':'💪 Tetap semangat! Ulangi materi dulu.';
+  document.getElementById('bermain-content').innerHTML=`<div class="akhir">
+    <h2> Permainan Selesai!</h2>
+    <div class="idtag">${murid.nama} · ${murid.sek}</div>
+    <p style="font-size:21px;margin-top:16px">Total Skor Bermain:</p>
+    <p class="snum">${skBermain}</p>
+    <p style="font-size:19px;margin-bottom:8px">${lvl}</p>
+    <div style="display:flex;gap:16px;margin-top:8px">
+      <button class="btn bB" style="height:56px;padding:0 26px;font-size:18px" onclick="startBermain()">🔄 Main Lagi</button>
+      <button class="btn bM" style="height:56px;padding:0 26px;font-size:18px" onclick="goMenu()">☰ Menu</button>
+    </div></div>`;
+}
+
+/* ══════════════════════════════════════════════════
+   BERLATIH
+   ══════════════════════════════════════════════════ */
+let lt={step:0, skor:0, state:[]};
+function startBerlatih(){lt={step:0,skor:0,state:[]};LATIH.forEach((_,i)=>lt.state[i]={done:false,tried:false});showScr('scr-berlatih');renderLt();}
+function berlatihNext(){if(lt.step<LATIH.length){lt.step++;renderLt();}}
+function berlatihPrev(){
+  document.querySelector('#scr-berlatih .nb-back').textContent='◀ Sebelumnya';
+  if(lt.step>0){lt.step--;renderLt();}else goMenu();
+}
+function lockLt(){document.querySelectorAll('.opsi,.bsbtn,.okomp,.wbtn,.pitem,#btncek').forEach(el=>el.style.pointerEvents='none');}
+function restoreLt(q){if(lt.state[lt.step].done){setTimeout(()=>{fb('bl-fb','ok',`✅ <b>Sudah benar!</b><br>${q.msg||''}`);lockLt();},50);}}
+function renderLt(){
+  if(lt.step>=LATIH.length){renderSkorLt();return;}
+  setPg('berlatih-pf','berlatih-pl',lt.step+1,LATIH.length);
+  document.getElementById('berlatih-next').disabled=!lt.state[lt.step].done;
+  document.getElementById('berlatih-sub').textContent='Soal '+(lt.step+1);
+  const q=LATIH[lt.step], c=document.getElementById('berlatih-content');
+  if(q.t==='pg') rPG(c,q);
+  else if(q.t==='bs') rBS(c,q);
+  else if(q.t==='pgk') rPGK(c,q);
+  else if(q.t==='drag') rDrag(c,q);
+  else if(q.t==='jodoh') rJodoh(c,q);
+  restoreLt(q);
+}
+function evLt(ok){
+  const q=LATIH[lt.step], st=lt.state[lt.step];
+  if(ok){st.done=true;if(!st.tried)lt.skor++;confetti();fb('bl-fb','ok',`✅ <b>Benar!</b><br>${q.msg||''}`);document.getElementById('berlatih-next').disabled=false;lockLt();}
+  else{st.tried=true;flash();fb('bl-fb','no',`❌ <b>Kurang tepat.</b><br>${q.msg||''}`);lockLt();}
+}
+function rPG(c,q){
+  let op=''; const H=['A','B','C','D'];
+  q.opsi.forEach((o,i)=>op+=`<div class="opsi ${lt.state[lt.step].done&&i===q.j?'benar':''}" tabindex="0" role="button" onclick="if(!lt.state[lt.step].done){play('klik');evLt(${i===q.j});}"><span class="bul">${H[i]}</span>${o}</div>`);
+  c.innerHTML=`<div class="col"><div class="soal">${q.soal}</div><div class="ogrid">${op}</div><div class="fb" id="bl-fb"></div></div>`;
+}
+function rBS(c,q){
+  c.innerHTML=`<div class="col"><div class="soal">${q.soal}</div><div class="bsgrid">
+    <button class="bsbtn bsB" onclick="if(!lt.state[lt.step].done){play('klik');evLt(${true===q.j});}">✔ BENAR</button>
+    <button class="bsbtn bsS" onclick="if(!lt.state[lt.step].done){play('klik');evLt(${false===q.j});}">✘ SALAH</button>
+  </div><div class="fb" id="bl-fb"></div></div>`;
+}
+function rPGK(c,q){
+  lt.tmp=[]; let op=''; const H=['A','B','C','D'];
+  q.opsi.forEach((o,i)=>op+=`<div class="opsi okomp" id="pk${i}" tabindex="0" role="button" onclick="togKomp(${i})"><span class="bul">${H[i]}</span>${o}</div>`);
+  c.innerHTML=`<div class="col"><div class="soal">${q.soal}</div><div class="ogrid">${op}</div>
+    <button class="btn bB" id="btncek" style="height:50px;margin-top:16px;font-size:18px" onclick="cekKomp()">⚖️ Periksa</button>
+    <div class="fb" id="bl-fb"></div></div>`;
+}
+function togKomp(i){if(lt.state[lt.step].done)return;const el=document.getElementById('pk'+i);play('klik');el.classList.toggle('tp');const idx=lt.tmp.indexOf(i);if(idx>-1)lt.tmp.splice(idx,1);else lt.tmp.push(i);}
+function cekKomp(){const q=LATIH[lt.step];const ok=lt.tmp.length===q.j.length&&lt.tmp.every(v=>q.j.includes(v));document.querySelectorAll('.okomp').forEach((el,i)=>{if(q.j.includes(i))el.classList.add('benar');});evLt(ok);}
+function rDrag(c,q){
+  let ws=''; q.w.forEach((w,i)=>ws+=`<button class="wbtn" id="wb${i}" onclick="tapW(this,'${w.replace(/'/g,"\\'")}')">${w}</button>`);
+  c.innerHTML=`<div class="col"><div class="kdrag" id="kdrag">${q.soal}</div><div class="wpool">${ws}</div>
+    <button class="btn bB" id="btncek" style="height:50px;margin-top:16px;font-size:18px" onclick="cekDrag()">⚖️ Periksa</button>
+    <div class="fb" id="bl-fb"></div></div>`;
+  setTimeout(()=>document.querySelectorAll('#kdrag .bslot').forEach(b=>b.addEventListener('click',()=>tapB(b))),50);
+}
+function tapW(btn,w){if(lt.state[lt.step].done)return;const bl=Array.from(document.querySelectorAll('#kdrag .bslot'));const t=bl.find(b=>!b.classList.contains('ti'));if(t){play('klik');t.textContent=w;t.classList.add('ti');btn.classList.add('dp');t.dataset.wb=btn.id;}}
+function tapB(b){if(lt.state[lt.step].done||!b.classList.contains('ti'))return;play('klik');const btn=document.getElementById(b.dataset.wb);if(btn)btn.classList.remove('dp');b.textContent='___';b.classList.remove('ti');delete b.dataset.wb;}
+function cekDrag(){const q=LATIH[lt.step];const ans=Array.from(document.querySelectorAll('#kdrag .bslot')).map(b=>b.textContent.trim());evLt(ans.join('|')===q.j.join('|'));}
+function rJodoh(c,q){
+  aGame={s:null,c:0,t:q.pairs.length};
+  let k='', r='';
+  shuffle(q.pairs).forEach(p=>k+=`<div class="pitem" data-side="ki" data-n="${p.n}" tabindex="0" role="button" onclick="latJodoh(this)"><span>${p.t}</span></div>`);
+  shuffle(q.imgs).forEach(p=>r+=`<div class="pitem" data-side="ka" data-n="${p.n}" tabindex="0" role="button" onclick="latJodoh(this)"><img src="${p.i}" class="pip" alt="${p.name}" onerror="imgErr(this)"><span>${p.name}</span></div>`);
+  c.innerHTML=`<div class="col" style="z-index:10"><div class="soal">${q.soal}</div>
+    <div class="jwrap" id="jw-bl"><div class="jkol">${k}</div><div class="jkol">${r}</div></div>
+    <div class="fb" id="bl-fb"></div></div>`;
+}
+function latJodoh(el){
+  if(lt.state[lt.step].done||el.classList.contains('locked'))return;
+  if(el.dataset.side==='ki'){document.querySelectorAll('#berlatih-content [data-side="ki"]').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');aGame.s=el;play('klik');return;}
+  if(!aGame.s)return;
+  if(el.dataset.n===aGame.s.dataset.n){play('klik');el.classList.add('locked');aGame.s.classList.add('locked','benar');drawLine(aGame.s,el,'jw-bl');aGame.s.classList.remove('sel');aGame.s=null;aGame.c++;if(aGame.c===aGame.t)evLt(true);}
+  else evLt(false);
+}
+
+/* ══════════════════════════════════════════════════════
+   PERCABANGAN — renderSkorLt → cabang sesuai nilai
+   Tinggi (≥80): Tantangan Bonus HOTS
+   Sedang (50–79): Lanjut ke menu dengan sertifikat
+   Rendah (<50): Remedial otomatis
+   ══════════════════════════════════════════════════════ */
+function renderSkorLt(){
+  document.getElementById('berlatih-sub').textContent='Selesai';
+  document.getElementById('berlatih-next').disabled=true;
+  const tot=LATIH.length, pct=Math.round(lt.skor/tot*100);
+  play('bint');
+
+  // Tentukan level dan kelas warna
+  const lvl = pct>=80 ? 'tinggi' : pct>=50 ? 'sedang' : 'rendah';
+  const predikat = pct>=90?'A – Sangat Baik':pct>=80?'B – Baik':pct>=65?'C – Cukup':pct>=50?'D – Perlu Perbaikan':'E – Ulangi Materi';
+  const emoji = pct>=80?'🏆':pct>=50?'📝':'📚';
+
+  // Teks Raka per level
+  const rakaMsg = pct>=80
+    ? `Nilai ${pct}?! Kamu luar biasa. Tapi aku punya satu tantangan ekstra yang benar-benar menguji pikiranmu. Berani?`
+    : pct>=50
+    ? `Nilai ${pct} sudah lumayan! Pelajari lagi bagian yang masih keliru ya. Kamu pasti bisa lebih baik.`
+    : `Nilai ${pct}… Jangan menyerah! Mari kita ringkas ulang materi yang paling penting. Aku siap menemanimu.`;
+
+  // Tombol cabang sesuai level
+  const btnCabang = pct>=80 ? `
+    <div class="cabang-card cc-bonus slide-up" style="animation-delay:.1s" onclick="startBonus()" tabindex="0" role="button">
+      <div class="cc-ikon">🔥</div>
+      <div class="cc-body">
+        <div class="cc-judul">Tantangan Bonus HOTS</div>
+        <div class="cc-desc">3 soal analisis tingkat tinggi tentang dampak Reformasi. Hanya untuk yang terbaik!</div>
+      </div>
+    </div>
+    <div class="cabang-card cc-ulang slide-up" style="animation-delay:.2s" onclick="startBerlatih()" tabindex="0" role="button">
+      <div class="cc-ikon">🔄</div>
+      <div class="cc-body">
+        <div class="cc-judul">Ulangi Latihan</div>
+        <div class="cc-desc">Coba lagi untuk memperkuat pemahaman dan meningkatkan skor.</div>
+      </div>
+    </div>
+    <div class="cabang-card cc-menu slide-up" style="animation-delay:.3s" onclick="goMenu()" tabindex="0" role="button">
+      <div class="cc-ikon">🏠</div>
+      <div class="cc-body">
+        <div class="cc-judul">Kembali ke Menu</div>
+        <div class="cc-desc">Eksplorasi bagian lain dari media pembelajaran ini.</div>
+      </div>
+    </div>` : pct>=50 ? `
+    <div class="cabang-card cc-ulang slide-up" style="animation-delay:.1s" onclick="startBerlatih()" tabindex="0" role="button">
+      <div class="cc-ikon">🔄</div>
+      <div class="cc-body">
+        <div class="cc-judul">Ulangi Latihan</div>
+        <div class="cc-desc">Coba lagi — kamu hampir di level tinggi!</div>
+      </div>
+    </div>
+    <div class="cabang-card cc-remedial slide-up" style="animation-delay:.2s" onclick="startRemedial()" tabindex="0" role="button">
+      <div class="cc-ikon">📚</div>
+      <div class="cc-body">
+        <div class="cc-judul">Pelajari Ringkasan</div>
+        <div class="cc-desc">Tinjau kembali poin-poin kunci yang sering salah sebelum mencoba lagi.</div>
+      </div>
+    </div>
+    <div class="cabang-card cc-menu slide-up" style="animation-delay:.3s" onclick="goMenu()" tabindex="0" role="button">
+      <div class="cc-ikon">🏠</div>
+      <div class="cc-body">
+        <div class="cc-judul">Kembali ke Menu</div>
+        <div class="cc-desc">Ulangi bagian Belajar atau Kronologi terlebih dahulu.</div>
+      </div>
+    </div>` : `
+    <div class="cabang-card cc-remedial slide-up" style="animation-delay:.1s" onclick="startRemedial()" tabindex="0" role="button">
+      <div class="cc-ikon">📚</div>
+      <div class="cc-body">
+        <div class="cc-judul">Remedial Sekarang</div>
+        <div class="cc-desc">Ringkasan materi + latihan terbimbing. Aku akan menemanimu langkah demi langkah.</div>
+      </div>
+    </div>
+    <div class="cabang-card cc-ulang slide-up" style="animation-delay:.2s" onclick="startBelajar()" tabindex="0" role="button">
+      <div class="cc-ikon">📖</div>
+      <div class="cc-body">
+        <div class="cc-judul">Ulangi Materi Belajar</div>
+        <div class="cc-desc">Baca kembali 4 slide materi inti dari awal dengan lebih cermat.</div>
+      </div>
+    </div>
+    <div class="cabang-card cc-menu slide-up" style="animation-delay:.3s" onclick="goMenu()" tabindex="0" role="button">
+      <div class="cc-ikon">🏠</div>
+      <div class="cc-body">
+        <div class="cc-judul">Kembali ke Menu</div>
+        <div class="cc-desc">Pilih kegiatan lain untuk memperkuat pemahamanmu.</div>
+      </div>
+    </div>`;
+
+  document.getElementById('berlatih-content').innerHTML=`
+    <div class="cabang-wrap">
+      <div class="cabang-kiri slide-up">
+        <img src="${CFG.raka}" style="width:80px;height:80px;border-radius:50%;border:4px solid var(--A);object-fit:cover;background:var(--Ptua)" alt="Raka" onerror="imgErr(this)">
+        <div class="skor-besar ${lvl}">${pct}</div>
+        <div style="font-size:13px;font-weight:700;color:#888;margin-top:-8px">dari 100</div>
+        <div class="predikat-badge ${lvl}">${emoji} ${predikat}</div>
+        <div class="sertif" style="margin-top:6px;max-width:100%">
+          <h4>📋 Hasil Belajar</h4>
+          <p class="sn">${lt.skor}/${tot} soal benar</p>
+          <p class="sk">${murid.nama} · ${murid.sek}</p>
+        </div>
+        <div style="background:var(--Amuda);border:2px solid var(--A);border-radius:var(--r16);padding:12px 16px;margin-top:4px;max-width:100%">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <span style="font-size:28px;flex-shrink:0">💬</span>
+            <p style="font-size:14px;font-weight:700;color:var(--T);line-height:1.55;margin:0"><b>Raka:</b> ${rakaMsg}</p>
+          </div>
+        </div>
+      </div>
+      <div class="cabang-kanan">
+        <p style="font-size:18px;font-weight:900;color:var(--Ptua);margin-bottom:4px">Apa yang ingin kamu lakukan selanjutnya?</p>
+        ${btnCabang}
+      </div>
+    </div>`;
+  // Efek visual sesuai hasil
+  if(pct>=80) confetti();
+}
+
+/* ══════════════════════════════════════════════════════
+   DATA REMEDIAL — 3 soal terbimbing + ringkasan materi
+   FOKUS: Akhir Orde Baru & Transisi Reformasi
+   ══════════════════════════════════════════════════════ */
+const DATA_REMEDIAL = [
+  { ringkasan:{
+      judul:'🔑 Kunci 1: Mengapa Orde Baru Bisa Runtuh?',
+      poin:[
+        {j:'KKN Sistemik', i:'Keluarga Cendana dan kroni Soeharto menguasai perusahaan-perusahaan strategis nasional. Korupsi bukan sekadar oknum — melainkan sistem yang dibangun dan dilindungi dari atas.'},
+        {j:'Krisis Moneter 1997', i:'Rupiah jatuh dari Rp2.500 ke Rp17.000/dolar. PHK massal, harga sembako melonjak. Legitimasi Orde Baru yang bertumpu pada stabilitas ekonomi runtuh seketika.'},
+        {j:'Represi Tanpa Jalan Keluar', i:'Selama 32 tahun, tidak ada ruang untuk kritik atau oposisi legal. Ketika krisis datang, tidak ada mekanisme koreksi — rakyat hanya punya satu jalan: turun ke jalan.'}
+      ]
+    },
+    soal:'Mengapa krisis moneter 1997 menjadi ancaman yang jauh lebih fatal bagi Orde Baru dibanding krisis-krisis sebelumnya?',
+    opsi:['Karena untuk pertama kalinya militer menolak mendukung Soeharto secara terbuka',
+          'Karena krisis menghancurkan satu-satunya sumber legitimasi Orde Baru yang tersisa: keberhasilan ekonomi',
+          'Karena IMF langsung memaksa Soeharto mundur sebagai syarat pinjaman',
+          'Karena partai-partai oposisi akhirnya diizinkan berkampanye secara terbuka'],
+    j:1, ket:'Orde Baru membenarkan kekuasaannya lewat pembangunan ekonomi. Saat rupiah hancur dan rakyat kelaparan, alasan terakhir bertahan itu hilang — dan tidak ada legitimasi lain yang bisa menggantikannya.'
+  },
+  { ringkasan:{
+      judul:'🔑 Kunci 2: Dari Trisakti ke Mundurnya Soeharto',
+      poin:[
+        {j:'Tragedi Trisakti (12 Mei 1998)', i:'Empat mahasiswa gugur: Elang Mulia, Heri Hertanto, Hendriawan Sie, Hafidin Royan. Menjadi titik balik yang membakar amarah publik nasional.'},
+        {j:'Kerusuhan 13–15 Mei 1998', i:'Lebih dari 1.000 orang tewas di Jakarta. Kota lumpuh. Soeharto kehilangan kendali atas situasi dan dukungan dari semua pihak.'},
+        {j:'21 Mei 1998', i:'Soeharto mundur. Habibie dilantik. Era 32 tahun Orde Baru berakhir dalam satu pidato singkat.'}
+      ]
+    },
+    soal:'Apa hubungan langsung antara Tragedi Trisakti 12 Mei 1998 dengan mundurnya Soeharto?',
+    opsi:['Tragedi Trisakti membakar kemarahan publik dan mempercepat tekanan dahsyat pada Soeharto untuk mundur',
+          'Soeharto sendiri yang memerintahkan penembakan untuk menguji loyalitas aparat',
+          'Tragedi Trisakti tidak berkaitan langsung karena Soeharto mundur karena alasan kesehatan',
+          'MPR langsung memakzulkan Soeharto sehari setelah Tragedi Trisakti'],
+    j:0, ket:'Tragedi Trisakti menjadi katalis — amarah publik meledak menjadi kerusuhan 13–15 Mei, membuat Soeharto kehilangan legitimasi, dukungan kabinet, dan pimpinan militer, sehingga akhirnya mundur 21 Mei.'
+  },
+  { ringkasan:{
+      judul:'🔑 Kunci 3: Habibie & Pintu Demokrasi',
+      poin:[
+        {j:'Kebebasan Pers', i:'Sensor pers dicabut dalam minggu-minggu pertama Habibie. Ratusan media baru bermunculan — kebebasan yang 32 tahun tidak ada.'},
+        {j:'Pemilu 1999 (48 Partai)', i:'Pemilu pertama yang bebas dan multipartai sejak 1955. Berlangsung relatif damai. PDI-P (Megawati) menjadi pemenang suara terbanyak.'},
+        {j:'Referendum Timor Timur', i:'78,5% warga memilih merdeka. Timor-Leste lahir. Keputusan kontroversial yang membuktikan Habibie berani memutus kebijakan Orde Baru.'}
+      ]
+    },
+    soal:'Apa yang membuat kebijakan B.J. Habibie di era transisi dianggap sebagai terobosan demokratis yang signifikan?',
+    opsi:['Habibie mempertahankan semua kebijakan Orde Baru namun dengan wajah yang lebih ramah',
+          'Dalam waktu singkat Habibie membuka kebebasan pers, sistem multipartai, dan referendum — mengubah struktur politik Indonesia secara mendasar',
+          'Habibie berhasil menangkap dan mengadili semua pelaku KKN era Soeharto',
+          'Habibie menghapus jabatan presiden dan menggantinya dengan sistem parlementer'],
+    j:1, ket:'Habibie melakukan lebih banyak perubahan struktural dalam 17 bulan daripada yang pernah terjadi dalam 32 tahun sebelumnya — dari kebebasan pers hingga pemilu multipartai dan referendum.'
+  }
+];
+
+/* ══════════════════════════════════════════════════════
+   DATA BONUS HOTS — 3 soal analisis tingkat tinggi
+   FOKUS: Akhir Orde Baru & Transisi Reformasi
+   ══════════════════════════════════════════════════════ */
+const DATA_BONUS = [
+  { konteks:`Pada 1998, berbagai kelompok masyarakat — mahasiswa, buruh, pedagang pasar, hingga ibu rumah tangga — turun ke jalan. Ini berbeda dengan gerakan mahasiswa murni seperti di negara lain.
+    <b>Pernyataan sejarawan:</b> Reformasi 1998 adalah "gerakan multipihak yang meledak karena akumulasi ketidakadilan selama puluhan tahun."`,
+    soal:'Pernyataan sejarawan tersebut paling tepat dimaknai bahwa Reformasi 1998…',
+    opsi:['Adalah gerakan spontan tanpa perencanaan yang tiba-tiba meledak dalam satu hari',
+          'Terjadi karena berbagai lapisan masyarakat menanggung ketidakadilan Orde Baru yang berbeda namun sama-sama menyakitkan',
+          'Hanya dilakukan oleh mahasiswa yang dimanipulasi oleh kelompok politik tertentu',
+          'Merupakan gerakan yang direncanakan jauh-jauh hari oleh partai oposisi sejak 1990-an'],
+    j:1, ket:'Reformasi bukan insiden tunggal — ia adalah puncak dari puluhan tahun ketidakadilan yang dirasakan berbeda: mahasiswa merasakan pembungkaman, buruh merasakan upah murah, rakyat kecil merasakan KKN dan sembako mahal.'
+  },
+  { konteks:`Tragedi Trisakti (12 Mei 1998) sering disebut "titik balik" Reformasi. Namun demo mahasiswa sudah berlangsung sejak Januari 1998. Soeharto juga sudah menghadapi tekanan ekonomi sejak Juli 1997.
+    <b>Pertanyaan kritis:</b> Apakah satu peristiwa bisa "menyebabkan" jatuhnya sebuah rezim yang telah berkuasa 32 tahun?`,
+    soal:'Secara historiografis, cara paling tepat memahami peran Tragedi Trisakti dalam keruntuhan Orde Baru adalah…',
+    opsi:['Tragedi Trisakti adalah satu-satunya penyebab tunggal jatuhnya Soeharto',
+          'Tragedi Trisakti hanyalah kebetulan yang tidak memiliki dampak signifikan terhadap jatuhnya Orde Baru',
+          'Tragedi Trisakti adalah katalis — percikan yang membakar tumpukan bahan bakar berupa krisis ekonomi, KKN, dan represi yang sudah menumpuk bertahun-tahun',
+          'Tragedi Trisakti menyebabkan TNI berbalik mendukung mahasiswa sehingga Soeharto dipaksa mundur secara militer'],
+    j:2, ket:'Sejarah jarang punya satu penyebab tunggal. Tragedi Trisakti menjadi katalis — bukan penyebab sendiri — karena ia menyalakan kemarahan yang sudah siap meledak akibat akumulasi krisis, KKN, dan represi bertahun-tahun.'
+  },
+  { konteks:`Habibie memerintah hanya 17 bulan (Mei 1998 – Oktober 1999). Dalam waktu itu ia membuka kebebasan pers, mengizinkan 48 partai, dan menggelar Pemilu 1999 yang relatif demokratis. Namun ia juga mantan Wakil Presiden Soeharto dan bagian dari kabinet Orde Baru selama bertahun-tahun.
+    <b>Debat historiografi:</b> Apakah Habibie "arsitek Reformasi" atau "warisan Orde Baru yang bertobat"?`,
+    soal:'Argumen yang paling kuat untuk menilai Habibie secara berimbang sebagai tokoh transisi adalah…',
+    opsi:['Habibie adalah murni korban — ia tidak punya pilihan lain karena dipaksa mahasiswa',
+          'Habibie adalah bagian sistem Orde Baru yang kemudian membuat pilihan-pilihan berani yang justru meruntuhkan sistem tempat ia tumbuh',
+          'Habibie sebenarnya adalah agen asing yang dikirim IMF untuk menghancurkan kedaulatan Indonesia',
+          'Habibie tidak layak diapresiasi karena tidak menuntut Soeharto secara hukum'],
+    j:1, ket:'Penilaian historis yang baik melihat kompleksitas: Habibie adalah produk Orde Baru yang juga agen perubahannya — ia membuat pilihan-pilihan yang secara sadar membuka demokratisasi, meski itu berarti menghancurkan sistem yang membesarkannya.'
+  }
+];
+
+/* ══════════════════════════════════════════════════════
+   ENGINE REMEDIAL
+   ══════════════════════════════════════════════════════ */
+const rem = { step:0 };
+function startRemedial(){
+  rem.step=0;
+  showScr('scr-remedial');
+  renderRem();
+}
+function remNext(){
+  if(rem.step < DATA_REMEDIAL.length-1){ rem.step++; renderRem(); }
+  else { renderRemSelesai(); }
+}
+function renderRem(){
+  const tot=DATA_REMEDIAL.length;
+  setPg('rem-pf','rem-pl',rem.step+1,tot);
+  document.getElementById('rem-next').disabled=true;
+  document.getElementById('rem-sub').textContent='Soal '+(rem.step+1)+' dari '+tot;
+  const d=DATA_REMEDIAL[rem.step], r=d.ringkasan;
+  // Dots progress
+  const dots=DATA_REMEDIAL.map((_,i)=>`<div class="rem-dot ${i===rem.step?'ak':i<rem.step?'dn':''}"></div>`).join('');
+  // Poin ringkasan
+  const poinH=r.poin.map(p=>`<div class="rem-poin"><div class="rp-judul">📌 ${p.j}</div><div class="rp-isi">${p.i}</div></div>`).join('');
+  // Opsi soal
+  const H=['A','B','C','D'];
+  const opsiH=d.opsi.map((o,i)=>`<div class="rem-opsi" id="ro${i}" tabindex="0" role="button" onclick="cekRem(${i},${i===d.j},'${d.ket.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><div class="rb">${H[i]}</div><span>${o}</span></div>`).join('');
+  document.getElementById('rem-content').innerHTML=`
+    <div class="rem-wrap">
+      <div class="rem-kiri">
+        <h3>${r.judul}</h3>
+        <div class="rem-progress">${dots}</div>
+        ${poinH}
+        <div style="display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.12);border-radius:var(--r16);padding:12px 14px;margin-top:auto">
+          <img src="${CFG.raka}" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--A);flex-shrink:0;object-fit:cover;background:var(--Ptua)" alt="Raka" onerror="imgErr(this)">
+          <p style="font-size:13px;font-weight:700;color:rgba(255,255,255,.9);line-height:1.5;margin:0">💬 Baca dulu ringkasan di kiri, lalu jawab soalnya. Tidak perlu buru-buru!</p>
+        </div>
+      </div>
+      <div class="rem-kanan">
+        <div class="rem-soal">Soal ${rem.step+1}: ${d.soal}</div>
+        <div style="display:flex;flex-direction:column;gap:9px">${opsiH}</div>
+        <div class="fb" id="rem-fb"></div>
+      </div>
+    </div>`;
+}
+function cekRem(idx, ok, ket){
+  document.querySelectorAll('.rem-opsi').forEach(el=>el.style.pointerEvents='none');
+  const el=document.getElementById('ro'+idx);
+  if(ok){
+    el.classList.add('benar'); confetti();
+    fb('rem-fb','ok',`✅ <b>Tepat!</b><br><i>${ket}</i>`);
+    document.getElementById('rem-next').disabled=false;
+  } else {
+    el.classList.add('salah'); flash();
+    // Tampilkan jawaban benar
+    const d=DATA_REMEDIAL[rem.step];
+    document.getElementById('ro'+d.j).classList.add('benar');
+    fb('rem-fb','info',`❌ <b>Belum tepat.</b> Jawaban yang benar sudah ditandai hijau.<br><i>${ket}</i>`);
+    // Tetap bisa lanjut setelah salah (remedial tidak menghukum)
+    setTimeout(()=>{ document.getElementById('rem-next').disabled=false; }, 1200);
+  }
+}
+function renderRemSelesai(){
+  document.getElementById('rem-sub').textContent='Selesai';
+  document.getElementById('rem-next').disabled=true;
+  confetti(); play('bint');
+  document.getElementById('rem-content').innerHTML=`
+    <div class="akhir">
+      <div style="font-size:60px">🌟</div>
+      <h2 style="font-size:34px">Remedial Selesai!</h2>
+      <div class="idtag">${murid.nama} · ${murid.sek}</div>
+      <div style="background:var(--Amuda);border:2px solid var(--A);border-radius:var(--r16);padding:16px 22px;max-width:560px;margin-top:8px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <img src="${CFG.raka}" style="width:52px;height:52px;border-radius:50%;border:3px solid var(--A);flex-shrink:0;object-fit:cover;background:var(--Ptua)" alt="Raka" onerror="imgErr(this)">
+          <p style="font-size:16px;font-weight:700;color:var(--T);line-height:1.6;margin:0">💬 <b>Raka:</b> Kamu sudah melewati semua poin kunci! Sekarang coba ulangi Latihan — aku yakin hasilnya lebih baik dari sebelumnya.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:14px">
+        <button class="btn bM" style="height:54px;padding:0 24px;font-size:17px" onclick="startBerlatih()">✏️ Ulangi Latihan</button>
+        <button class="btn bB" style="height:54px;padding:0 24px;font-size:17px" onclick="goMenu()">☰ Menu</button>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════════
+   ENGINE BONUS HOTS
+   ══════════════════════════════════════════════════════ */
+const bonus = { step:0, skor:0 };
+function startBonus(){
+  bonus.step=0; bonus.skor=0;
+  showScr('scr-bonus');
+  renderBonus();
+}
+function bonusNext(){
+  if(bonus.step < DATA_BONUS.length-1){ bonus.step++; renderBonus(); }
+  else { renderBonusSelesai(); }
+}
+function renderBonus(){
+  const tot=DATA_BONUS.length;
+  setPg('bonus-pf','bonus-pl',bonus.step+1,tot);
+  document.getElementById('bonus-next').disabled=true;
+  document.getElementById('bonus-sub').textContent='Tantangan '+(bonus.step+1)+' dari '+tot;
+  const d=DATA_BONUS[bonus.step];
+  const H=['A','B','C','D'];
+  const opsiH=d.opsi.map((o,i)=>`<div class="bonus-opsi" id="bo${i}" tabindex="0" role="button" onclick="cekBonus(${i},${i===d.j},'${d.ket.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"><div class="bb">${H[i]}</div><span>${o}</span></div>`).join('');
+  const dots=DATA_BONUS.map((_,i)=>`<div class="rem-dot ${i===bonus.step?'ak':i<bonus.step?'dn':''}"></div>`).join('');
+  document.getElementById('bonus-content').innerHTML=`
+    <div class="bonus-wrap">
+      <div class="bonus-kiri">
+        <h3>🔍 Konteks Tantangan ${bonus.step+1}</h3>
+        <div class="rem-progress">${dots}</div>
+        <div class="bonus-konteks">${d.konteks}</div>
+        <div style="display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.12);border-radius:var(--r16);padding:12px 14px;margin-top:auto">
+          <img src="${CFG.raka}" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--A);flex-shrink:0;object-fit:cover;background:var(--Ptua)" alt="Raka" onerror="imgErr(this)">
+          <p style="font-size:13px;font-weight:700;color:rgba(255,255,255,.9);line-height:1.5;margin:0">💬 Ini bukan soal hapalan. Gunakan konteks dan logikamu untuk berpikir kritis!</p>
+        </div>
+      </div>
+      <div class="bonus-kanan">
+        <div class="bonus-soal">Tantangan ${bonus.step+1}: ${d.soal}</div>
+        <div class="dok-opsi-wrap">${opsiH}</div>
+        <div class="fb" id="bonus-fb"></div>
+      </div>
+    </div>`;
+}
+function cekBonus(idx, ok, ket){
+  document.querySelectorAll('.bonus-opsi').forEach(el=>el.style.pointerEvents='none');
+  const el=document.getElementById('bo'+idx);
+  if(ok){
+    el.classList.add('benar'); bonus.skor++; confetti();
+    fb('bonus-fb','ok',`✅ <b>Analisis tepat!</b><br><i>${ket}</i>`);
+    document.getElementById('bonus-next').disabled=false;
+  } else {
+    el.classList.add('salah'); flash();
+    const d=DATA_BONUS[bonus.step];
+    document.getElementById('bo'+d.j).classList.add('benar');
+    fb('bonus-fb','no',`❌ <b>Belum tepat.</b><br><i>${ket}</i>`);
+    setTimeout(()=>{ document.getElementById('bonus-next').disabled=false; }, 1400);
+  }
+}
+function renderBonusSelesai(){
+  document.getElementById('bonus-sub').textContent='Selesai';
+  document.getElementById('bonus-next').disabled=true;
+  play('bint'); confetti();
+  const pct=Math.round(bonus.skor/DATA_BONUS.length*100);
+  const pesan=bonus.skor===3
+    ? '🌟 Sempurna! Kemampuan berpikir kritismu luar biasa. Kamu benar-benar seorang analis sejarah!'
+    : bonus.skor===2
+    ? '💪 Hampir sempurna! Satu soal lagi yang perlu diasah — tapi ini sudah sangat bagus.'
+    : '📚 Soal HOTS memang menantang. Teruslah melatih kemampuan berpikir kritismu!';
+  document.getElementById('bonus-content').innerHTML=`
+    <div class="akhir">
+      <div style="font-size:60px">🏆</div>
+      <h2 style="font-size:32px">Tantangan Bonus Selesai!</h2>
+      <div class="idtag">${murid.nama} · ${murid.sek}</div>
+      <div class="bonus-badge" style="margin-top:6px">
+        <h4>🔍 Skor Analisis HOTS</h4>
+        <p class="bn">${bonus.skor} / ${DATA_BONUS.length}</p>
+        <p style="font-size:15px;font-weight:700;color:#555">${pct} poin bonus berhasil diraih!</p>
+      </div>
+      <div style="background:var(--Amuda);border:2px solid var(--A);border-radius:var(--r16);padding:14px 20px;max-width:540px;margin-top:8px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <img src="${CFG.raka}" style="width:48px;height:48px;border-radius:50%;border:3px solid var(--A);flex-shrink:0;object-fit:cover;background:var(--Ptua)" alt="Raka" onerror="imgErr(this)">
+          <p style="font-size:15px;font-weight:700;color:var(--T);line-height:1.55;margin:0">💬 <b>Raka:</b> ${pesan}</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:14px">
+        <button class="btn bH" style="height:54px;padding:0 24px;font-size:17px" onclick="startBonus()">🔄 Coba Lagi</button>
+        <button class="btn bB" style="height:54px;padding:0 24px;font-size:17px" onclick="goMenu()">☰ Menu</button>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════
+   APPLY CONFIG & INIT
+   ══════════════════════════════════════════════════ */
+function setT(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function setS(id,v){const e=document.getElementById(id);if(e)e.setAttribute('src',v);}
+function applyConfig(){
+  const C=CFG;
+  setT('cfg-judul',C.judul); setT('cfg-subjudul',C.subjudul);
+  setS('cfg-logo',C.logo); setS('cfg-bgjudul',C.bgJudul); setS('cfg-raka',C.raka);
+  setT('cfg-judul-menu',C.judul);
+  setT('cfg-mapel',C.mapel); setT('cfg-fase',C.fase);
+  setT('cfg-unit',C.unit); setT('cfg-subunit',C.subunit); setT('cfg-tp',C.tp);
+  setT('cfg-nama',C.profil.nama); setT('cfg-nama2',C.profil.nama);
+  setT('cfg-jenis',C.profil.jenis);
+  setS('cfg-foto',C.profil.foto);
+  document.title = C.judul + ' — MPI Sejarah';
+}
+applyConfig();
+</script>
+</body>
+</html>
