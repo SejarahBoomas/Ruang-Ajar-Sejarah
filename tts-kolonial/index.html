@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teka-Teki Silang Kolonialisme</title>
+<style>
+  :root{
+    --navy:#12314a; --ink:#183044; --sand:#f6eddc; --paper:#fffaf0;
+    --terra:#a94f2e; --gold:#d79b35; --teal:#1f6b69; --line:#d8c6a9;
+    --ok:#d7eee4; --bad:#f8d9cf; --cell:40px;
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; font-family:var(--sans); color:var(--ink); font-size:17px; line-height:1.45;
+    background:
+      radial-gradient(circle at 92% 6%,rgba(215,155,53,.22),transparent 24rem),
+      radial-gradient(circle at 6% 60%,rgba(31,107,105,.12),transparent 28rem),
+      linear-gradient(rgba(18,49,74,.03) 1px,transparent 1px) 0 0/30px 30px,
+      linear-gradient(90deg,rgba(18,49,74,.03) 1px,transparent 1px) 0 0/30px 30px,
+      var(--sand);
+    min-height:100vh;
+  }
+  button{font:inherit;color:inherit}
+  .wrap{max-width:1360px;margin:0 auto;padding:0 20px}
+
+  /* Header */
+  header.hero{background:linear-gradient(100deg,#0b2233 0%,var(--navy) 55%,#1d4a66 100%);color:#fff;padding:28px 0 30px;position:relative;overflow:hidden}
+  header.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:320px;height:320px;border-radius:50%;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 0 40px rgba(255,255,255,.03),0 0 0 80px rgba(255,255,255,.02)}
+  .hero-inner{display:flex;gap:20px;align-items:center;position:relative;z-index:1}
+  .compass{flex:none;width:76px;height:76px;color:#efc66e}
+  .kicker{margin:0 0 4px;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#f4ce79}
+  h1{margin:0;font-family:var(--serif);font-size:clamp(1.7rem,4vw,2.9rem);line-height:1.12}
+  .sub{margin:8px 0 0;max-width:46rem;color:#e6eef0}
+
+  /* Toolbar */
+  .toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:22px 0 18px;padding:14px 18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,250,240,.9)}
+  .toolbar p{margin:0;max-width:44rem;color:#3d4f56}
+  .toolbar .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:.92rem}
+  .chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+  .chip:hover{filter:brightness(.97)}
+
+  /* Layout */
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:22px;align-items:start}
+  .card{background:rgba(255,250,240,.96);border:1px solid var(--line);border-radius:22px;box-shadow:0 16px 40px rgba(62,48,24,.10)}
+  .board{padding:22px}
+  .board-head{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;margin-bottom:14px}
+  h2{margin:0;font-family:var(--serif);color:var(--navy);font-size:1.45rem}
+  .stats{display:flex;gap:10px;flex-wrap:wrap}
+  .stat{background:var(--navy);color:#fff;border-radius:12px;padding:8px 14px;min-width:96px}
+  .stat b{display:block;font-size:1.25rem;line-height:1.2;font-variant-numeric:tabular-nums}
+  .stat span{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#b7d8d4;font-weight:700}
+  .bar{height:8px;border-radius:99px;background:#e8dcc4;overflow:hidden;margin-bottom:14px}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .3s}
+
+  .active-clue{position:sticky;top:0;z-index:5;display:flex;gap:12px;align-items:flex-start;background:#fff2d5;border-left:5px solid var(--gold);border-radius:0 12px 12px 0;padding:10px 14px;margin-bottom:14px;min-height:64px}
+  .active-clue .tag{flex:none;background:var(--terra);color:#fff;border-radius:8px;padding:2px 10px;font-weight:800;font-size:.9rem;white-space:nowrap}
+  .active-clue p{margin:0;font-weight:600}
+  .active-clue .q::first-letter{text-transform:uppercase}
+  .active-clue small{display:block;color:#6a5a3a;font-weight:500}
+
+  .grid-scroll{overflow-x:auto;padding:4px}
+  .grid{display:grid;grid-template-columns:repeat(var(--cols),var(--cell));gap:0;width:max-content;margin:0 auto;padding:4px}
+  .cell{position:relative;width:var(--cell);height:var(--cell);background:transparent}
+  .cell.open{background:#fffdf7;border:1.5px solid var(--navy)}
+  .cell.block{background:#808080;border:1.5px solid var(--navy)}
+  .cell.in-word{background:#fff0c8}
+  .cell.solved{background:var(--ok)}
+  .cell.solved.in-word{background:#c3e6d6}
+  .cell.wrong{background:repeating-linear-gradient(45deg,var(--bad),var(--bad) 5px,#f2c3b5 5px,#f2c3b5 7px)}
+  .cell.active{background:#ffd983;box-shadow:inset 0 0 0 3px #e7a52c;z-index:2}
+  .cell input{width:100%;height:100%;border:0;padding:0;margin:0;background:transparent;outline:0;text-align:center;text-transform:uppercase;color:var(--navy);font:800 calc(var(--cell)*.55) var(--sans);caret-color:transparent;border-radius:0;cursor:pointer}
+  .cell.locked input{color:var(--teal)}
+  .num{position:absolute;top:1px;left:3px;pointer-events:none;color:var(--terra);font-weight:800;font-size:max(9px,calc(var(--cell)*.27));line-height:1;z-index:1}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:12px 18px;color:#fff;font-weight:700;cursor:pointer;transition:transform .15s,filter .15s}
+  .btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  .btn.primary{background:var(--terra)} .btn.teal{background:var(--teal)}
+  .btn.navy{background:var(--navy)} .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+  button:focus-visible,.cell input:focus-visible{outline:3px solid #e7a52c;outline-offset:2px}
+  .status{margin-top:16px;padding:12px 14px;border-left:4px solid var(--gold);background:#fff2d5;border-radius:0 12px 12px 0;font-weight:600;color:#4d3d1f;min-height:48px}
+
+  /* Clues */
+  .clues{padding:20px;position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto}
+  .clues h3{margin:16px 0 6px;color:var(--teal);font-size:1.02rem;letter-spacing:.06em;text-transform:uppercase}
+  .clues h3:first-of-type{margin-top:10px}
+  .clues ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+  .clue{display:grid;grid-template-columns:2rem 1fr 1.4rem;gap:8px;align-items:start;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:12px;padding:8px;cursor:pointer}
+  .clue:hover{background:#fff}
+  .clue.active{background:#fff0c8;border-color:#e7c26a}
+  .cnum{display:grid;place-items:center;width:1.9rem;height:1.9rem;border-radius:99px;background:var(--terra);color:#fff;font-weight:800;font-size:.85rem}
+  .ctext{line-height:1.3}
+  .ctext .q::first-letter{text-transform:uppercase}
+  .ctext em{display:block;color:#6a5f4a;font-size:.84rem;font-style:normal;margin-top:2px}
+  .tick{opacity:0;color:var(--teal);font-weight:900}
+  .clue.done .tick{opacity:1}
+  .clue.done .ctext{color:#5c6d6c}
+  .clue.done .cnum{background:var(--teal)}
+
+  /* Facts */
+  .facts-sec{margin:26px 0 8px;padding:22px}
+  .facts-sec header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .facts-sec header span{color:#5c6d6c;font-weight:600}
+  .facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+  .fact{background:#fff;border:1px solid var(--line);border-top:5px solid var(--gold);border-radius:14px;padding:14px 16px;animation:pop .35s ease}
+  .fact h4{margin:0 0 4px;font-family:var(--serif);color:var(--navy);font-size:1.05rem}
+  .fact p{margin:0;font-size:.95rem}
+  .empty{color:#5c6d6c;margin:0}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+
+  footer{margin-top:24px;border-top:1px solid #ddcdb3;padding:18px 0 28px;text-align:center;color:#59666a;font-size:.92rem}
+  footer p{margin:2px 0}
+
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(10,30,45,.72);display:grid;place-items:center;padding:20px;z-index:50}
+  .overlay[hidden]{display:none}
+  .modal{max-width:460px;width:100%;background:var(--paper);border-radius:22px;padding:28px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+  .modal h2{font-size:1.7rem;margin-bottom:8px}
+  .modal .big{font-size:2.6rem;color:var(--terra);font-weight:800;font-variant-numeric:tabular-nums}
+  .modal .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  .modal .meta{display:flex;gap:10px;justify-content:center;margin:14px 0 0;flex-wrap:wrap}
+  .modal .meta div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 16px;min-width:110px}
+  .modal .meta b{display:block;font-size:1.3rem;color:var(--navy)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  @media (max-width:1020px){
+    .layout{grid-template-columns:1fr}
+    .clues{position:static;max-height:none}
+  }
+  @media (max-width:560px){
+    body{font-size:16px}
+    .wrap{padding:0 12px}
+    .board{padding:14px}
+    .compass{width:52px;height:52px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <svg class="compass" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+      <circle cx="32" cy="32" r="29" opacity=".6"/><circle cx="32" cy="32" r="22" opacity=".35"/>
+      <path d="M32 3v10M32 51v10M3 32h10M51 32h10" opacity=".7"/>
+      <path d="M40 24 35 35 24 40 29 29Z" fill="currentColor" stroke="none"/>
+    </svg>
+    <div>
+      <p class="kicker" id="kicker">Pameran Pendidikan · Sejarah</p>
+      <h1>Teka-Teki Silang Kolonialisme</h1>
+      <p class="sub">Telusuri jejak bangsa Eropa di Nusantara: dari pencarian rempah, penjelajahan samudra, hingga penguasaan wilayah dan perlawanan rakyat.</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="toolbar" aria-label="Cara bermain">
+    <p><b>Cara bermain:</b> klik kotak lalu ketik jawaban. Klik kotak yang sama sekali lagi (atau tekan <kbd>Enter</kbd>) untuk berpindah arah <b>Secara horizontal ↔ Tegak lurus</b>. Jawaban ditulis tanpa spasi.</p>
+    <div class="tools">
+      <button class="chip" id="sound" type="button" aria-pressed="true">🔊 Suara</button>
+      <button class="chip" id="autoreset" type="button" aria-pressed="true" title="Papan direset otomatis bila tidak ada aktivitas">⏱ Reset otomatis</button>
+      <button class="chip" id="fs" type="button" hidden>⛶ Layar penuh</button>
+    </div>
+  </section>
+
+  <div class="layout">
+    <section class="card board" aria-label="Papan teka-teki silang">
+      <div class="board-head">
+        <h2>Papan Teka-Teki</h2>
+        <div class="stats" aria-live="polite">
+          <div class="stat"><span>Kata benar</span><b id="stWords">0 / 0</b></div>
+          <div class="stat"><span>Waktu</span><b id="stTime">00:00</b></div>
+        </div>
+      </div>
+      <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+
+      <div class="active-clue" id="activeClue" aria-live="polite"></div>
+
+      <div class="grid-scroll" id="gridWrap">
+        <div class="grid" id="grid" role="group" aria-label="Kotak teka-teki silang interaktif"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="check" type="button">✔ Periksa Jawaban</button>
+        <button class="btn navy" id="hint" type="button">💡 Beri Huruf</button>
+        <button class="btn teal" id="reset" type="button">↺ Ulangi</button>
+        <button class="btn ghost" id="reveal" type="button">Lihat Kunci</button>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <aside class="card clues" aria-label="Daftar petunjuk">
+      <h2>Petunjuk</h2>
+      <h3>Secara horizontal →</h3><ol id="listA"></ol>
+      <h3>Tegak lurus ↓</h3><ol id="listD"></ol>
+    </aside>
+  </div>
+
+  <section class="card facts-sec" id="factsSec" aria-label="Catatan sejarah">
+    <header>
+      <h2>Catatan Sejarah</h2>
+      <span id="factCount">0 terbuka</span>
+    </header>
+    <div class="facts" id="facts"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p id="credit"></p>
+    <p>Catatan sejarah disajikan ringkas untuk keperluan pembelajaran; rujuk buku teks dan sumber sejarah untuk uraian lengkap.</p>
+  </div>
+</footer>
+
+<div class="overlay" id="doneOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
+    <div style="font-size:2.6rem" aria-hidden="true">🏆</div>
+    <h2 id="doneTitle">Selamat, kamu berhasil!</h2>
+    <p>Semua jawaban Teka-Teki Silang Kolonialisme telah terisi dengan benar.</p>
+    <div class="meta">
+      <div><span>Waktu</span><b id="doneTime">00:00</b></div>
+      <div><span>Huruf bantuan</span><b id="doneHints">0</b></div>
+    </div>
+    <div class="row">
+      <button class="btn primary" id="again" type="button">Main lagi</button>
+      <button class="btn ghost" id="closeDone" type="button">Lihat papan</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="idleOverlay" hidden>
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="idleTitle">
+    <h2 id="idleTitle">Masih di sana?</h2>
+    <p>Papan akan direset otomatis dalam</p>
+    <div class="big" id="idleCount">15</div>
+    <div class="row"><button class="btn primary" id="stay" type="button">Lanjutkan bermain</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ====== Pengaturan (silakan ubah) ====== */
+const CONFIG = {
+  kicker: "Pameran Pendidikan · Sejarah",
+  showFacts: true,            // false = sembunyikan bagian “Catatan Sejarah”
+  credit: "",                 // contoh: "Disusun oleh Kelompok 3 · Kelas XI IPS 2 · SMA Negeri 1 ..."
+  idleMs: 120000,             // waktu tanpa aktivitas sebelum peringatan (ms)
+  idleCountdown: 15           // hitung mundur sebelum reset (detik)
+};
+
+/* ====== Pola kotak dari dokumen asli (Anisa_crossword-maker_Kolonialisme.docx) ======
+   [jawaban, baris, kolom, arah, nomor soal]  (a = secara horizontal, d = tegak lurus)
+   Baris/kolom dihitung dari 0. Kotak abu-abu tua pada dokumen asli dipertahankan sebagai BLOCKS. */
+const LAYOUT = [["JAWA", 6, 3, "a", 4], ["SPANYOL", 6, 17, "a", 6], ["KOLONIALISME", 8, 11, "a", 8], ["PORTUGIS", 10, 0, "a", 9], ["NUSANTARA", 10, 11, "a", 10], ["MALAHAYATI", 12, 3, "a", 11], ["CULTUURSTELSEL", 15, 8, "a", 12], ["VOC", 18, 10, "a", 13], ["RAFFLES", 21, 7, "a", 14], ["TORDESILLAS", 0, 13, "d", 1], ["MALUKU", 5, 4, "d", 2], ["NAVIGASI", 5, 19, "d", 3], ["AMERIKA", 6, 6, "d", 5], ["GLORY", 7, 2, "d", 7], ["KONSTANTINOPEL", 8, 11, "d", 8]];
+const BLOCKS = [[9,12]];
+
+/* ====== Petunjuk & catatan sejarah ====== */
+const INFO = {
+  /* clue = teks soal persis dari dokumen asli (tidak diubah). title/fact = catatan sejarah tambahan. */
+  TORDESILLAS:{title:"Perjanjian Tordesillas (1494)",
+    clue:"perjanjian antara Kerajaan Spanyol dan Portugal mengenai hak untuk menjelajahi dan menaklukkan wilayah di luar Eropa",
+    fact:"Dua kerajaan Eropa membagi wilayah di luar Eropa tanpa melibatkan bangsa-bangsa yang mendiaminya."},
+  MALUKU:{title:"Maluku",
+    clue:"Kepulauan Rempah",
+    fact:"Julukan “Kepulauan Rempah” lahir dari cengkih dan pala. Portugis, Spanyol, Belanda, dan Inggris bersaing menguasainya."},
+  NAVIGASI:{title:"Navigasi",
+    clue:"cara menentukan kedudukan dan arah perjalanan baik di medan sebenarnya atau di peta",
+    fact:"Kemajuan alat dan pengetahuan pelayaran (kompas, astrolab, peta) membuat kapal Eropa mampu berlayar jauh melintasi samudra."},
+  JAWA:{title:"Perang Jawa (1825–1830)",
+    clue:"perang antara Diponegoro dan Belanda disebut dengan Perang ...",
+    fact:"Dikenal juga sebagai Perang Diponegoro. Biayanya yang sangat besar turut mendorong Belanda menerapkan Tanam Paksa pada 1830."},
+  AMERIKA:{title:"Benua Amerika (1492)",
+    clue:"penemunya Christopher Columbus",
+    fact:"Pelayaran Columbus didukung Spanyol. Benua ini sudah dihuni banyak bangsa jauh sebelum kedatangan orang Eropa."},
+  SPANYOL:{title:"Spanyol",
+    clue:"negara pesaing Portugis dalam penjelajahan samudra",
+    fact:"Kapal dari ekspedisi Magellan yang berlayar atas nama Spanyol tiba di Maluku (Tidore) pada 1521."},
+  GLORY:{title:"3G: Gold, Glory, Gospel",
+    clue:"motif bangsa Eropa untuk melakukan praktik kolonialisme dan imperialisme guna membangun dan mengembalikan kejayaan",
+    fact:"Gold (kekayaan), Glory (kejayaan), dan Gospel (penyebaran agama) sering disebut sebagai pendorong penjelajahan bangsa Eropa."},
+  KOLONIALISME:{title:"Kolonialisme",
+    clue:"pengembangan kekuasaan sebuah negara atas wilayah dan manusia di luar batas negaranya",
+    fact:"Bagi masyarakat terjajah, kolonialisme berarti hilangnya kedaulatan, eksploitasi sumber daya dan tenaga, serta perubahan sosial yang mendalam."},
+  KONSTANTINOPEL:{title:"Konstantinopel (jatuh 1453)",
+    clue:"kota yang dibangun Kaisar Romawi Timur",
+    fact:"Setelah kota ini dikuasai Kesultanan Utsmaniyah pada 1453, jalur dagang darat Eropa–Asia dianggap terganggu sehingga bangsa Eropa mencari jalur laut langsung ke sumber rempah."},
+  PORTUGIS:{title:"Portugis di Malaka (1511)",
+    clue:"bangsa Eropa pertama yang mendarat di Indonesia,",
+    fact:"Penguasaan Malaka pada 1511 menjadi pijakan Portugis untuk melanjutkan pelayaran ke Maluku, sumber cengkih dan pala."},
+  NUSANTARA:{title:"Nusantara",
+    clue:"sebutan nama bagi seluruh wilayah Kepulauan Indonesia",
+    fact:"Letaknya yang strategis di jalur perdagangan dan kekayaan rempahnya menjadikan Nusantara pusat perhatian bangsa-bangsa Eropa."},
+  MALAHAYATI:{title:"Malahayati (Keumalahayati)",
+    clue:"salah seorang perempuan pejuang yang berasal dari Kesultanan Aceh",
+    fact:"Laksamana perempuan Kesultanan Aceh yang memimpin pasukan Inong Balee pada akhir abad ke-16 dan menghadapi armada Portugis serta Belanda. Ditetapkan sebagai Pahlawan Nasional pada 2017."},
+  CULTUURSTELSEL:{title:"Cultuurstelsel (Tanam Paksa)",
+    clue:"taman paksa",
+    fact:"Berlaku sejak 1830: petani diwajibkan menanam tanaman ekspor untuk pemerintah kolonial. Kebijakan ini menguntungkan Belanda, tetapi menimbulkan penderitaan dan kelaparan di berbagai daerah."},
+  VOC:{title:"VOC (1602)",
+    clue:"perusahaan dagang Belanda",
+    fact:"Kongsi dagang Belanda dengan hak monopoli dan wewenang mirip negara; berdiri 1602 dan dibubarkan 1799."},
+  RAFFLES:{title:"Thomas Stamford Raffles",
+    clue:"seorang negarawan Inggris yang pernah menjabat sebagai gubernur jenderal Hindia Timur",
+    fact:"Memerintah Jawa pada 1811–1816 dan menerapkan sistem sewa tanah (landrent) yang mewajibkan petani membayar pajak atas tanah garapan."}
+};
+
+/* ====== Bangun struktur data ====== */
+const $ = id => document.getElementById(id);
+const rows = Math.max(...LAYOUT.map(([w,r,c,d]) => d==='d' ? r+w.length : r+1));
+const cols = Math.max(...LAYOUT.map(([w,r,c,d]) => d==='a' ? c+w.length : c+1));
+const blockSet = new Set(BLOCKS.map(b=>b[0]+','+b[1]));
+const map = Array.from({length:rows}, () => Array(cols).fill(null));
+const words = LAYOUT.map(([answer,r,c,dir,num]) => ({answer,r,c,dir,cells:[],solved:false,num,info:INFO[answer]}));
+const allCells = [];
+
+words.forEach(w => {
+  for (let i=0;i<w.answer.length;i++){
+    const rr = w.r + (w.dir==='d'?i:0), cc = w.c + (w.dir==='a'?i:0);
+    let cell = map[rr][cc];
+    if (!cell){ cell = {r:rr,c:cc,letter:w.answer[i],words:{},num:0,locked:false}; map[rr][cc]=cell; allCells.push(cell); }
+    cell.words[w.dir] = w; w.cells.push(cell);
+  }
+});
+words.forEach(w => { w.cells[0].num = w.num; });   // nomor sesuai dokumen asli
+const across = words.filter(w=>w.dir==='a').sort((a,b)=>a.num-b.num);
+const down   = words.filter(w=>w.dir==='d').sort((a,b)=>a.num-b.num);
+const order  = [...across, ...down];
+
+/* ====== Render papan ====== */
+const grid = $('grid');
+grid.style.setProperty('--cols', cols);
+for (let r=0;r<rows;r++) for (let c=0;c<cols;c++){
+  const cell = map[r][c];
+  const el = document.createElement('div');
+  el.className = 'cell';
+  if (blockSet.has(r+','+c)) el.classList.add('block');
+  if (cell){
+    el.classList.add('open');
+    if (cell.num){ const n=document.createElement('span'); n.className='num'; n.textContent=cell.num; el.appendChild(n); }
+    const inp = document.createElement('input');
+    inp.type='text'; inp.autocomplete='off'; inp.autocapitalize='characters'; inp.spellcheck=false;
+    inp.setAttribute('inputmode','text'); inp.setAttribute('enterkeyhint','next');
+    inp.setAttribute('aria-label', (cell.num?('Nomor '+cell.num+', '):'') + 'baris '+(r+1)+', kolom '+(c+1));
+    inp.dataset.r=r; inp.dataset.c=c;
+    el.appendChild(inp);
+    cell.el=el; cell.input=inp;
+  }
+  grid.appendChild(el);
+}
+
+/* ====== Render daftar petunjuk ====== */
+function clueItem(w){
+  const li=document.createElement('li');
+  const b=document.createElement('button'); b.type='button'; b.className='clue';
+  const note = w.answer.length+' huruf';
+  b.innerHTML='<span class="cnum">'+w.num+'</span><span class="ctext"></span><span class="tick" aria-hidden="true">✓</span>';
+  const t=b.querySelector('.ctext');
+  const q=document.createElement('span'); q.className='q'; q.textContent=w.info.clue; t.appendChild(q);
+  const em=document.createElement('em'); em.textContent='('+note+')'; t.appendChild(em);
+  b.addEventListener('click',()=>{
+    const target = w.cells.find(c=>!c.input.value) || w.cells[0];
+    select(target,w.dir);
+  });
+  w.clueEl=b; li.appendChild(b); return li;
+}
+across.forEach(w=>$('listA').appendChild(clueItem(w)));
+down.forEach(w=>$('listD').appendChild(clueItem(w)));
+
+/* ====== State ====== */
+const state = {cell:null, dir:'a'};
+let hints=0, revealed=false, startTime=null, timerId=null, elapsed=0, completeShown=false;
+const unlockOrder=[];
+let soundOn=true, autoReset=true;
+
+function setStatus(t){ $('status').textContent=t; }
+
+/* ====== Seleksi ====== */
+function select(cell, dir, opts){
+  opts = opts||{};
+  if (!cell.words[dir]) dir = cell.words.a ? 'a' : 'd';
+  state.cell=cell; state.dir=dir;
+  paint();
+  if (opts.focus!==false){ cell.input.focus({preventScroll:false}); cell.input.select(); }
+}
+function paint(){
+  const w = state.cell.words[state.dir];
+  allCells.forEach(c=>c.el.classList.remove('in-word','active'));
+  w.cells.forEach(c=>c.el.classList.add('in-word'));
+  state.cell.el.classList.add('active');
+  words.forEach(x=>x.clueEl.classList.toggle('active', x===w));
+  const dirName = w.dir==='a' ? 'Horizontal' : 'Tegak lurus';
+  const note = '';
+  $('activeClue').innerHTML = '<span class="tag">'+w.num+' '+dirName+'</span><p></p>';
+  const p=$('activeClue').querySelector('p'); const qs=document.createElement('span'); qs.className='q'; qs.textContent=w.info.clue; p.appendChild(qs);
+  const sm=document.createElement('small'); sm.textContent=w.answer.length+' huruf'+note; p.appendChild(sm);
+  // gulir daftar petunjuk agar item aktif terlihat
+  const box = document.querySelector('.clues');
+  if (box && box.scrollHeight>box.clientHeight && getComputedStyle(box).position==='sticky'){
+    const el=w.clueEl, top=el.offsetTop, bottom=top+el.offsetHeight;
+    if (top<box.scrollTop+40) box.scrollTop=top-60; else if (bottom>box.scrollTop+box.clientHeight-10) box.scrollTop=bottom-box.clientHeight+20;
+  }
+}
+function move(cell,dr,dc){
+  let r=cell.r+dr, c=cell.c+dc;
+  while(r>=0&&r<rows&&c>=0&&c<cols){
+    const t=map[r][c];
+    if(t){ const d=dr?'d':'a'; select(t, t.words[d]?d:state.dir); return; }
+    r+=dr; c+=dc;
+  }
+}
+function nextWord(step){
+  const cur=state.cell.words[state.dir]; let i=order.indexOf(cur);
+  const w=order[(i+step+order.length)%order.length];
+  select(w.cells.find(c=>!c.input.value)||w.cells[0], w.dir);
+}
+
+/* ====== Evaluasi ====== */
+function evaluate(){
+  let newly=[];
+  words.forEach(w=>{
+    const ok=w.cells.every(c=>c.input.value===c.letter);
+    if(ok && !w.solved){ w.solved=true; unlockOrder.push(w); newly.push(w); }
+    else if(!ok && w.solved){ w.solved=false; const i=unlockOrder.indexOf(w); if(i>-1) unlockOrder.splice(i,1); }
+    w.clueEl.classList.toggle('done', w.solved);
+  });
+  allCells.forEach(c=>c.el.classList.toggle('solved', Object.values(c.words).some(w=>w.solved)));
+  renderFacts(); updateProgress();
+  if (newly.length && !revealed){
+    const w=newly[0];
+    setStatus('Benar! “'+w.info.title+'” terselesaikan. Catatan sejarahnya sudah terbuka di bawah.');
+    if (words.every(x=>x.solved)) onComplete(); else tone([660,880],.14);
+  }
+}
+function renderFacts(){
+  const box=$('facts'); if(!box) return; box.innerHTML='';
+  if(!unlockOrder.length){ const p=document.createElement('p'); p.className='empty'; p.textContent='Selesaikan sebuah jawaban untuk membuka catatan sejarahnya.'; box.appendChild(p); }
+  [...unlockOrder].reverse().forEach(w=>{
+    const d=document.createElement('article'); d.className='fact';
+    const h=document.createElement('h4'); h.textContent=w.info.title;
+    const p=document.createElement('p'); p.textContent=w.info.fact;
+    d.append(h,p); box.appendChild(d);
+  });
+  if($('factCount')) $('factCount').textContent=unlockOrder.length+' dari '+words.length+' terbuka';
+}
+function updateProgress(){
+  const correct=allCells.filter(c=>c.input.value===c.letter).length;
+  $('bar').style.width=(correct/allCells.length*100)+'%';
+  $('stWords').textContent=words.filter(w=>w.solved).length+' / '+words.length;
+}
+function filledCount(){ return allCells.filter(c=>c.input.value).length; }
+
+/* ====== Timer ====== */
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function startTimer(){ if(timerId||completeShown) return; startTime=Date.now()-elapsed*1000; timerId=setInterval(()=>{elapsed=Math.floor((Date.now()-startTime)/1000); $('stTime').textContent=fmt(elapsed);},500); }
+function stopTimer(){ clearInterval(timerId); timerId=null; }
+
+/* ====== Suara ====== */
+let actx=null;
+function tone(freqs,dur){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    let t=actx.currentTime;
+    freqs.forEach(f=>{
+      const o=actx.createOscillator(), g=actx.createGain();
+      o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.12,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+dur+.02); t+=dur*.9;
+    });
+  }catch(e){}
+}
+
+/* ====== Input ====== */
+function onEdited(cell){
+  cell.el.classList.remove('wrong');
+  if(cell.input.value) startTimer();
+  evaluate();
+}
+allCells.forEach(cell=>{
+  const inp=cell.input;
+  inp.addEventListener('focus',()=>inp.select());
+  inp.addEventListener('click',()=>{
+    if(state.cell===cell && cell.words.a && cell.words.d) select(cell, state.dir==='a'?'d':'a');
+    else select(cell, state.dir);
+  });
+  inp.addEventListener('input',()=>{
+    const ch=inp.value.replace(/[^a-zA-Z]/g,'').slice(-1).toUpperCase();
+    inp.value=ch;
+    if(state.cell!==cell) select(cell,state.dir,{focus:false});
+    onEdited(cell);
+    if(ch && $('doneOverlay').hidden){
+      const w=cell.words[state.dir]||cell.words.a||cell.words.d;
+      const nxt=w.cells[w.cells.indexOf(cell)+1];
+      if(nxt) select(nxt,state.dir); else select(cell,state.dir);
+    }
+  });
+  inp.addEventListener('keydown',e=>{
+    if(e.ctrlKey||e.metaKey||e.altKey) return;
+    switch(e.key){
+      case 'ArrowRight': e.preventDefault(); move(cell,0,1); break;
+      case 'ArrowLeft':  e.preventDefault(); move(cell,0,-1); break;
+      case 'ArrowDown':  e.preventDefault(); move(cell,1,0); break;
+      case 'ArrowUp':    e.preventDefault(); move(cell,-1,0); break;
+      case 'Enter': case ' ':
+        e.preventDefault();
+        if(cell.words.a&&cell.words.d) select(cell,state.dir==='a'?'d':'a'); break;
+      case 'Tab': e.preventDefault(); nextWord(e.shiftKey?-1:1); break;
+      case 'Backspace': {
+        e.preventDefault();
+        if(inp.value && !cell.locked){ inp.value=''; onEdited(cell); }
+        else{
+          const w=cell.words[state.dir]||cell.words.a||cell.words.d;
+          const prev=w.cells[w.cells.indexOf(cell)-1];
+          if(prev){ select(prev,state.dir); if(!prev.locked){ prev.input.value=''; onEdited(prev);} }
+        }
+        break; }
+      case 'Delete': e.preventDefault(); if(!cell.locked){ inp.value=''; onEdited(cell);} break;
+    }
+  });
+});
+
+/* ====== Tombol ====== */
+$('check').addEventListener('click',()=>{
+  let filled=0,wrong=0;
+  allCells.forEach(c=>{
+    c.el.classList.remove('wrong');
+    if(c.input.value){ filled++; if(c.input.value!==c.letter){ wrong++; c.el.classList.add('wrong'); } }
+  });
+  if(!filled){ setStatus('Isi beberapa kotak terlebih dahulu, lalu periksa jawabanmu.'); tone([220],.25); return; }
+  if(!wrong){ setStatus('Semua huruf yang sudah kamu isi benar ('+filled+' kotak). Lanjutkan!'); tone([660,880],.14); }
+  else{ setStatus(wrong+' kotak masih keliru (bergaris merah muda). Ubah hurufnya, atau tekan “Beri Huruf” bila butuh bantuan.'); tone([220],.25); }
+});
+$('hint').addEventListener('click',()=>{
+  const c=state.cell; if(!c||c.locked){ setStatus('Pilih kotak yang belum terkunci untuk mendapat huruf bantuan.'); return; }
+  c.input.value=c.letter; c.locked=true; c.input.readOnly=true; c.el.classList.add('locked'); c.el.classList.remove('wrong');
+  hints++; startTimer(); evaluate();
+  setStatus('Huruf bantuan diberikan (total '+hints+').');
+  const w=c.words[state.dir], nxt=w.cells.find(x=>!x.input.value);
+  if(nxt) select(nxt,state.dir); else c.input.focus();
+});
+function resetAll(){
+  allCells.forEach(c=>{ c.input.value=''; c.input.readOnly=false; c.locked=false; c.el.classList.remove('wrong','locked','solved'); });
+  words.forEach(w=>{ w.solved=false; w.clueEl.classList.remove('done'); });
+  unlockOrder.length=0; hints=0; revealed=false; completeShown=false; elapsed=0; stopTimer();
+  $('stTime').textContent='00:00';
+  $('doneOverlay').hidden=true; hideIdle();
+  renderFacts(); updateProgress();
+  select(across[0].cells[0], across[0].dir, {focus:false});
+  setStatus('Papan siap. Klik sebuah kotak atau pilih petunjuk untuk mulai.');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('reset').addEventListener('click',()=>{ if(filledCount()===0 || confirm('Kosongkan seluruh papan dan mulai dari awal?')) resetAll(); });
+$('reveal').addEventListener('click',()=>{
+  if(!confirm('Tampilkan seluruh kunci jawaban? Waktu dan permainan akan dianggap selesai tanpa penghargaan.')) return;
+  revealed=true; stopTimer();
+  allCells.forEach(c=>{ c.input.value=c.letter; c.input.readOnly=true; c.locked=true; c.el.classList.add('locked'); c.el.classList.remove('wrong'); });
+  evaluate(); setStatus('Kunci jawaban ditampilkan. Baca catatan sejarah di bawah, lalu tekan “Ulangi” untuk mencoba lagi.');
+});
+function onComplete(){
+  stopTimer(); completeShown=true;
+  $('doneTime').textContent=fmt(elapsed); $('doneHints').textContent=hints;
+  setStatus('Hebat! Semua jawaban benar.');
+  tone([523,659,784,1046],.16);
+  $('doneOverlay').hidden=false; $('again').focus();
+}
+$('again').addEventListener('click',resetAll);
+$('closeDone').addEventListener('click',()=>{ $('doneOverlay').hidden=true; });
+
+/* ====== Pengaturan cepat ====== */
+$('sound').addEventListener('click',e=>{ soundOn=!soundOn; e.currentTarget.setAttribute('aria-pressed',soundOn); e.currentTarget.textContent=(soundOn?'🔊':'🔇')+' Suara'; });
+$('autoreset').addEventListener('click',e=>{ autoReset=!autoReset; e.currentTarget.setAttribute('aria-pressed',autoReset); });
+if(document.documentElement.requestFullscreen){
+  const fs=$('fs'); fs.hidden=false;
+  fs.addEventListener('click',()=>{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>{}); });
+}
+
+/* ====== Mode pameran: reset otomatis saat tidak aktif ====== */
+let lastActivity=Date.now(), idleTimer=null, idleLeft=0;
+['pointerdown','keydown','input','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{ lastActivity=Date.now(); },true));
+function hideIdle(){ clearInterval(idleTimer); idleTimer=null; $('idleOverlay').hidden=true; }
+function showIdle(){
+  idleLeft=CONFIG.idleCountdown; $('idleCount').textContent=idleLeft; $('idleOverlay').hidden=false; $('stay').focus();
+  idleTimer=setInterval(()=>{ idleLeft--; $('idleCount').textContent=idleLeft; if(idleLeft<=0){ resetAll(); } },1000);
+}
+$('stay').addEventListener('click',()=>{ lastActivity=Date.now(); hideIdle(); if(state.cell) state.cell.input.focus(); });
+setInterval(()=>{
+  if(!autoReset||idleTimer) return;
+  const active = filledCount()>0 || completeShown || revealed;
+  if(active && Date.now()-lastActivity>CONFIG.idleMs) showIdle();
+},1000);
+
+/* ====== Ukuran kotak responsif ====== */
+function fit(){
+  const wrap=$('gridWrap').clientWidth-14;
+  let size=Math.floor((wrap-(cols-1)*2)/cols);
+  if(window.innerWidth>=1020){ size=Math.min(size, Math.floor((window.innerHeight-330)/rows)); }
+  size=Math.max(26,Math.min(58,size));
+  grid.style.setProperty('--cell',size+'px');
+}
+window.addEventListener('resize',fit);
+if(window.ResizeObserver) new ResizeObserver(fit).observe($('gridWrap'));
+
+/* ====== Mulai ====== */
+$('kicker').textContent=CONFIG.kicker;
+if(!CONFIG.showFacts) $('factsSec').remove();
+if(CONFIG.credit) $('credit').textContent=CONFIG.credit; else $('credit').remove();
+renderFacts(); updateProgress(); fit();
+select(across[0].cells[0], across[0].dir, {focus:false});
+setStatus('Isi kotak berdasarkan petunjuk Secara horizontal dan Tegak lurus. Klik sebuah kotak untuk mulai.');
+})();
+</script>
+</body>
+</html>
