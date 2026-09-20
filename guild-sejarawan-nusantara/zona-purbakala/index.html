@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ekspedisi Arkeologi: Jejak Purba</title>
+<style>
+  :root{
+    --moss-dark:#2b3a2c;
+    --moss:#3f5440;
+    --dirt:#7a5330;
+    --dirt-dark:#5a3c22;
+    --parchment:#f1e6c9;
+    --parchment-dark:#d8c592;
+    --ink:#3a2c1a;
+    --ochre:#c68a2e;
+    --ochre-dark:#8f5f1c;
+    --rust:#b1502f;
+    --stone:#8a8574;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    font-family:'Trebuchet MS','Segoe UI',sans-serif;
+    color:var(--ink);
+    overflow:hidden;
+    -webkit-user-select:none;user-select:none;
+  }
+  img{image-rendering:pixelated;image-rendering:crisp-edges;-webkit-user-drag:none;pointer-events:none;}
+  #app{position:relative;width:100vw;height:100vh;background:var(--moss-dark);}
+
+  .screen{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;
+    opacity:0;pointer-events:none;
+    transition:opacity .4s ease;
+  }
+  .screen.active{opacity:1;pointer-events:auto;}
+
+  /* ---------- START SCREEN ---------- */
+  #screen-start{
+    background:
+      linear-gradient(180deg, rgba(10,16,8,.4) 0%, rgba(10,16,8,.6) 55%, rgba(10,16,8,.82) 100%),
+      url("assets/image/purbakala_bg.jpg") center 30%/cover no-repeat;
+    text-align:center;padding:24px;
+  }
+  .title-badge{
+    font-size:13px;letter-spacing:3px;color:var(--ochre);
+    margin-bottom:10px;font-weight:bold;
+  }
+  #screen-start h1{
+    font-size:clamp(28px,6vw,52px);
+    margin:0 0 6px;
+    color:var(--parchment);
+    text-shadow:3px 3px 0 var(--dirt-dark), 0 0 30px rgba(198,138,46,.4);
+    font-family:Georgia,'Times New Roman',serif;
+  }
+  #screen-start .subtitle{
+    color:var(--parchment-dark);
+    font-size:clamp(14px,2.4vw,18px);
+    max-width:520px;margin:0 0 26px;line-height:1.5;
+  }
+  .carved-panel{
+    background:linear-gradient(180deg,#e9dcb2,#d3c091);
+    border:4px solid var(--dirt-dark);
+    border-radius:10px;
+    box-shadow:inset 0 0 0 2px #fff6dd, 0 8px 0 var(--dirt-dark), 0 14px 24px rgba(0,0,0,.45);
+    padding:18px 22px;
+  }
+  .btn{
+    font-family:inherit;font-weight:bold;font-size:16px;
+    color:var(--parchment);
+    background:linear-gradient(180deg,var(--ochre),var(--ochre-dark));
+    border:3px solid var(--dirt-dark);
+    border-radius:8px;
+    padding:12px 28px;
+    cursor:pointer;
+    box-shadow:0 4px 0 #6b430f, 0 8px 14px rgba(0,0,0,.35);
+    transition:transform .08s ease;
+  }
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #6b430f;}
+  .btn.secondary{
+    background:linear-gradient(180deg,#8a8574,#6c6858);
+    box-shadow:0 4px 0 #4a4638, 0 8px 14px rgba(0,0,0,.35);
+  }
+  .btn.secondary:active{box-shadow:0 1px 0 #4a4638;}
+  .brief-list{
+    text-align:left;max-width:460px;margin:18px auto 0;
+    font-size:14px;color:var(--ink);line-height:1.6;
+  }
+  .brief-list b{color:var(--ochre-dark);}
+
+  /* ---------- HUD ---------- */
+  #hud{
+    position:absolute;top:0;left:0;right:0;
+    display:flex;align-items:center;gap:12px;
+    padding:10px 14px;
+    background:linear-gradient(180deg, rgba(20,26,14,.92), rgba(20,26,14,0));
+    z-index:20;pointer-events:none;
+  }
+  #hud > *{pointer-events:auto;}
+  .hud-chip{
+    background:linear-gradient(180deg,#e9dcb2,#cdb885);
+    border:3px solid var(--dirt-dark);border-radius:8px;
+    padding:6px 12px;font-size:13px;font-weight:bold;color:var(--ink);
+    display:flex;align-items:center;gap:8px;
+    box-shadow:0 3px 0 var(--dirt-dark);
+  }
+  #xp-track{
+    width:120px;height:10px;background:#4c4433;border-radius:5px;overflow:hidden;
+    border:1px solid var(--dirt-dark);
+  }
+  #xp-fill{height:100%;width:0%;background:linear-gradient(90deg,#c68a2e,#e8b85a);transition:width .4s ease;}
+  #progress-chip{margin-left:auto;}
+  #level-chip .level-num{color:var(--rust);font-size:15px;}
+
+  /* ---------- MAP SCREEN ---------- */
+  #screen-map{
+    background:#4a7a3a url("assets/image/purbakala_bg.jpg") center 32%/cover no-repeat;
+  }
+  #site{
+    position:relative;
+    width:100%;height:100%;
+    overflow:hidden;
+    touch-action:none;
+  }
+  .site-vignette{
+    position:absolute;inset:0;pointer-events:none;
+    box-shadow:inset 0 0 90px 30px rgba(10,16,8,.4);
+  }
+  .path-blob{
+    position:absolute;
+    background:radial-gradient(ellipse at center, var(--dirt) 0%, var(--dirt-dark) 70%, transparent 100%);
+    border-radius:50%;
+    opacity:.55;
+    filter:blur(1px);
+  }
+  .deco{position:absolute;pointer-events:none;filter:drop-shadow(0 6px 4px rgba(0,0,0,.35));}
+  .marker{
+    position:absolute;
+    display:flex;flex-direction:column;align-items:center;
+    cursor:pointer;
+    transform:translate(-50%,-100%);
+    filter:drop-shadow(0 6px 4px rgba(0,0,0,.4));
+    animation:bob 2.6s ease-in-out infinite;
+  }
+  .marker .glow{
+    position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+    width:46px;height:14px;border-radius:50%;
+    background:radial-gradient(ellipse at center, rgba(255,214,120,.75), transparent 70%);
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  .marker.found{animation:none;filter:drop-shadow(0 6px 4px rgba(0,0,0,.4)) grayscale(0);}
+  .marker.found .glow{display:none;}
+  .marker.found::after{
+    content:"✓";
+    position:absolute;top:-6px;right:-6px;
+    background:#3f7d3a;color:#fff;font-size:11px;font-weight:bold;
+    width:18px;height:18px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid #fff;
+  }
+  /* buried mound shown before excavation; swapped for the real sprite once found */
+  .marker .mound{
+    width:44px;height:22px;border-radius:50%;
+    background:radial-gradient(ellipse at 35% 30%, #9a6a3c 0%, #6b431f 55%, #4a2f16 100%);
+    box-shadow:inset 0 -3px 4px rgba(0,0,0,.4), inset 0 2px 3px rgba(255,255,255,.15);
+    position:relative;
+  }
+  .marker .mound::before,.marker .mound::after{
+    content:"";position:absolute;top:38%;width:11px;height:2px;
+    background:rgba(0,0,0,.35);border-radius:1px;
+  }
+  .marker .mound::before{left:8px;transform:rotate(-12deg);}
+  .marker .mound::after{right:8px;transform:rotate(10deg);}
+  .marker .marker-img{display:none;}
+  .marker.found .mound{display:none;}
+  .marker.found .marker-img{display:block;}
+  .marker .tag-buried{
+    margin-top:4px;background:rgba(20,26,14,.85);color:var(--parchment-dark);
+    font-size:10.5px;font-weight:bold;padding:2px 7px;border-radius:5px;white-space:nowrap;
+  }
+  .marker .tag-found{
+    margin-top:4px;display:none;
+    background:rgba(20,26,14,.85);color:var(--parchment);
+    font-size:10.5px;font-weight:bold;padding:2px 7px;border-radius:5px;white-space:nowrap;
+  }
+  .marker.found .tag-buried{display:none;}
+  .marker.found .tag-found{display:inline-block;}
+  @keyframes bob{0%,100%{translate:0 0;}50%{translate:0 -6px;}}
+  @keyframes pulse{0%,100%{opacity:.5;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.25);}}
+
+  /* ---------- INVENTORY DOCK ---------- */
+  #dock{
+    position:absolute;bottom:0;left:0;right:0;
+    display:flex;justify-content:center;gap:8px;
+    padding:10px 10px 14px;
+    background:linear-gradient(0deg, rgba(20,26,14,.92), rgba(20,26,14,0));
+    z-index:20;
+  }
+  .dock-slot{
+    width:44px;height:44px;border-radius:7px;
+    background:linear-gradient(180deg,#e9dcb2,#cdb885);
+    border:2px solid var(--dirt-dark);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 0 var(--dirt-dark);
+    cursor:pointer;
+  }
+  .dock-slot.empty{background:linear-gradient(180deg,#3d4234,#2a2e22);opacity:.55;cursor:default;}
+  .dock-slot img{width:32px;height:32px;object-fit:contain;}
+  .dock-slot .q{color:#8a8f78;font-size:18px;font-weight:bold;}
+
+  /* ---------- MODAL ---------- */
+  #modal-backdrop{
+    position:absolute;inset:0;background:rgba(10,12,7,.72);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+    z-index:50;padding:16px;
+  }
+  #modal-backdrop.active{opacity:1;pointer-events:auto;}
+  #modal-card{
+    width:min(480px,100%);max-height:88vh;overflow-y:auto;
+    background:linear-gradient(180deg,#f4ead0,#e3d1a4);
+    border:4px solid var(--dirt-dark);border-radius:12px;
+    box-shadow:inset 0 0 0 2px #fff8e4, 0 10px 0 var(--dirt-dark), 0 18px 30px rgba(0,0,0,.5);
+    padding:20px;
+    transform:scale(.92);transition:transform .25s ease;
+  }
+  #modal-backdrop.active #modal-card{transform:scale(1);}
+
+  .dig-stage{text-align:center;}
+  .pit{
+    position:relative;
+    width:150px;height:140px;margin:0 auto 12px;
+    border-radius:14px;overflow:hidden;
+    border:3px solid var(--dirt-dark);
+    box-shadow:inset 0 0 16px rgba(0,0,0,.4);
+    background:linear-gradient(180deg,#bfe0bd 0%,#bfe0bd 34%,#8a5a30 34%,#5c3a1c 100%);
+  }
+  .pit.shake{animation:pit-shake .18s ease;}
+  .pit .grass-edge{
+    position:absolute;left:0;right:0;top:34%;height:4px;
+    background:#3f6e39;
+  }
+  .pit .artifact-rising{
+    position:absolute;left:50%;bottom:10px;
+    width:78px;height:78px;object-fit:contain;
+    transform:translate(-50%, 95%);
+    filter:brightness(.5) saturate(.4);
+    transition:transform .3s ease, filter .3s ease;
+  }
+  .pit .dust{
+    position:absolute;bottom:34%;
+    width:6px;height:6px;border-radius:50%;
+    background:#caa877;opacity:.9;
+    animation:dust-pop .55s ease-out forwards;
+    pointer-events:none;
+  }
+  @keyframes pit-shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-3px);}
+    75%{transform:translateX(3px);}
+  }
+  @keyframes dust-pop{
+    0%{opacity:.9;transform:translate(0,0) scale(1);}
+    100%{opacity:0;transform:translate(var(--dx,10px),-34px) scale(.4);}
+  }
+  #dig-progress{
+    width:100%;height:16px;background:#4c4433;border-radius:8px;overflow:hidden;
+    border:2px solid var(--dirt-dark);margin:14px 0;
+  }
+  #dig-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#8a5a2e,#c68a2e);transition:width .18s ease;}
+  #dig-hint{font-size:13px;color:var(--ink);opacity:.75;margin-bottom:10px;}
+
+  .era-tag{
+    display:inline-block;font-size:11px;font-weight:bold;letter-spacing:.5px;
+    background:var(--rust);color:#fff;padding:3px 9px;border-radius:5px;margin-bottom:8px;
+  }
+  .artifact-header{display:flex;gap:14px;align-items:center;margin-bottom:12px;}
+  .artifact-header img{width:72px;height:72px;object-fit:contain;flex-shrink:0;}
+  .artifact-header h2{margin:0 0 4px;font-size:19px;font-family:Georgia,serif;color:var(--ink);}
+  .artifact-desc{font-size:14px;line-height:1.55;margin:0 0 12px;}
+  .fact-box{
+    background:rgba(122,83,48,.12);border-left:4px solid var(--ochre-dark);
+    padding:8px 12px;font-size:13px;line-height:1.5;border-radius:0 6px 6px 0;margin-bottom:14px;
+  }
+
+  .quiz-q{font-size:14.5px;font-weight:bold;margin-bottom:10px;line-height:1.4;}
+  .quiz-opt{
+    display:block;width:100%;text-align:left;
+    background:#fff8e4;border:2px solid var(--parchment-dark);
+    border-radius:7px;padding:10px 12px;margin-bottom:8px;
+    font-family:inherit;font-size:13.5px;cursor:pointer;color:var(--ink);
+  }
+  .quiz-opt:hover{border-color:var(--ochre);}
+  .quiz-opt.correct{background:#dcefd0;border-color:#3f7d3a;}
+  .quiz-opt.wrong{background:#f4d9d3;border-color:var(--rust);}
+  .quiz-feedback{font-size:13px;margin:8px 0 4px;line-height:1.5;min-height:18px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+
+  /* ---------- REPORT SCREEN ---------- */
+  #screen-report{
+    background:linear-gradient(180deg,#26331f,#141f0e);
+    padding:20px;overflow-y:auto;
+  }
+  #report-card{
+    width:min(560px,100%);
+    background:linear-gradient(180deg,#f4ead0,#e3d1a4);
+    border:4px solid var(--dirt-dark);border-radius:12px;
+    box-shadow:inset 0 0 0 2px #fff8e4,0 10px 24px rgba(0,0,0,.5);
+    padding:22px;max-height:82vh;overflow-y:auto;
+  }
+  #report-card h2{font-family:Georgia,serif;text-align:center;margin:0 0 4px;font-size:22px;}
+  #report-card .report-sub{text-align:center;font-size:13px;color:var(--ochre-dark);margin-bottom:16px;font-weight:bold;}
+  .report-row{
+    display:flex;gap:10px;align-items:center;
+    padding:8px 0;border-bottom:1px solid var(--parchment-dark);
+  }
+  .report-row img{width:36px;height:36px;object-fit:contain;}
+  .report-row .rn{font-weight:bold;font-size:13.5px;}
+  .report-row .re{font-size:11px;color:var(--ochre-dark);font-weight:bold;}
+
+  /* ---------- PLAYER & CONTROLS ---------- */
+  #audio-toggle{
+    position:absolute;top:10px;right:10px;z-index:40;
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(20,26,14,.6);border:2px solid rgba(241,230,201,.5);
+    display:flex;align-items:center;justify-content:center;
+    color:#f1e6c9;font-size:16px;cursor:pointer;
+  }
+  .player{
+    position:absolute;width:34px;height:34px;
+    background-image:url("assets/image/player_walk.png");
+    background-repeat:no-repeat;
+    background-size:204px 136px;
+    transform:translate(-50%,-78%);
+    filter:drop-shadow(0 4px 3px rgba(0,0,0,.5));
+    z-index:14;
+  }
+  #dpad{
+    position:absolute;left:16px;bottom:16px;z-index:25;
+    width:132px;height:132px;
+    display:grid;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px 44px;
+  }
+  .dbtn{
+    background:rgba(20,26,14,.55);border:2px solid rgba(241,230,201,.5);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;color:#f1e6c9;font-size:18px;
+    -webkit-user-select:none;user-select:none;touch-action:none;
+  }
+  .dbtn:active,.dbtn.pressed{background:rgba(198,138,46,.75);}
+  #dbtn-up{grid-column:2;grid-row:1;border-radius:8px 8px 4px 4px;}
+  #dbtn-down{grid-column:2;grid-row:3;border-radius:4px 4px 8px 8px;}
+  #dbtn-left{grid-column:1;grid-row:2;border-radius:8px 4px 4px 8px;}
+  #dbtn-right{grid-column:3;grid-row:2;border-radius:4px 8px 8px 4px;}
+
+  @media (max-width:520px){
+    .marker{transform:translate(-50%,-100%) scale(.85);}
+    .hud-chip{font-size:11px;padding:5px 8px;}
+    #xp-track{width:80px;}
+    .player{width:28px;height:28px;background-size:168px 112px;}
+    #dpad{left:10px;bottom:10px;width:114px;height:114px;grid-template-columns:38px 38px 38px;grid-template-rows:38px 38px 38px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="audio-toggle">🔊</div>
+  <audio id="bgm" src="../assets/audio/backsound.mp3" loop preload="auto"></audio>
+
+  <!-- START SCREEN -->
+  <div class="screen active" id="screen-start">
+    <div class="title-badge">SITUS ARKEOLOGI &middot; SEJARAH KELAS X</div>
+    <h1>Ekspedisi Arkeologi:<br>Jejak Purba</h1>
+    <p class="subtitle">Jadilah arkeolog muda. Gali situs, identifikasi temuan, dan susun laporan tentang manusia purba serta asal-usul nenek moyang bangsa Indonesia.</p>
+    <div class="carved-panel">
+      <button class="btn" id="btn-start">Mulai Ekspedisi</button>
+      <div class="brief-list">
+        <div><b>Gerakkan:</b> tombol panah/WASD atau pad arah di pojok kiri bawah.</div>
+        <div><b>Dekati</b> gundukan tanah untuk mulai menggali &mdash; tak perlu klik.</div>
+        <div><b>Setiap temuan</b> berisi fakta singkat + 1 pertanyaan identifikasi.</div>
+        <div><b>Jawaban benar</b> menambah lencana Arkeolog dan poin pengalaman (XP).</div>
+      </div>
+    </div>
+    <a href="../index.html" id="link-back-guild-1" style="display:inline-block;margin-top:16px;color:var(--parchment-dark);font-size:12.5px;text-decoration:underline;">&larr; Kembali ke Balai Guild</a>
+  </div>
+
+  <!-- MAP SCREEN -->
+  <div class="screen" id="screen-map">
+    <div id="hud">
+      <div class="hud-chip" id="level-chip">🏺 <span class="level-num" id="level-label">Arkeolog Pemula</span></div>
+      <div class="hud-chip"><div id="xp-track"><div id="xp-fill"></div></div></div>
+      <div class="hud-chip" id="progress-chip">Temuan: <span id="progress-label">0/7</span></div>
+    </div>
+    <div id="site"></div>
+    <div id="dpad">
+      <div class="dbtn" id="dbtn-up">▲</div>
+      <div class="dbtn" id="dbtn-down">▼</div>
+      <div class="dbtn" id="dbtn-left">◀</div>
+      <div class="dbtn" id="dbtn-right">▶</div>
+    </div>
+    <div id="dock"></div>
+  </div>
+
+  <!-- REPORT SCREEN -->
+  <div class="screen" id="screen-report">
+    <div id="report-card">
+      <h2>Laporan Ekspedisi</h2>
+      <div class="report-sub" id="report-sub"></div>
+      <div id="report-list"></div>
+      <div class="modal-actions" style="justify-content:center;margin-top:18px;">
+        <button class="btn secondary" id="btn-replay">Gali Ulang</button>
+        <a href="../index.html" id="link-back-guild-2" class="btn secondary" style="text-decoration:none;display:inline-flex;align-items:center;">&larr; Balai Guild</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal-backdrop">
+    <div id="modal-card"></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var IMG = "assets/image/";
+
+  var SITES = [
+    {
+      id:"stegodon", x:14, y:72, img:IMG+"fosil_stegodon.png", size:70,
+      era:"BUKTI PENDUKUNG", title:"Fosil Stegodon",
+      desc:"Tulang hewan purba besar sekelompok gajah ini ditemukan pada lapisan tanah yang sama dengan beberapa fosil manusia purba di Sangiran.",
+      fact:"Fosil fauna seperti Stegodon dan Bovidae dipakai ahli untuk menentukan usia lapisan tanah (stratigrafi/biostratigrafi) tempat fosil manusia purba ditemukan.",
+      quiz:{
+        q:"Mengapa fosil hewan seperti Stegodon penting bagi arkeolog, meski bukan fosil manusia?",
+        opts:[
+          "Karena dagingnya dijadikan bukti pola makan manusia modern",
+          "Karena membantu menentukan usia lapisan tanah tempat fosil manusia ditemukan",
+          "Karena hewan purba lebih langka daripada fosil manusia"
+        ],correct:1,
+        expl:"Fosil fauna sezaman menjadi penanda usia lapisan tanah, sehingga membantu memperkirakan usia fosil manusia yang ditemukan di lapisan yang sama."
+      }
+    },
+    {
+      id:"meganthropus", x:30, y:52, img:IMG+"fosil_meganthropus.png", size:80,
+      era:"PALEOLITIKUM", title:"Rahang Meganthropus Paleojavanicus",
+      desc:"Fragmen rahang berukuran besar dan kuat ini mengingatkan pada temuan G.H.R. von Koenigswald di Sangiran pada 1941.",
+      fact:"Meganthropus Paleojavanicus dianggap sebagai salah satu manusia purba tertua dan terbesar yang pernah ditemukan di Indonesia, berdasarkan ukuran rahang dan giginya.",
+      quiz:{
+        q:"Apa dasar utama para ahli menduga Meganthropus berukuran besar dan kuat?",
+        opts:[
+          "Bentuk dan ukuran fragmen rahang serta gigi yang ditemukan",
+          "Catatan tertulis dari masyarakat setempat",
+          "Perbandingan dengan hewan purba di lapisan yang sama"
+        ],correct:0,
+        expl:"Dugaan ukuran tubuh Meganthropus didasarkan pada analisis bentuk dan ukuran fosil rahang serta gigi yang ditemukan, karena rangka tubuh lengkap belum ditemukan."
+      }
+    },
+    {
+      id:"pithecanthropus", x:52, y:66, img:IMG+"fosil_pithecanthropus.png", size:78,
+      era:"PALEOLITIKUM", title:"Ruas Tulang Pithecanthropus Erectus",
+      desc:"Bentuknya menyerupai temuan Eugène Dubois di tepi Bengawan Solo, Trinil, tahun 1891 — tengkorak dan tulang paha yang mengubah pemahaman tentang manusia purba.",
+      fact:"Nama 'Pithecanthropus erectus' berarti 'manusia kera yang berjalan tegak', karena struktur tulang pahanya menunjukkan kemampuan berjalan dengan dua kaki.",
+      quiz:{
+        q:"Mengapa Pithecanthropus erectus disebut sudah 'berjalan tegak'?",
+        opts:[
+          "Karena ditemukan bersama peralatan berburu",
+          "Berdasarkan struktur tulang paha yang mirip manusia modern",
+          "Karena tengkoraknya berukuran sama dengan manusia modern"
+        ],correct:1,
+        expl:"Struktur tulang paha (femur) yang ditemukan menunjukkan bentuk yang memungkinkan berjalan tegak dengan dua kaki, mirip manusia modern."
+      }
+    },
+    {
+      id:"floresiensis", x:74, y:50, img:IMG+"fosil_floresiensis.png", size:64,
+      era:"HOMO FLORESIENSIS", title:"Rangka Mungil dari Gua",
+      desc:"Ukurannya jauh lebih kecil dari temuan lain di situs ini — mengingatkan pada penemuan di Liang Bua, Flores, tahun 2003.",
+      fact:"Homo floresiensis dijuluki 'manusia hobbit' karena tinggi tubuhnya hanya sekitar satu meter, namun tetap mampu membuat dan menggunakan alat batu.",
+      quiz:{
+        q:"Apa yang membuat penemuan Homo floresiensis di Liang Bua istimewa?",
+        opts:[
+          "Ukuran tubuhnya sangat kecil namun tetap mampu membuat alat batu",
+          "Ditemukan di dalam kapal purba",
+          "Merupakan manusia purba pertama yang ditemukan di Indonesia"
+        ],correct:0,
+        expl:"Homo floresiensis istimewa karena tubuhnya sangat kecil (sekitar 1 meter), namun bukti arkeologis menunjukkan mereka tetap mampu membuat dan memakai alat dari batu."
+      }
+    },
+    {
+      id:"menhir", x:22, y:82, img:IMG+"menhir.png", size:90,
+      era:"MEGALITIKUM", title:"Menhir Pemujaan",
+      desc:"Tugu batu tegak berukir wajah leluhur ini didirikan sebagai sarana pemujaan arwah nenek moyang pada masa bercocok tanam.",
+      fact:"Menhir adalah tugu batu tunggal peninggalan zaman Megalitikum yang berfungsi sebagai media pemujaan terhadap roh nenek moyang.",
+      quiz:{
+        q:"Apa fungsi utama menhir bagi masyarakat prasejarah?",
+        opts:[
+          "Sebagai alat memasak bersama",
+          "Sebagai sarana pemujaan terhadap roh nenek moyang",
+          "Sebagai penanda batas wilayah berburu"
+        ],correct:1,
+        expl:"Menhir didirikan terutama sebagai media atau sarana pemujaan terhadap roh nenek moyang, mencerminkan sistem kepercayaan animisme pada masa itu."
+      }
+    },
+    {
+      id:"punden", x:66, y:80, img:IMG+"punden_berundak.png", size:80,
+      era:"MEGALITIKUM", title:"Punden Berundak",
+      desc:"Struktur batu bertingkat menyerupai bukit buatan ini menjadi tempat pemujaan — cikal bakal konsep bangunan berundak yang kelak memengaruhi arsitektur candi.",
+      fact:"Punden berundak adalah bangunan pemujaan bertingkat dari zaman Megalitikum, dan pola berundaknya diyakini menjadi salah satu akar arsitektur candi pada masa Hindu-Buddha.",
+      quiz:{
+        q:"Apa hubungan punden berundak dengan bangunan candi di masa berikutnya?",
+        opts:[
+          "Tidak ada hubungan sama sekali",
+          "Punden berundak dibangun setelah candi, sebagai tiruan sederhana",
+          "Pola berundaknya diduga menjadi salah satu akar arsitektur candi"
+        ],correct:2,
+        expl:"Konsep bangunan bertingkat pada punden berundak diyakini para ahli menjadi salah satu unsur asli Nusantara yang diserap ke dalam arsitektur candi pada masa Hindu-Buddha."
+      }
+    },
+    {
+      id:"lumpang", x:46, y:58, img:IMG+"lumpang.png", size:64,
+      era:"WARISAN BERLANJUT", title:"Lumpang & Pipisan",
+      desc:"Sepasang batu penumbuk dan penggiling ini mirip dengan koleksi yang diteliti di Museum Daerah Kabupaten Gresik — jejak budaya yang bertahan lintas zaman.",
+      fact:"Lumpang (batu penumbuk) dan pipisan (batu penggiling) sudah digunakan sejak masa food producing, dan di berbagai daerah termasuk Jawa, alat ini juga memiliki makna ritual dan kosmologis, bukan sekadar alat dapur.",
+      quiz:{
+        q:"Selain sebagai alat sehari-hari, apa peran lain lumpang dan pipisan di banyak tradisi lokal?",
+        opts:[
+          "Sebagai alat tukar dalam perdagangan antarpulau",
+          "Sebagai benda dengan makna ritual dan kosmologis dalam tradisi masyarakat",
+          "Sebagai alat musik dalam upacara adat"
+        ],correct:1,
+        expl:"Di banyak tradisi lokal, termasuk Jawa, lumpang dan pipisan tidak hanya berfungsi praktis untuk menumbuk/menggiling, tetapi juga dipandang memiliki makna ritual dan kosmologis."
+      }
+    }
+  ];
+
+  var DECOS = [
+    {img:IMG+"totem_head.png", x:90, y:60, size:50},
+    {img:IMG+"fern1.png", x:6, y:78, size:56},
+    {img:IMG+"fern2.png", x:94, y:78, size:52},
+    {img:IMG+"mushroom1.png", x:60, y:48, size:34},
+    {img:IMG+"mushroom2.png", x:36, y:76, size:30},
+    {img:IMG+"rock_deco1.png", x:12, y:46, size:40},
+    {img:IMG+"rock_deco2.png", x:82, y:44, size:40}
+  ];
+
+  var state = { found:{}, xp:0 };
+  var DIG_TARGET = 6; // clicks needed to excavate
+  var siteEls = {};
+
+  var BOUNDS = {xMin:5, xMax:95, yMin:40, yMax:90};
+  var NEAR_PX = 48;
+  var FAR_PX  = 72;
+  var SPEED_PX_S = 120;
+  var player = {xFrac:50, yFrac:88, dir:0, frame:0, moving:false, animAcc:0};
+  var keys = {up:false,down:false,left:false,right:false};
+  var lastTime = null;
+  var rafId = null;
+
+  var KEY_MAP = {
+    "ArrowUp":"up","w":"up","W":"up",
+    "ArrowDown":"down","s":"down","S":"down",
+    "ArrowLeft":"left","a":"left","A":"left",
+    "ArrowRight":"right","d":"right","D":"right"
+  };
+  window.addEventListener("keydown", function(e){
+    var k = KEY_MAP[e.key];
+    if(k){ keys[k] = true; e.preventDefault(); }
+  });
+  window.addEventListener("keyup", function(e){
+    var k = KEY_MAP[e.key];
+    if(k){ keys[k] = false; e.preventDefault(); }
+  });
+  function bindDpad(id, key){
+    var elx = document.getElementById(id);
+    function on(e){ e.preventDefault(); keys[key]=true; elx.classList.add("pressed"); }
+    function off(){ keys[key]=false; elx.classList.remove("pressed"); }
+    elx.addEventListener("pointerdown", on);
+    elx.addEventListener("pointerup", off);
+    elx.addEventListener("pointerleave", off);
+    elx.addEventListener("pointercancel", off);
+  }
+  bindDpad("dbtn-up","up");
+  bindDpad("dbtn-down","down");
+  bindDpad("dbtn-left","left");
+  bindDpad("dbtn-right","right");
+
+  function modalIsActive(){ return $("#modal-backdrop").classList.contains("active"); }
+
+  function tick(t){
+    if(lastTime === null) lastTime = t;
+    var dt = Math.min(48, t - lastTime) / 1000;
+    lastTime = t;
+
+    if(!modalIsActive()){
+      var dx = (keys.right?1:0) - (keys.left?1:0);
+      var dy = (keys.down?1:0) - (keys.up?1:0);
+      var moving = dx !== 0 || dy !== 0;
+      if(moving){
+        var len = Math.sqrt(dx*dx + dy*dy);
+        dx /= len; dy /= len;
+        var siteWrap = $("#site");
+        var w = siteWrap.clientWidth, h = siteWrap.clientHeight;
+        player.xFrac += (dx * SPEED_PX_S * dt / w) * 100;
+        player.yFrac += (dy * SPEED_PX_S * dt / h) * 100;
+        player.xFrac = Math.max(BOUNDS.xMin, Math.min(BOUNDS.xMax, player.xFrac));
+        player.yFrac = Math.max(BOUNDS.yMin, Math.min(BOUNDS.yMax, player.yFrac));
+        if(Math.abs(dx) > Math.abs(dy)) player.dir = dx > 0 ? 2 : 1;
+        else player.dir = dy > 0 ? 0 : 3;
+        player.animAcc += dt;
+        if(player.animAcc > 0.11){ player.animAcc = 0; player.frame = (player.frame+1) % 6; }
+      } else {
+        player.frame = 0; player.animAcc = 0;
+      }
+      player.moving = moving;
+      renderPlayer();
+      checkDigProximity();
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function renderPlayer(){
+    var pel = document.getElementById("player-el");
+    if(!pel) return;
+    pel.style.left = player.xFrac + "%";
+    pel.style.top = player.yFrac + "%";
+    var fw = pel.offsetWidth || 34;
+    pel.style.backgroundPosition = (-player.frame*fw) + "px " + (-player.dir*fw) + "px";
+  }
+
+  function checkDigProximity(){
+    var siteWrap = $("#site");
+    var rect = siteWrap.getBoundingClientRect();
+    var px = rect.left + (player.xFrac/100)*rect.width;
+    var py = rect.top + (player.yFrac/100)*rect.height;
+    SITES.forEach(function(s){
+      var mEl = siteEls[s.id];
+      if(!mEl) return;
+      var r = mEl.getBoundingClientRect();
+      var nx = r.left + r.width/2, ny = r.bottom - 6;
+      var d = Math.hypot(px-nx, py-ny);
+      if(d < NEAR_PX){
+        if(!s._triggered && !modalIsActive()){ s._triggered = true; openDig(s); }
+      } else if(d > FAR_PX){
+        s._triggered = false;
+      }
+    });
+  }
+
+  var STORAGE_KEY = "guildSejarawan_purbakala_v1";
+
+  function saveProgress(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({found: state.found, total: SITES.length}));
+    }catch(e){ /* localStorage unavailable — progress just won't sync to the hub */ }
+  }
+  function loadProgress(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var data = JSON.parse(raw);
+        if(data && data.found) state.found = data.found;
+      }
+    }catch(e){ /* ignore, start fresh */ }
+  }
+  loadProgress(); // load immediately so "back to guild" from the start screen carries correct progress
+
+  var LEVELS = [
+    {min:0,label:"Arkeolog Pemula"},
+    {min:2,label:"Arkeolog Lapangan"},
+    {min:4,label:"Arkeolog Berpengalaman"},
+    {min:6,label:"Arkeolog Ahli"},
+    {min:7,label:"Kurator Situs"}
+  ];
+
+  function $(sel){return document.querySelector(sel);}
+  function el(tag,cls){var e=document.createElement(tag); if(cls)e.className=cls; return e;}
+
+  /* ---------- background music ---------- */
+  var MUTE_KEY = "guildSejarawan_audio_muted";
+  var bgm = document.getElementById("bgm");
+  var isMuted = false;
+  try{ isMuted = localStorage.getItem(MUTE_KEY) === "1"; }catch(e){}
+  function applyMuteState(){
+    if(bgm) bgm.muted = isMuted;
+    var t = $("#audio-toggle");
+    if(t) t.textContent = isMuted ? "🔇" : "🔊";
+  }
+  applyMuteState();
+  var audioToggleEl = $("#audio-toggle");
+  if(audioToggleEl){
+    audioToggleEl.addEventListener("click", function(){
+      isMuted = !isMuted;
+      try{ localStorage.setItem(MUTE_KEY, isMuted ? "1" : "0"); }catch(e){}
+      applyMuteState();
+    });
+  }
+  function tryPlayMusic(){
+    if(!bgm) return;
+    try{
+      bgm.volume = 0.45;
+      var p = bgm.play();
+      if(p && p.catch) p.catch(function(){});
+    }catch(e){}
+  }
+  function foundCount(){return Object.keys(state.found).length;}
+
+  function showScreen(id){
+    document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
+    $("#"+id).classList.add("active");
+  }
+
+  function buildSite(){
+    var site = $("#site");
+    site.innerHTML = '<div class="site-vignette"></div>';
+    player.xFrac = 50; player.yFrac = 88; player.dir = 0; player.frame = 0;
+    siteEls = {};
+    DECOS.forEach(function(d){
+      var img = document.createElement("img");
+      img.src = d.img; img.className="deco";
+      img.style.left=d.x+"%"; img.style.top=d.y+"%";
+      img.style.width=d.size+"px";
+      img.style.transform="translate(-50%,-50%)";
+      site.appendChild(img);
+    });
+    SITES.forEach(function(s){
+      var m = el("div","marker");
+      m.dataset.id = s.id;
+      m.style.left = s.x+"%"; m.style.top = s.y+"%";
+      m.innerHTML = '<div class="glow"></div><div class="mound"></div>'+
+        '<img class="marker-img" src="'+s.img+'" style="width:'+s.size+'px;height:'+s.size+'px;object-fit:contain;">'+
+        '<div class="tag-buried">Titik Galian</div>'+
+        '<div class="tag-found">'+s.title+'</div>';
+      m.addEventListener("click", function(){ openDig(s); });
+      site.appendChild(m);
+      siteEls[s.id] = m;
+    });
+    var pl = document.createElement("div");
+    pl.className = "player";
+    pl.id = "player-el";
+    site.appendChild(pl);
+    refreshMarkers();
+  }
+
+  function refreshMarkers(){
+    SITES.forEach(function(s){
+      var m = document.querySelector('.marker[data-id="'+s.id+'"]');
+      if(!m) return;
+      if(state.found[s.id]) m.classList.add("found");
+      else m.classList.remove("found");
+    });
+  }
+
+  function buildDock(){
+    var dock = $("#dock");
+    dock.innerHTML = "";
+    SITES.forEach(function(s){
+      var slot = el("div","dock-slot");
+      if(state.found[s.id]){
+        var img = document.createElement("img");
+        img.src = s.img;
+        slot.appendChild(img);
+        slot.addEventListener("click", function(){ showArtifactCard(s, true); });
+      } else {
+        slot.classList.add("empty");
+        slot.innerHTML = '<span class="q">?</span>';
+      }
+      dock.appendChild(slot);
+    });
+  }
+
+  function updateHUD(){
+    var fc = foundCount();
+    $("#progress-label").textContent = fc + "/" + SITES.length;
+    var pct = Math.round((fc/SITES.length)*100);
+    $("#xp-fill").style.width = pct + "%";
+    var lvl = LEVELS[0].label;
+    LEVELS.forEach(function(l){ if(fc >= l.min) lvl = l.label; });
+    $("#level-label").textContent = lvl;
+  }
+
+  function openModal(html){
+    $("#modal-card").innerHTML = html;
+    $("#modal-backdrop").classList.add("active");
+  }
+  function closeModal(){
+    $("#modal-backdrop").classList.remove("active");
+  }
+
+  function openDig(site){
+    if(state.found[site.id]){ showArtifactCard(site, true); return; }
+    var clicks = 0;
+    var html =
+      '<div class="dig-stage">'+
+        '<div class="era-tag">'+site.era+'</div>'+
+        '<h2 style="margin:0 0 10px;font-family:Georgia,serif;">Menggali Titik Bertanda &hellip;</h2>'+
+        '<div class="pit" id="pit">'+
+          '<div class="grass-edge"></div>'+
+          '<img class="artifact-rising" id="rising-img" src="'+site.img+'">'+
+        '</div>'+
+        '<div id="dig-hint">Sesuatu terkubur di sini. Ketuk untuk menggali.</div>'+
+        '<div id="dig-progress"><div id="dig-progress-fill"></div></div>'+
+        '<button class="btn" id="btn-dig">⛏ Gali</button>'+
+      '</div>';
+    openModal(html);
+    var pit = $("#pit");
+    var risingImg = $("#rising-img");
+    $("#btn-dig").addEventListener("click", function(){
+      clicks++;
+      var frac = Math.min(1, clicks/DIG_TARGET);
+      var pct = Math.round(frac*100);
+      $("#dig-progress-fill").style.width = pct+"%";
+
+      // rise out of the soil, buried(95%) -> fully surfaced(0%)
+      var riseY = Math.round((1-frac)*95);
+      risingImg.style.transform = "translate(-50%,"+riseY+"%)";
+      if(frac >= 0.55){ risingImg.style.filter = "none"; }
+
+      // shake + dust puff feedback
+      pit.classList.remove("shake"); void pit.offsetWidth; pit.classList.add("shake");
+      for(var i=0;i<3;i++){
+        var d = document.createElement("div");
+        d.className = "dust";
+        var dx = (Math.random()*40-20).toFixed(0)+"px";
+        d.style.setProperty("--dx", dx);
+        d.style.left = (48 + Math.random()*20 - 10)+"%";
+        pit.appendChild(d);
+        (function(dd){ setTimeout(function(){ dd.remove(); }, 600); })(d);
+      }
+
+      if(clicks >= DIG_TARGET){
+        $("#dig-hint").textContent = "Temuan berhasil diangkat!";
+        setTimeout(function(){ showArtifactCard(site, false); }, 380);
+      } else {
+        $("#dig-hint").textContent = "Terus gali\u2026 ("+clicks+"/"+DIG_TARGET+")";
+      }
+    });
+  }
+
+  function showArtifactCard(site, alreadyKnown){
+    var quizHtml = "";
+    if(!alreadyKnown){
+      quizHtml =
+        '<div class="quiz-q">'+site.quiz.q+'</div>'+
+        '<div id="quiz-opts">'+
+          site.quiz.opts.map(function(o,i){
+            return '<button class="quiz-opt" data-i="'+i+'">'+o+'</button>';
+          }).join("")+
+        '</div>'+
+        '<div class="quiz-feedback" id="quiz-feedback"></div>'+
+        '<div class="modal-actions"><button class="btn secondary" id="btn-close-locked" style="display:none;">Tutup</button></div>';
+    } else {
+      quizHtml = '<div class="fact-box"><b>Sudah teridentifikasi.</b> '+site.quiz.expl+'</div>'+
+        '<div class="modal-actions"><button class="btn" id="btn-close2">Tutup</button></div>';
+    }
+    var html =
+      '<div class="era-tag">'+site.era+'</div>'+
+      '<div class="artifact-header">'+
+        '<img src="'+site.img+'">'+
+        '<div><h2>'+site.title+'</h2></div>'+
+      '</div>'+
+      '<p class="artifact-desc">'+site.desc+'</p>'+
+      '<div class="fact-box">'+site.fact+'</div>'+
+      quizHtml;
+    openModal(html);
+
+    if(!alreadyKnown){
+      var opts = document.querySelectorAll(".quiz-opt");
+      var answered = false;
+      opts.forEach(function(btn){
+        btn.addEventListener("click", function(){
+          if(answered) return;
+          answered = true;
+          var i = parseInt(btn.dataset.i,10);
+          opts.forEach(function(o,oi){
+            if(oi === site.quiz.correct) o.classList.add("correct");
+            else if(oi === i) o.classList.add("wrong");
+          });
+          var fb = $("#quiz-feedback");
+          if(i === site.quiz.correct){
+            fb.textContent = "Tepat! " + site.quiz.expl;
+          } else {
+            fb.textContent = "Belum tepat. " + site.quiz.expl;
+          }
+          state.found[site.id] = true;
+          saveProgress();
+          refreshMarkers();
+          buildDock();
+          updateHUD();
+          document.getElementById("btn-close-locked").style.display = "inline-block";
+          document.getElementById("btn-close-locked").addEventListener("click", function(){
+            closeModal();
+            if(foundCount() >= SITES.length){
+              setTimeout(showReport, 350);
+            }
+          });
+        });
+      });
+    } else {
+      $("#btn-close2").addEventListener("click", closeModal);
+    }
+  }
+
+  function showReport(){
+    var list = $("#report-list");
+    list.innerHTML = "";
+    SITES.forEach(function(s){
+      var row = el("div","report-row");
+      row.innerHTML = '<img src="'+s.img+'"><div><div class="rn">'+s.title+'</div><div class="re">'+s.era+'</div></div>';
+      list.appendChild(row);
+    });
+    $("#report-sub").textContent = "Arkeolog Muda \u2014 "+SITES.length+"/"+SITES.length+" temuan teridentifikasi";
+    showScreen("screen-report");
+  }
+
+  function startLoop(){
+    lastTime = null;
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  $("#btn-start").addEventListener("click", function(){
+    loadProgress();
+    showScreen("screen-map");
+    buildSite();
+    buildDock();
+    updateHUD();
+    startLoop();
+    tryPlayMusic();
+    if(foundCount() >= SITES.length){ setTimeout(showReport, 250); }
+  });
+
+  $("#btn-replay").addEventListener("click", function(){
+    state = { found:{}, xp:0 };
+    saveProgress();
+    showScreen("screen-map");
+    buildSite();
+    buildDock();
+    updateHUD();
+    startLoop();
+  });
+
+  function goToGuildHall(e){
+    if(e) e.preventDefault();
+    var qs = "purbakala=" + foundCount() + "-" + SITES.length;
+    window.location.href = "../index.html?" + qs;
+  }
+  var backLink1 = document.getElementById("link-back-guild-1");
+  var backLink2 = document.getElementById("link-back-guild-2");
+  if(backLink1) backLink1.addEventListener("click", goToGuildHall);
+  if(backLink2) backLink2.addEventListener("click", goToGuildHall);
+
+  $("#modal-backdrop").addEventListener("click", function(e){
+    if(e.target === $("#modal-backdrop")) {
+      // prevent closing mid-dig by accident on backdrop tap during dig stage is fine to allow
+      closeModal();
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

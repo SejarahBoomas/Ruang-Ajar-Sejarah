@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Balai Guild Sejarawan</title>
+<style>
+  :root{
+    --dusk1:#3a3a5c;
+    --dusk2:#20203a;
+    --wood:#7a5330;
+    --wood-dark:#4a2f16;
+    --parchment:#f1e6c9;
+    --parchment-dark:#d8c592;
+    --ink:#2c2418;
+    --gold:#c68a2e;
+    --gold-dark:#8f5f1c;
+    --ember:#c1531f;
+    --leaf:#4f9a4a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;font-family:'Trebuchet MS','Segoe UI',sans-serif;color:var(--ink);overflow:hidden;-webkit-user-select:none;user-select:none;}
+  img{image-rendering:pixelated;image-rendering:crisp-edges;-webkit-user-drag:none;pointer-events:none;}
+  #app{position:relative;width:100vw;height:100vh;background:var(--dusk2);}
+
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .4s ease;}
+  .screen.active{opacity:1;pointer-events:auto;}
+
+  /* ---------- START ---------- */
+  #screen-start{
+    background:
+      linear-gradient(180deg, rgba(12,10,22,.35) 0%, rgba(12,10,22,.55) 55%, rgba(12,10,22,.8) 100%),
+      radial-gradient(ellipse at 50% 100%, rgba(10,8,18,.55), transparent 65%),
+      url("assets/image/splash_bg.jpg") center 30%/cover no-repeat;
+    text-align:center;padding:24px;
+  }
+  .title-badge{font-size:13px;letter-spacing:3px;color:var(--gold);margin-bottom:10px;font-weight:bold;}
+  #screen-start h1{
+    font-size:clamp(28px,6vw,52px);margin:0 0 6px;color:var(--parchment);
+    text-shadow:3px 3px 0 var(--wood-dark), 0 0 30px rgba(198,138,46,.35);
+    font-family:Georgia,'Times New Roman',serif;
+  }
+  #screen-start .subtitle{color:var(--parchment-dark);font-size:clamp(14px,2.4vw,18px);max-width:520px;margin:0 0 22px;line-height:1.5;}
+  .carved-panel{
+    background:linear-gradient(180deg,#e9dcb2,#d3c091);border:4px solid var(--wood-dark);border-radius:10px;
+    box-shadow:inset 0 0 0 2px #fff6dd, 0 8px 0 var(--wood-dark), 0 14px 24px rgba(0,0,0,.45);padding:18px 22px;
+  }
+  .btn{
+    font-family:inherit;font-weight:bold;font-size:16px;color:var(--parchment);
+    background:linear-gradient(180deg,var(--gold),var(--gold-dark));border:3px solid var(--wood-dark);border-radius:8px;
+    padding:12px 28px;cursor:pointer;box-shadow:0 4px 0 #6b430f, 0 8px 14px rgba(0,0,0,.35);transition:transform .08s ease;
+  }
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #6b430f;}
+  .btn.secondary{background:linear-gradient(180deg,#8a8574,#6c6858);box-shadow:0 4px 0 #4a4638, 0 8px 14px rgba(0,0,0,.3);}
+  .btn.secondary:active{box-shadow:0 1px 0 #4a4638;}
+  .brief-list{text-align:left;max-width:440px;margin:14px auto 0;font-size:13px;line-height:1.6;}
+  .brief-list b{color:var(--gold-dark);}
+
+  /* ---------- COURTYARD ---------- */
+  #screen-hub{
+    background:#2f4a2e url("assets/image/guild_hub_bg.jpg") center 38%/cover no-repeat;
+  }
+  #hub-hud{
+    position:absolute;top:0;left:0;right:0;text-align:center;padding:10px 14px;
+    background:linear-gradient(180deg, rgba(20,16,10,.8), rgba(20,16,10,0));z-index:20;pointer-events:none;
+  }
+  #hub-hud .banner-text{
+    display:inline-block;background:rgba(30,22,10,.75);color:var(--parchment);
+    font-size:12px;font-weight:bold;padding:5px 14px;border-radius:20px;letter-spacing:.3px;
+  }
+  #courtyard{position:relative;width:100%;height:100%;overflow:hidden;touch-action:none;}
+
+  .npc{position:absolute;cursor:pointer;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);filter:drop-shadow(0 5px 4px rgba(0,0,0,.4));animation:bob 3s ease-in-out infinite;z-index:12;}
+  .npc .glow{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:38px;height:11px;border-radius:50%;background:radial-gradient(ellipse at center, rgba(255,224,150,.7), transparent 70%);animation:pulse 2s ease-in-out infinite;}
+  .npc .tag{margin-top:3px;background:rgba(20,16,10,.85);color:var(--parchment);font-size:10px;font-weight:bold;padding:2px 7px;border-radius:5px;white-space:nowrap;}
+  .npc.ambient{cursor:default;animation:bob 3.4s ease-in-out infinite;filter:drop-shadow(0 5px 4px rgba(0,0,0,.35)) brightness(.85);}
+  .npc.ambient .glow,.npc.ambient .tag{display:none;}
+  .npc.near .tag{background:rgba(143,95,28,.95);}
+  @keyframes bob{0%,100%{translate:0 0;}50%{translate:0 -5px;}}
+  @keyframes pulse{0%,100%{opacity:.5;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.2);}}
+
+  /* ---------- PLAYER ---------- */
+  .player{
+    position:absolute;width:34px;height:34px;
+    background-image:url("assets/image/player_walk.png");
+    background-repeat:no-repeat;
+    background-size:204px 136px;
+    transform:translate(-50%,-78%);
+    filter:drop-shadow(0 4px 3px rgba(0,0,0,.5));
+    z-index:14;
+  }
+
+  /* ---------- PORTALS (in-scene) ---------- */
+  .portal{
+    position:absolute;width:64px;height:34px;transform:translate(-50%,-50%);
+    pointer-events:auto;cursor:pointer;z-index:10;
+  }
+  .portal .glowshape{
+    position:absolute;inset:0;border-radius:50%;
+    animation:portal-pulse 2.2s ease-in-out infinite;
+  }
+  .portal.purbakala .glowshape{background:radial-gradient(ellipse at center, rgba(120,220,120,.85), rgba(70,160,70,.35) 55%, transparent 75%);box-shadow:0 0 22px 6px rgba(110,220,110,.45);}
+  .portal.pasar .glowshape{background:radial-gradient(ellipse at center, rgba(255,205,110,.9), rgba(220,140,50,.4) 55%, transparent 75%);box-shadow:0 0 22px 6px rgba(255,190,100,.5);}
+  @keyframes portal-pulse{0%,100%{opacity:.65;transform:scale(1);}50%{opacity:1;transform:scale(1.12);}}
+  .portal .ptag{
+    position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);
+    background:rgba(20,16,10,.85);color:var(--parchment);font-size:10px;font-weight:bold;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;
+  }
+
+  /* ---------- CONTROLS ---------- */
+  #dpad{
+    position:absolute;left:16px;bottom:16px;z-index:25;
+    width:132px;height:132px;
+    display:grid;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px 44px;
+    gap:0;
+  }
+  .dbtn{
+    grid-column:2;grid-row:2;
+    background:rgba(30,22,10,.55);border:2px solid rgba(241,230,201,.5);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;color:#f1e6c9;font-size:18px;
+    -webkit-user-select:none;user-select:none;touch-action:none;
+  }
+  .dbtn:active,.dbtn.pressed{background:rgba(198,138,46,.75);}
+  #dbtn-up{grid-column:2;grid-row:1;border-radius:8px 8px 4px 4px;}
+  #dbtn-down{grid-column:2;grid-row:3;border-radius:4px 4px 8px 8px;}
+  #dbtn-left{grid-column:1;grid-row:2;border-radius:8px 4px 4px 8px;}
+  #dbtn-right{grid-column:3;grid-row:2;border-radius:4px 8px 8px 4px;}
+
+  /* ---------- MODAL ---------- */
+  #modal-backdrop{position:absolute;inset:0;background:rgba(10,8,16,.72);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:50;padding:16px;}
+  #modal-backdrop.active{opacity:1;pointer-events:auto;}
+  #modal-card{width:min(420px,100%);background:linear-gradient(180deg,#f4ead0,#e3d1a4);border:4px solid var(--wood-dark);border-radius:12px;box-shadow:inset 0 0 0 2px #fff8e4, 0 10px 0 var(--wood-dark), 0 18px 30px rgba(0,0,0,.5);padding:20px;transform:scale(.92);transition:transform .25s ease;text-align:center;}
+  #modal-backdrop.active #modal-card{transform:scale(1);}
+  #modal-card img{width:64px;height:64px;object-fit:contain;margin-bottom:8px;}
+  #modal-card h2{margin:0 0 10px;font-family:Georgia,serif;font-size:18px;}
+  #modal-card p{font-size:14px;line-height:1.6;margin:0 0 16px;}
+  #modal-card .btn{padding:9px 22px;font-size:14px;margin:3px;}
+  .portal-icon-preview{width:54px;height:54px;border-radius:50%;margin:0 auto 10px;}
+  .portal-icon-preview.purbakala{background:radial-gradient(ellipse at center, rgba(120,220,120,.9), rgba(70,160,70,.4) 60%, transparent 78%);}
+  .portal-icon-preview.pasar{background:radial-gradient(ellipse at center, rgba(255,205,110,.95), rgba(220,140,50,.45) 60%, transparent 78%);}
+
+  .cert-input{
+    width:100%;padding:9px 10px;font-family:inherit;font-size:14px;
+    border:2px solid var(--parchment-dark);border-radius:6px;margin-bottom:14px;text-align:center;
+  }
+  .cert-view{
+    position:relative;
+    border:3px solid var(--gold-dark);border-radius:8px;padding:28px 18px 22px;margin-bottom:14px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(198,138,46,.12), transparent 60%),
+      linear-gradient(180deg,#fffaf0,#f2e4bf);
+    box-shadow:inset 0 0 0 6px #fdf6e3, inset 0 0 0 8px var(--gold-dark);
+  }
+  .cert-view::before,.cert-view::after{
+    content:"✦";position:absolute;color:var(--gold-dark);font-size:13px;top:14px;
+  }
+  .cert-view::before{left:14px;} .cert-view::after{right:14px;}
+  .cert-medal{
+    width:72px;height:72px;border-radius:50%;margin:0 auto 4px;position:relative;
+    background:radial-gradient(circle at 35% 30%, #fff2c4, #e8b84a 45%, #a86f1e 90%);
+    border:3px solid #7a4f14;
+    box-shadow:0 3px 0 #6b430f, 0 6px 10px rgba(0,0,0,.35), inset 0 0 0 3px #fff6d9;
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;
+  }
+  .cert-medal::after{
+    content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);
+    width:0;height:0;
+    border-left:16px solid transparent;border-right:16px solid transparent;
+    border-top:16px solid var(--voc-navy,#233a5e);
+    filter:drop-shadow(0 2px 0 #17263e);
+  }
+  .cert-ribbons{display:flex;justify-content:center;gap:26px;margin:14px 0 2px;position:relative;z-index:1;}
+  .cert-ribbons .rb{
+    width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;
+    border-top:26px solid var(--ember);
+  }
+  .cert-ribbons .rb.alt{border-top-color:var(--gold-dark);}
+  .cert-view .cert-title{font-family:Georgia,serif;font-size:16.5px;font-weight:bold;color:var(--gold-dark);margin:6px 0 10px;letter-spacing:.6px;}
+  .cert-view .cert-name{font-family:Georgia,serif;font-size:22px;font-weight:bold;margin:6px 0;color:var(--ink);border-bottom:2px solid var(--gold-dark);display:inline-block;padding:0 10px 4px;}
+  .cert-view .cert-sub{font-size:12.5px;line-height:1.6;color:#5a4a30;margin-top:10px;}
+  .cert-zones{display:flex;justify-content:center;gap:18px;margin:14px 0 4px;}
+  .cert-zones .cz{display:flex;flex-direction:column;align-items:center;font-size:10.5px;font-weight:bold;color:#5a4a30;}
+  .cert-zones .cz img{width:30px;height:30px;object-fit:contain;margin-bottom:3px;}
+  .cert-zones .cz .ck{color:#2e7d32;font-size:11px;}
+  .cert-seal{
+    margin-top:16px;padding-top:12px;border-top:1px dashed var(--parchment-dark);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    font-family:Georgia,serif;font-style:italic;font-size:12px;color:#5a4a30;
+  }
+  .cert-seal .seal-dot{
+    width:26px;height:26px;border-radius:50%;flex-shrink:0;
+    background:radial-gradient(circle at 35% 30%, #e8b84a, #8f5f1c 85%);
+    border:1.5px solid #6b430f;
+    display:flex;align-items:center;justify-content:center;color:#fff8e4;font-size:11px;
+  }
+  @media print{
+    body *{visibility:hidden;}
+    .cert-view, .cert-view *{visibility:visible;}
+    .cert-view{position:fixed;left:0;top:0;width:100%;}
+  }
+
+  #audio-toggle{
+    position:absolute;top:10px;right:10px;z-index:40;
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(20,16,10,.65);border:2px solid rgba(241,230,201,.5);
+    display:flex;align-items:center;justify-content:center;
+    color:#f1e6c9;font-size:16px;cursor:pointer;
+  }
+
+  @media (max-width:560px){
+    .npc{transform:translate(-50%,-100%) scale(.85);}
+    .player{width:28px;height:28px;background-size:168px 112px;}
+    #dpad{left:10px;bottom:10px;width:114px;height:114px;grid-template-columns:38px 38px 38px;grid-template-rows:38px 38px 38px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="audio-toggle">🔊</div>
+  <audio id="bgm" src="assets/audio/backsound.mp3" loop preload="auto"></audio>
+
+  <div class="screen active" id="screen-start">
+    <div class="title-badge">GUILD SEJARAWAN NUSANTARA</div>
+    <h1>Balai Guild<br>Sejarawan</h1>
+    <p class="subtitle">Markas para sejarawan muda. Gerakkan karaktermu, dekati penasihat guild untuk mendengar pesan mereka, lalu masuki portal cahaya menuju tiap misi.</p>
+    <div class="carved-panel">
+      <button class="btn" id="btn-enter">Masuk Balai</button>
+      <div class="brief-list">
+        <div><b>Gerakkan:</b> tombol panah / WASD di keyboard, atau pad arah di pojok kiri bawah.</div>
+        <div><b>Dekati</b> karakter berlabel untuk mendengar penjelasan mereka.</div>
+        <div><b>Masuki</b> cahaya oval hijau/emas untuk berpindah ke misi.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-hub">
+    <div id="hub-hud"><span class="banner-text" id="hub-banner-text">🏛 Gerakkan karaktermu &mdash; dekati penasihat atau portal cahaya</span></div>
+    <div id="courtyard"></div>
+    <div id="dpad">
+      <div class="dbtn" id="dbtn-up">▲</div>
+      <div class="dbtn" id="dbtn-down">▼</div>
+      <div class="dbtn" id="dbtn-left">◀</div>
+      <div class="dbtn" id="dbtn-right">▶</div>
+    </div>
+  </div>
+
+  <div id="modal-backdrop"><div id="modal-card"></div></div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var IMG = "assets/image/";
+
+  /* ---------- sync progress carried back from a zone via URL ---------- */
+  (function syncFromQuery(){
+    try{
+      var params = new URLSearchParams(window.location.search);
+      var map = {purbakala:"guildSejarawan_purbakala_v1", pasar:"guildSejarawan_pasar_v1"};
+      var touched = false;
+      Object.keys(map).forEach(function(key){
+        var val = params.get(key);
+        if(val){
+          touched = true;
+          var parts = val.split("-");
+          var count = parseInt(parts[0],10) || 0;
+          var total = parseInt(parts[1],10) || 7;
+          var found = {};
+          for(var i=0;i<count;i++){ found["slot"+i] = true; }
+          localStorage.setItem(map[key], JSON.stringify({found:found, total:total}));
+        }
+      });
+      if(touched){
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }catch(e){ /* localStorage/URLSearchParams unavailable — progress badges just won't sync */ }
+  })();
+
+  var NPCS = [
+    {id:"guildmaster", x:50, y:46, img:IMG+"guildmaster.png", w:56, tag:"Guildmaster",
+      title:"Sang Guildmaster",
+      text:"Selamat datang, sejarawan muda. Guild ini mencatat jejak Nusantara agar tak lekang oleh waktu. Dua portal cahaya menantimu di halaman ini \u2014 dekati salah satu untuk memulai penyelidikanmu."},
+    {id:"fighter", x:24, y:60, img:IMG+"fighter.png", w:46, tag:"Sang Petarung",
+      title:"Sang Petarung",
+      text:"\u201cSejarah bukan cuma dihafal di atas kertas. Turun langsung ke situsnya, rasakan bagaimana peristiwa itu benar-benar terjadi.\u201d"},
+    {id:"mage", x:76, y:58, img:IMG+"mage.png", w:52, tag:"Sang Pengamat",
+      title:"Sang Pengamat",
+      text:"\u201cSetiap klaim butuh bukti. Sebelum percaya sebuah cerita sejarah, telusuri dulu dari mana sumbernya berasal.\u201d"},
+    {id:"reader", x:36, y:70, img:IMG+"reader.png", w:40, tag:"Sang Pengarsip",
+      title:"Sang Pengarsip",
+      text:"\u201cSetiap dokumen dan artefak adalah jejak yang menunggu ditemukan kembali. Catat baik-baik apa yang kau pelajari di tiap misi.\u201d"},
+    {id:"citizen", x:63, y:80, img:IMG+"citizen.png", w:34, ambient:true},
+    {id:"talk1", x:13, y:82, img:IMG+"talk1.png", w:32, ambient:true},
+    {id:"talk2", x:90, y:80, img:IMG+"talk2.png", w:32, ambient:true}
+  ];
+
+  var PORTALS = [
+    {id:"purbakala", x:11, y:29, color:"purbakala", label:"Zona Purbakala",
+      title:"Portal Zona Purbakala", icon:IMG+"icon_purbakala.png",
+      desc:"Ekspedisi Arkeologi \u2014 Manusia Purba & Asal-usul Nenek Moyang (Kelas X)",
+      href:"zona-purbakala/index.html", storageKey:"guildSejarawan_purbakala_v1", total:7},
+    {id:"pasar", x:80, y:23, color:"pasar", label:"Zona Pasar",
+      title:"Portal Zona Pasar", icon:IMG+"icon_pasar.png",
+      desc:"Jalur Rempah & Monopoli VOC (Kelas XI)",
+      href:"zona-pasar/index.html", storageKey:"guildSejarawan_pasar_v1", total:7}
+  ];
+
+  var BOUNDS = {xMin:5, xMax:95, yMin:20, yMax:88};
+  var NEAR_PX = 50;      // proximity trigger radius in real pixels
+  var FAR_PX  = 74;      // hysteresis reset radius
+  var SPEED_PX_S = 120;  // player speed in px/sec at current viewport scale
+
+  var player = {xFrac:50, yFrac:64, dir:0, frame:0, moving:false, animAcc:0};
+  var keys = {up:false,down:false,left:false,right:false};
+  var lastTime = null;
+  var rafId = null;
+
+  function $(sel){return document.querySelector(sel);}
+
+  /* ---------- background music ---------- */
+  var MUTE_KEY = "guildSejarawan_audio_muted";
+  var bgm = document.getElementById("bgm");
+  var isMuted = false;
+  try{ isMuted = localStorage.getItem(MUTE_KEY) === "1"; }catch(e){}
+  function applyMuteState(){
+    if(bgm) bgm.muted = isMuted;
+    var t = $("#audio-toggle");
+    if(t) t.textContent = isMuted ? "🔇" : "🔊";
+  }
+  applyMuteState();
+  var audioToggleEl = $("#audio-toggle");
+  if(audioToggleEl){
+    audioToggleEl.addEventListener("click", function(){
+      isMuted = !isMuted;
+      try{ localStorage.setItem(MUTE_KEY, isMuted ? "1" : "0"); }catch(e){}
+      applyMuteState();
+    });
+  }
+  function tryPlayMusic(){
+    if(!bgm) return;
+    try{
+      bgm.volume = 0.45;
+      var p = bgm.play();
+      if(p && p.catch) p.catch(function(){ /* autoplay blocked — ignore, toggle still works */ });
+    }catch(e){ /* audio unavailable, ignore */ }
+  }
+
+  function showScreen(id){
+    document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
+    $("#"+id).classList.add("active");
+  }
+  function modalActive(){ return $("#modal-backdrop").classList.contains("active"); }
+
+  /* ---------- progress read/write (shared with the two zones) ---------- */
+  function readZoneProgress(p){
+    try{
+      var raw = localStorage.getItem(p.storageKey);
+      if(!raw) return {count:0, total:p.total};
+      var data = JSON.parse(raw);
+      var count = data && data.found ? Object.keys(data.found).length : 0;
+      return {count: count, total: data.total || p.total};
+    }catch(e){ return {count:0, total:p.total}; }
+  }
+  function allZonesComplete(){
+    return PORTALS.every(function(p){ var r = readZoneProgress(p); return r.count >= r.total; });
+  }
+
+  /* ---------- build scene ---------- */
+  var npcEls = {};
+  var portalEls = {};
+
+  function buildCourtyard(){
+    var yard = $("#courtyard");
+    yard.innerHTML = "";
+
+    NPCS.forEach(function(n){
+      var d = document.createElement("div");
+      d.className = "npc" + (n.ambient ? " ambient" : "");
+      d.style.left = n.x+"%"; d.style.top = n.y+"%";
+      d.innerHTML = (n.ambient?"":'<div class="glow"></div>') +
+        '<img src="'+n.img+'" style="width:'+n.w+'px;height:auto;object-fit:contain;">' +
+        (n.ambient?"":'<div class="tag">'+n.tag+'</div>');
+      if(!n.ambient){
+        d.addEventListener("click", function(){ openDialogue(n); });
+        n._triggered = false;
+      }
+      yard.appendChild(d);
+      npcEls[n.id] = d;
+    });
+
+    PORTALS.forEach(function(p){
+      var d = document.createElement("div");
+      d.className = "portal "+p.color;
+      d.style.left = p.x+"%"; d.style.top = p.y+"%";
+      d.innerHTML = '<div class="glowshape"></div><div class="ptag">'+p.label+'</div>';
+      d.addEventListener("click", function(){ openPortalPrompt(p); });
+      p._triggered = false;
+      yard.appendChild(d);
+      portalEls[p.id] = d;
+    });
+
+    var pl = document.createElement("div");
+    pl.className = "player";
+    pl.id = "player-el";
+    yard.appendChild(pl);
+  }
+
+  /* ---------- dialogue / portal modals ---------- */
+  function openDialogue(n){
+    var extra = "";
+    if(n.id === "guildmaster" && allZonesComplete()){
+      extra = '<button class="btn" id="btn-claim-piagam">🏅 Klaim Piagam</button>';
+    }
+    $("#modal-card").innerHTML =
+      '<img src="'+n.img+'">'+
+      '<h2>'+n.title+'</h2>'+
+      '<p>'+n.text+'</p>'+
+      extra+
+      '<button class="btn secondary" id="btn-close-dlg">Tutup</button>';
+    $("#modal-backdrop").classList.add("active");
+    $("#btn-close-dlg").addEventListener("click", closeModal);
+    var claimBtn = $("#btn-claim-piagam");
+    if(claimBtn) claimBtn.addEventListener("click", openCertificate);
+  }
+
+  function openPortalPrompt(p){
+    var prog = readZoneProgress(p);
+    var progText = prog.count === 0 ? "Belum dimulai" :
+      (prog.count >= prog.total ? "✓ "+prog.count+"/"+prog.total+" selesai" : prog.count+"/"+prog.total+" ditemukan");
+    $("#modal-card").innerHTML =
+      '<div class="portal-icon-preview '+p.color+'"></div>'+
+      '<h2>'+p.label+'</h2>'+
+      '<p>'+p.desc+'<br><b>'+progText+'</b></p>'+
+      '<button class="btn" id="btn-portal-go">Masuk</button>'+
+      '<button class="btn secondary" id="btn-portal-cancel">Batal</button>';
+    $("#modal-backdrop").classList.add("active");
+    $("#btn-portal-go").addEventListener("click", function(){ window.location.href = p.href; });
+    $("#btn-portal-cancel").addEventListener("click", closeModal);
+  }
+
+  function closeModal(){ $("#modal-backdrop").classList.remove("active"); }
+
+  function openCertificate(){
+    $("#modal-card").innerHTML =
+      '<h2>🏅 Klaim Piagam Guild</h2>'+
+      '<input type="text" class="cert-input" id="cert-name" placeholder="Tulis namamu di sini">'+
+      '<button class="btn" id="btn-generate-cert">Buat Piagam</button>';
+    $("#modal-backdrop").classList.add("active");
+    $("#btn-generate-cert").addEventListener("click", function(){
+      var name = ($("#cert-name").value || "Sejarawan Muda").trim();
+      var todayStr = new Date().toLocaleDateString("id-ID", {day:"numeric",month:"long",year:"numeric"});
+      $("#modal-card").innerHTML =
+        '<div class="cert-view">'+
+          '<div class="cert-medal">🛡️</div>'+
+          '<div class="cert-ribbons"><div class="rb"></div><div class="rb alt"></div></div>'+
+          '<div class="cert-title">PIAGAM GUILD SEJARAWAN NUSANTARA</div>'+
+          '<div style="font-size:12.5px;">dengan bangga diberikan kepada</div>'+
+          '<div class="cert-name">'+name+'</div>'+
+          '<div class="cert-sub">atas keberhasilan menuntaskan seluruh misi penjelajahan sejarah Nusantara</div>'+
+          '<div class="cert-zones">'+
+            '<div class="cz"><img src="assets/image/icon_purbakala.png"><span>Zona Purbakala</span><span class="ck">✓ Tuntas</span></div>'+
+            '<div class="cz"><img src="assets/image/icon_pasar.png"><span>Zona Pasar</span><span class="ck">✓ Tuntas</span></div>'+
+          '</div>'+
+          '<div class="cert-seal"><div class="seal-dot">✦</div>Diberikan oleh Sang Guildmaster &middot; '+todayStr+'</div>'+
+        '</div>'+
+        '<button class="btn" id="btn-print-cert">🖨 Cetak</button> '+
+        '<button class="btn secondary" id="btn-close-cert">Tutup</button>';
+      $("#btn-print-cert").addEventListener("click", function(){ window.print(); });
+      $("#btn-close-cert").addEventListener("click", closeModal);
+    });
+  }
+
+  /* ---------- input ---------- */
+  var KEY_MAP = {
+    "ArrowUp":"up","w":"up","W":"up",
+    "ArrowDown":"down","s":"down","S":"down",
+    "ArrowLeft":"left","a":"left","A":"left",
+    "ArrowRight":"right","d":"right","D":"right"
+  };
+  window.addEventListener("keydown", function(e){
+    var k = KEY_MAP[e.key];
+    if(k){ keys[k] = true; e.preventDefault(); }
+  });
+  window.addEventListener("keyup", function(e){
+    var k = KEY_MAP[e.key];
+    if(k){ keys[k] = false; e.preventDefault(); }
+  });
+
+  function bindDpad(id, key){
+    var el = document.getElementById(id);
+    function on(e){ e.preventDefault(); keys[key]=true; el.classList.add("pressed"); }
+    function off(e){ keys[key]=false; el.classList.remove("pressed"); }
+    el.addEventListener("pointerdown", on);
+    el.addEventListener("pointerup", off);
+    el.addEventListener("pointerleave", off);
+    el.addEventListener("pointercancel", off);
+  }
+  bindDpad("dbtn-up","up");
+  bindDpad("dbtn-down","down");
+  bindDpad("dbtn-left","left");
+  bindDpad("dbtn-right","right");
+
+  /* ---------- game loop ---------- */
+  function tick(t){
+    if(lastTime === null) lastTime = t;
+    var dt = Math.min(48, t - lastTime) / 1000;
+    lastTime = t;
+
+    if(!modalActive()){
+      var dx = (keys.right?1:0) - (keys.left?1:0);
+      var dy = (keys.down?1:0) - (keys.up?1:0);
+      var moving = dx !== 0 || dy !== 0;
+      if(moving){
+        var len = Math.sqrt(dx*dx + dy*dy);
+        dx /= len; dy /= len;
+        var yard = $("#courtyard");
+        var w = yard.clientWidth, h = yard.clientHeight;
+        player.xFrac += (dx * SPEED_PX_S * dt / w) * 100;
+        player.yFrac += (dy * SPEED_PX_S * dt / h) * 100;
+        player.xFrac = Math.max(BOUNDS.xMin, Math.min(BOUNDS.xMax, player.xFrac));
+        player.yFrac = Math.max(BOUNDS.yMin, Math.min(BOUNDS.yMax, player.yFrac));
+
+        if(Math.abs(dx) > Math.abs(dy)) player.dir = dx > 0 ? 2 : 1;
+        else player.dir = dy > 0 ? 0 : 3;
+
+        player.animAcc += dt;
+        if(player.animAcc > 0.11){ player.animAcc = 0; player.frame = (player.frame+1) % 6; }
+      } else {
+        player.frame = 0; player.animAcc = 0;
+      }
+      player.moving = moving;
+
+      renderPlayer();
+      checkProximity();
+    }
+
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function renderPlayer(){
+    var el = document.getElementById("player-el");
+    if(!el) return;
+    el.style.left = player.xFrac + "%";
+    el.style.top = player.yFrac + "%";
+    var fw = el.offsetWidth || 34;
+    el.style.backgroundPosition = (-player.frame*fw) + "px " + (-player.dir*fw) + "px";
+  }
+
+  function checkProximity(){
+    var yard = $("#courtyard");
+    var rect = yard.getBoundingClientRect();
+    var px = rect.left + (player.xFrac/100)*rect.width;
+    var py = rect.top + (player.yFrac/100)*rect.height;
+
+    NPCS.forEach(function(n){
+      if(n.ambient) return;
+      var el = npcEls[n.id];
+      var r = el.getBoundingClientRect();
+      var nx = r.left + r.width/2, ny = r.bottom - 6;
+      var d = Math.hypot(px-nx, py-ny);
+      if(d < NEAR_PX){
+        el.classList.add("near");
+        if(!n._triggered && !modalActive()){ n._triggered = true; openDialogue(n); }
+      } else if(d > FAR_PX){
+        el.classList.remove("near");
+        n._triggered = false;
+      }
+    });
+
+    PORTALS.forEach(function(p){
+      var el = portalEls[p.id];
+      var r = el.getBoundingClientRect();
+      var nx = r.left + r.width/2, ny = r.top + r.height/2;
+      var d = Math.hypot(px-nx, py-ny);
+      if(d < NEAR_PX){
+        if(!p._triggered && !modalActive()){ p._triggered = true; openPortalPrompt(p); }
+      } else if(d > FAR_PX){
+        p._triggered = false;
+      }
+    });
+  }
+
+  $("#btn-enter").addEventListener("click", function(){
+    showScreen("screen-hub");
+    buildCourtyard();
+    renderPlayer();
+    tryPlayMusic();
+    lastTime = null;
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tick);
+  });
+
+  $("#modal-backdrop").addEventListener("click", function(e){
+    if(e.target === $("#modal-backdrop")) closeModal();
+  });
+})();
+</script>
+</body>
+</html>

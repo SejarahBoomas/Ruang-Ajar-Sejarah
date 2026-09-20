@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Jalur Rempah &amp; Monopoli VOC</title>
+<style>
+  :root{
+    --sky1:#fbe6a8;
+    --sky2:#f3c26b;
+    --wood:#8a5a30;
+    --wood-dark:#5c3a1c;
+    --parchment:#f6ecd2;
+    --parchment-dark:#dcc48f;
+    --ink:#3a2a16;
+    --spice:#c1531f;
+    --spice-dark:#8a3814;
+    --leaf:#4f7a3a;
+    --voc-navy:#233a5e;
+    --voc-gold:#d9a441;
+    --lock:#6b6152;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;font-family:'Trebuchet MS','Segoe UI',sans-serif;color:var(--ink);overflow:hidden;-webkit-user-select:none;user-select:none;}
+  img{image-rendering:pixelated;image-rendering:crisp-edges;-webkit-user-drag:none;pointer-events:none;}
+  #app{position:relative;width:100vw;height:100vh;background:var(--sky2);}
+
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .4s ease;}
+  .screen.active{opacity:1;pointer-events:auto;}
+
+  /* ---------- START ---------- */
+  #screen-start{
+    background:
+      linear-gradient(180deg, rgba(30,16,4,.45) 0%, rgba(30,16,4,.6) 55%, rgba(20,10,2,.8) 100%),
+      url("assets/image/market_table_bg.jpg") center 35%/cover no-repeat;
+    text-align:center;padding:24px;
+  }
+  .title-badge{font-size:13px;letter-spacing:3px;color:var(--ochre,#e8b45f);margin-bottom:10px;font-weight:bold;}
+  #screen-start h1{
+    font-size:clamp(26px,6vw,48px);margin:0 0 6px;color:#f6ecd2;
+    text-shadow:2px 2px 0 rgba(40,20,5,.6), 0 0 24px rgba(198,138,46,.35);
+    font-family:Georgia,'Times New Roman',serif;
+  }
+  #screen-start .subtitle{color:#e8dcc4;font-size:clamp(14px,2.4vw,18px);max-width:520px;margin:0 0 24px;line-height:1.5;text-shadow:1px 1px 3px rgba(30,16,4,.7);}
+  .carved-panel{
+    background:linear-gradient(180deg,#f9efd4,#e5cd9c);
+    border:4px solid var(--wood-dark);border-radius:10px;
+    box-shadow:inset 0 0 0 2px #fffbe9, 0 8px 0 var(--wood-dark), 0 14px 24px rgba(0,0,0,.35);
+    padding:18px 22px;
+  }
+  .btn{
+    font-family:inherit;font-weight:bold;font-size:16px;color:#fff6e0;
+    background:linear-gradient(180deg,var(--spice),var(--spice-dark));
+    border:3px solid var(--wood-dark);border-radius:8px;padding:12px 28px;cursor:pointer;
+    box-shadow:0 4px 0 #5e2a0d, 0 8px 14px rgba(0,0,0,.3);transition:transform .08s ease;
+  }
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #5e2a0d;}
+  .btn.secondary{background:linear-gradient(180deg,#8a8574,#6c6858);box-shadow:0 4px 0 #4a4638, 0 8px 14px rgba(0,0,0,.3);}
+  .btn.secondary:active{box-shadow:0 1px 0 #4a4638;}
+  .btn.small{padding:8px 18px;font-size:14px;}
+  .brief-list{text-align:left;max-width:460px;margin:16px auto 0;font-size:14px;line-height:1.6;}
+  .brief-list b{color:var(--spice-dark);}
+
+  /* ---------- HUD ---------- */
+  #hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:10px 14px;background:linear-gradient(180deg, rgba(60,36,10,.85), rgba(60,36,10,0));z-index:20;pointer-events:none;}
+  #hud > *{pointer-events:auto;}
+  .hud-chip{background:linear-gradient(180deg,#f9efd4,#dcc48f);border:3px solid var(--wood-dark);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:bold;color:var(--ink);display:flex;align-items:center;gap:8px;box-shadow:0 3px 0 var(--wood-dark);}
+  #xp-track{width:120px;height:10px;background:#5c4a30;border-radius:5px;overflow:hidden;border:1px solid var(--wood-dark);}
+  #xp-fill{height:100%;width:0%;background:linear-gradient(90deg,#c1531f,#e8945a);transition:width .4s ease;}
+  #progress-chip{margin-left:auto;}
+  .level-num{color:var(--spice-dark);font-size:15px;}
+  #babak-banner{
+    position:absolute;top:56px;left:50%;transform:translateX(-50%);
+    background:rgba(35,58,94,.9);color:#fff8e4;font-size:12.5px;font-weight:bold;
+    padding:5px 14px;border-radius:20px;z-index:19;white-space:nowrap;
+    box-shadow:0 3px 8px rgba(0,0,0,.3);
+  }
+
+  /* ---------- MAP ---------- */
+  #screen-map{
+    background:#2a1c10 url("assets/image/market_table_bg.jpg") center 30%/cover no-repeat;
+  }
+  #site{position:relative;width:100%;height:100%;overflow:hidden;}
+  .ground-strip{display:none;}
+  .deco{position:absolute;pointer-events:none;filter:drop-shadow(0 6px 4px rgba(0,0,0,.3));}
+
+  .marker{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:pointer;transform:translate(-50%,-100%);filter:drop-shadow(0 6px 4px rgba(0,0,0,.35));animation:bob 2.8s ease-in-out infinite;}
+  .marker .glow{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:44px;height:12px;border-radius:50%;background:radial-gradient(ellipse at center, rgba(255,224,150,.8), transparent 70%);animation:pulse 1.8s ease-in-out infinite;}
+  .marker.found{animation:none;}
+  .marker.found .glow{display:none;}
+  .marker.found::after{content:"✓";position:absolute;top:-6px;right:-6px;background:#3f7d3a;color:#fff;font-size:11px;font-weight:bold;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
+  .marker.locked{cursor:not-allowed;animation:none;filter:drop-shadow(0 6px 4px rgba(0,0,0,.35)) grayscale(.85) brightness(.6);}
+  .marker.locked .glow{display:none;}
+  .marker.locked::after{content:"🔒";position:absolute;top:-4px;right:-8px;font-size:15px;filter:none;}
+  .marker .tag{margin-top:4px;background:rgba(40,26,10,.85);color:var(--parchment);font-size:10px;font-weight:bold;padding:2px 7px;border-radius:5px;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;}
+  .flag{position:absolute;top:-16px;right:-10px;width:16px;height:12px;border-radius:1px;box-shadow:0 0 0 1px rgba(0,0,0,.3);}
+  .flag.pt{background:linear-gradient(90deg,#2e7d32 40%,#c1272d 40%);}
+  .flag.voc{background:repeating-linear-gradient(180deg,var(--voc-navy) 0 4px, var(--voc-gold) 4px 8px, #b23b3b 8px 12px);}
+  @keyframes bob{0%,100%{translate:0 0;}50%{translate:0 -6px;}}
+  @keyframes pulse{0%,100%{opacity:.5;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.25);}}
+
+  /* ---------- DOCK ---------- */
+  #dock{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:8px;padding:10px 10px 14px;background:linear-gradient(0deg, rgba(60,36,10,.85), rgba(60,36,10,0));z-index:20;flex-wrap:wrap;}
+  .dock-slot{width:40px;height:40px;border-radius:7px;background:linear-gradient(180deg,#f9efd4,#dcc48f);border:2px solid var(--wood-dark);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--wood-dark);cursor:pointer;}
+  .dock-slot.empty{background:linear-gradient(180deg,#5a5040,#3c362a);opacity:.55;cursor:default;}
+  .dock-slot img{width:30px;height:30px;object-fit:contain;}
+  .dock-slot .q{color:#a89f8c;font-size:16px;font-weight:bold;}
+
+  /* ---------- MODAL ---------- */
+  #modal-backdrop{position:absolute;inset:0;background:rgba(30,18,6,.72);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:50;padding:16px;}
+  #modal-backdrop.active{opacity:1;pointer-events:auto;}
+  #modal-card{width:min(480px,100%);max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#f9efd4,#e5cd9c);border:4px solid var(--wood-dark);border-radius:12px;box-shadow:inset 0 0 0 2px #fffbe9, 0 10px 0 var(--wood-dark), 0 18px 30px rgba(0,0,0,.45);padding:20px;transform:scale(.92);transition:transform .25s ease;}
+  #modal-backdrop.active #modal-card{transform:scale(1);}
+
+  .era-tag{display:inline-block;font-size:11px;font-weight:bold;letter-spacing:.5px;background:var(--spice-dark);color:#fff;padding:3px 9px;border-radius:5px;margin-bottom:8px;}
+  .era-tag.voc{background:var(--voc-navy);}
+  .artifact-header{display:flex;gap:14px;align-items:center;margin-bottom:12px;}
+  .artifact-header img{width:66px;height:66px;object-fit:contain;flex-shrink:0;}
+  .artifact-header h2{margin:0;font-size:18px;font-family:Georgia,serif;}
+  .artifact-desc{font-size:14px;line-height:1.55;margin:0 0 12px;}
+  .fact-box{background:rgba(138,90,48,.14);border-left:4px solid var(--spice-dark);padding:8px 12px;font-size:13px;line-height:1.5;border-radius:0 6px 6px 0;margin-bottom:14px;}
+
+  .quiz-q{font-size:14.5px;font-weight:bold;margin-bottom:10px;line-height:1.4;}
+  .quiz-opt{display:block;width:100%;text-align:left;background:#fffaef;border:2px solid var(--parchment-dark);border-radius:7px;padding:10px 12px;margin-bottom:8px;font-family:inherit;font-size:13.5px;cursor:pointer;color:var(--ink);}
+  .quiz-opt:hover{border-color:var(--spice);}
+  .quiz-opt.correct{background:#dcefd0;border-color:#3f7d3a;}
+  .quiz-opt.wrong{background:#f4d9d3;border-color:var(--spice-dark);}
+  .quiz-feedback{font-size:13px;margin:8px 0 4px;line-height:1.5;min-height:18px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+
+  /* ---------- BARGAIN METER (Babak 1 & 2) ---------- */
+  .bargain-stage{text-align:center;}
+  .bargain-track{position:relative;height:30px;border-radius:15px;background:#5c4a30;border:3px solid var(--wood-dark);margin:16px 0 8px;overflow:hidden;}
+  .bargain-zone{position:absolute;top:0;bottom:0;background:rgba(79,122,58,.55);border-left:2px dashed #fff8e4;border-right:2px dashed #fff8e4;}
+  .bargain-cursor{position:absolute;top:-4px;bottom:-4px;width:6px;background:#fff8e4;border-radius:3px;box-shadow:0 0 6px rgba(0,0,0,.5);left:0%;}
+  .bargain-cursor.running{animation:sweep var(--dur,1.6s) linear infinite alternate;}
+  @keyframes sweep{0%{left:2%;}100%{left:96%;}}
+  .bargain-result{font-size:14px;font-weight:bold;margin:10px 0;min-height:20px;}
+
+  /* ---------- FIXED PRICE STAMP (Babak 3) ---------- */
+  .stamp-stage{text-align:center;padding:6px 0 2px;}
+  .stamp-box{
+    display:inline-block;border:4px solid var(--voc-navy);color:var(--voc-navy);
+    font-weight:bold;font-size:15px;letter-spacing:1px;padding:10px 16px;border-radius:6px;
+    transform:rotate(-6deg) scale(0);opacity:0;margin:14px 0;
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+  }
+  .stamp-box.show{transform:rotate(-6deg) scale(1);opacity:1;}
+  .stamp-sub{font-size:12.5px;color:var(--ink);opacity:.8;max-width:340px;margin:0 auto;line-height:1.5;}
+
+  /* ---------- REPORT ---------- */
+  #screen-report{background:linear-gradient(180deg,#c98a4a,#7c4f26);padding:20px;overflow-y:auto;}
+  #report-card{width:min(560px,100%);background:linear-gradient(180deg,#f9efd4,#e5cd9c);border:4px solid var(--wood-dark);border-radius:12px;box-shadow:inset 0 0 0 2px #fffbe9,0 10px 24px rgba(0,0,0,.45);padding:22px;max-height:82vh;overflow-y:auto;}
+  #report-card h2{font-family:Georgia,serif;text-align:center;margin:0 0 4px;font-size:22px;}
+  #report-card .report-sub{text-align:center;font-size:13px;color:var(--spice-dark);margin-bottom:16px;font-weight:bold;}
+  .report-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--parchment-dark);}
+  .report-row img{width:34px;height:34px;object-fit:contain;}
+  .report-row .rn{font-weight:bold;font-size:13.5px;}
+  .report-row .re{font-size:11px;color:var(--spice-dark);font-weight:bold;}
+  .report-reflect{background:rgba(35,58,94,.1);border-left:4px solid var(--voc-navy);padding:10px 12px;font-size:12.5px;line-height:1.5;border-radius:0 6px 6px 0;margin-top:14px;}
+
+  .toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:rgba(35,20,6,.92);color:#fff6e0;font-size:13px;font-weight:bold;padding:9px 16px;border-radius:8px;z-index:60;opacity:0;transition:opacity .25s ease, transform .25s ease;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  #audio-toggle{
+    position:absolute;top:10px;right:10px;z-index:40;
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(40,26,10,.6);border:2px solid rgba(241,230,201,.5);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff6e0;font-size:16px;cursor:pointer;
+  }
+
+  @media (max-width:520px){
+    .marker{transform:translate(-50%,-100%) scale(.82);}
+    .hud-chip{font-size:11px;padding:5px 8px;}
+    #xp-track{width:80px;}
+    #babak-banner{font-size:11px;top:50px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="audio-toggle">🔊</div>
+  <audio id="bgm" src="../assets/audio/backsound.mp3" loop preload="auto"></audio>
+
+  <div class="screen active" id="screen-start">
+    <div class="title-badge">SIMULASI DAGANG &middot; SEJARAH KELAS XI</div>
+    <h1>Jalur Rempah &amp;<br>Monopoli VOC</h1>
+    <p class="subtitle">Kelola lapak dagangmu melintasi tiga babak: jaringan rempah Nusantara, kedatangan bangsa Eropa, hingga cengkeraman monopoli VOC.</p>
+    <div class="carved-panel">
+      <button class="btn" id="btn-start">Mulai Berdagang</button>
+      <div class="brief-list">
+        <div><b>Babak 1–2:</b> tawar harga di titik dagang, lalu jawab 1 pertanyaan identifikasi.</div>
+        <div><b>Babak 3:</b> harga sudah ditetapkan sepihak oleh VOC — rasakan bedanya.</div>
+        <div>Selesaikan satu babak untuk membuka babak berikutnya.</div>
+      </div>
+    </div>
+    <a href="../index.html" id="link-back-guild-1" style="display:inline-block;margin-top:16px;color:#5a3d1c;font-size:12.5px;text-decoration:underline;">&larr; Kembali ke Balai Guild</a>
+  </div>
+
+  <div class="screen" id="screen-map">
+    <div id="hud">
+      <div class="hud-chip">💰 <span class="level-num" id="level-label">Pedagang Pemula</span></div>
+      <div class="hud-chip"><div id="xp-track"><div id="xp-fill"></div></div></div>
+      <div class="hud-chip" id="progress-chip">Transaksi: <span id="progress-label">0/7</span></div>
+    </div>
+    <div id="babak-banner"></div>
+    <div id="site"></div>
+    <div id="dock"></div>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <div class="screen" id="screen-report">
+    <div id="report-card">
+      <h2>Laporan Pedagang</h2>
+      <div class="report-sub" id="report-sub"></div>
+      <div id="report-list"></div>
+      <div class="report-reflect" id="report-reflect"></div>
+      <div class="modal-actions" style="justify-content:center;margin-top:18px;">
+        <button class="btn secondary" id="btn-replay">Berdagang Ulang</button>
+        <a href="../index.html" id="link-back-guild-2" class="btn secondary" style="text-decoration:none;display:inline-flex;align-items:center;">&larr; Balai Guild</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-backdrop"><div id="modal-card"></div></div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var IMG = "assets/image/";
+
+  var BABAK = [
+    {id:1, name:"Jalur Rempah Nusantara", sub:"sebelum kedatangan bangsa Eropa"},
+    {id:2, name:"Kedatangan Bangsa Eropa", sub:"1511 \u2013 1596"},
+    {id:3, name:"Monopoli VOC", sub:"1602 dan seterusnya"}
+  ];
+
+  var SITES = [
+    {
+      id:"pala", babak:1, x:20, y:32, img:IMG+"herbs.png", size:64,
+      title:"Pala & Fuli dari Banda", era:"JALUR REMPAH NUSANTARA",
+      desc:"Kepulauan Banda yang mungil adalah satu-satunya penghasil pala dan fuli di dunia pada masa itu.",
+      fact:"Karena hanya tumbuh di Kepulauan Banda, pala menjadi komoditas yang sangat mahal dan diperebutkan di pasar dunia \u2014 semacam monopoli alami akibat letak geografis.",
+      zone:[55,80],
+      quiz:{q:"Mengapa Kepulauan Banda begitu diperebutkan para pedagang dunia?",
+        opts:["Karena satu-satunya sumber pala dan fuli di dunia saat itu","Karena penduduknya menguasai teknologi kapal tercanggih","Karena menjadi ibu kota kerajaan terbesar di Nusantara"],
+        correct:0, expl:"Pala dan fuli hanya tumbuh di Kepulauan Banda, sehingga wilayah ini punya nilai dagang sangat tinggi dan jadi incaran banyak bangsa."}
+    },
+    {
+      id:"cengkeh", babak:1, x:42, y:30, img:IMG+"goods2.png", size:60,
+      title:"Cengkeh dari Maluku", era:"JALUR REMPAH NUSANTARA",
+      desc:"Ternate dan Tidore, dua kesultanan penghasil cengkeh utama, lama bersaing memperebutkan pengaruh dagang di Maluku.",
+      fact:"Persaingan Ternate dan Tidore membuat masing-masing kesultanan mencari sekutu dagang dan politik dari bangsa asing yang berbeda saat orang Eropa mulai datang ke Maluku.",
+      zone:[50,78],
+      quiz:{q:"Apa dampak persaingan Ternate dan Tidore terhadap kehadiran bangsa Eropa di Maluku?",
+        opts:["Keduanya bersatu mengusir semua pedagang asing","Masing-masing kesultanan menggandeng sekutu Eropa yang berbeda","Perdagangan cengkeh berhenti total karena perang"],
+        correct:1, expl:"Rivalitas Ternate dan Tidore membuat keduanya mencari sekutu asing yang berbeda, membuka pintu bagi keterlibatan bangsa Eropa dalam politik lokal Maluku."}
+    },
+    {
+      id:"lada", babak:1, x:64, y:33, img:IMG+"basket.png", size:60,
+      title:"Lada & Jaringan Dagang Nusantara", era:"JALUR REMPAH NUSANTARA",
+      desc:"Jauh sebelum kapal Eropa tiba, lada dan rempah lain sudah mengalir lewat rantai pedagang Nusantara, Arab, India, dan Cina.",
+      fact:"Rempah Nusantara sampai ke Eropa melalui jaringan pedagang perantara yang panjang, melewati Asia Selatan dan Timur Tengah, hingga akhirnya tiba di pelabuhan-pelabuhan Laut Tengah.",
+      zone:[52,80],
+      quiz:{q:"Bagaimana rempah Nusantara bisa sampai ke Eropa sebelum bangsa Eropa datang langsung?",
+        opts:["Dikirim langsung oleh kerajaan Nusantara ke Portugal","Melalui rantai pedagang perantara: Arab, India, hingga Cina","Ditemukan tumbuh liar di Eropa"],
+        correct:1, expl:"Sebelum jalur laut langsung dibuka, rempah Nusantara mengalir ke Eropa lewat rantai panjang pedagang perantara di Asia dan Timur Tengah."}
+    },
+    {
+      id:"malaka", babak:2, x:30, y:53, img:IMG+"tent1.png", size:80, flag:"pt",
+      title:"1511: Portugis Merebut Malaka", era:"KEDATANGAN BANGSA EROPA",
+      desc:"Di bawah Alfonso de Albuquerque, Portugis merebut Malaka \u2014 pelabuhan transit rempah terpenting di Nusantara.",
+      fact:"Jatuhnya Konstantinopel ke Turki Utsmani pada 1453 memutus jalur dagang rempah lewat darat ke Eropa, mendorong Portugis mencari jalur laut langsung ke sumber rempah, didorong pula oleh semangat 3G: Gold, Gospel, Glory.",
+      zone:[45,72],
+      quiz:{q:"Apa yang mendorong Portugis mencari jalur laut langsung ke Nusantara?",
+        opts:["Ajakan raja-raja Nusantara","Jatuhnya Konstantinopel 1453 yang memutus jalur dagang lewat darat","Kegagalan jalur dagang lewat Samudra Pasifik"],
+        correct:1, expl:"Jatuhnya Konstantinopel 1453 menutup akses dagang rempah lewat darat ke Eropa, mendorong Portugis mencari jalur laut langsung ke Nusantara."}
+    },
+    {
+      id:"houtman", babak:2, x:58, y:52, img:IMG+"tent2.png", size:80, flag:"voc",
+      title:"1596: Ekspedisi Cornelis de Houtman", era:"KEDATANGAN BANGSA EROPA",
+      desc:"Armada Belanda pertama yang dipimpin Cornelis de Houtman mendarat di Banten, membuka jalur pelayaran langsung Belanda ke Nusantara.",
+      fact:"Meski hubungan awal dengan penguasa Banten sempat memburuk, ekspedisi 1596 ini membuktikan jalur dagang langsung Belanda ke Nusantara bisa ditempuh, memicu banyak ekspedisi dagang Belanda berikutnya.",
+      zone:[48,76],
+      quiz:{q:"Apa hasil penting dari ekspedisi Cornelis de Houtman tahun 1596?",
+        opts:["Belanda langsung menguasai seluruh Jawa","Membuka jalur pelayaran langsung Belanda ke Nusantara","Belanda dan Portugis bersatu menguasai rempah"],
+        correct:1, expl:"Ekspedisi ini membuktikan jalur laut langsung ke Nusantara bisa ditempuh Belanda, memicu gelombang ekspedisi dagang berikutnya yang berujung pada pembentukan VOC."}
+    },
+    {
+      id:"oktroi", babak:3, x:36, y:74, img:IMG+"chest.png", size:76, flag:"voc",
+      title:"1602: VOC & Hak Oktroi", era:"MONOPOLI VOC",
+      desc:"Kongsi-kongsi dagang Belanda bergabung membentuk VOC pada 1602, diberi hak istimewa oleh pemerintah Belanda.",
+      fact:"Hak oktroi memberi VOC kewenangan luar biasa layaknya sebuah negara: memonopoli perdagangan, mencetak uang sendiri, mengangkat pegawai, membangun benteng, bahkan menyatakan perang dan berdamai.",
+      quiz:{q:"Apa yang dimaksud dengan hak oktroi yang dimiliki VOC?",
+        opts:["Izin berdagang biasa seperti pedagang lain","Hak istimewa dari pemerintah Belanda yang memberi VOC kewenangan seperti negara","Gelar kehormatan dari kesultanan Nusantara"],
+        correct:1, expl:"Hak oktroi adalah hak istimewa dari pemerintah Belanda yang memberi VOC kewenangan luar biasa: monopoli dagang, mencetak uang, membangun benteng, hingga berperang."}
+    },
+    {
+      id:"hongi", babak:3, x:64, y:74, img:IMG+"crate.png", size:70, flag:"voc",
+      title:"Pelayaran Hongi & Ekstirpasi", era:"MONOPOLI VOC",
+      desc:"Perahu-perahu kora-kora VOC berpatroli antarpulau untuk memastikan tak ada rempah yang diperdagangkan di luar VOC.",
+      fact:"Ekstirpasi adalah kebijakan menebang paksa pohon rempah di luar area yang diizinkan VOC, sementara pelayaran Hongi adalah patroli bersenjata untuk menegakkan aturan ini \u2014 semua demi menjaga harga rempah tetap tinggi.",
+      quiz:{q:"Apa tujuan utama VOC melakukan kebijakan ekstirpasi?",
+        opts:["Menanam lebih banyak pohon rempah untuk rakyat","Mengendalikan jumlah produksi agar harga rempah tetap tinggi","Memberi pohon rempah gratis kepada petani"],
+        correct:1, expl:"Dengan membatasi jumlah pohon rempah yang boleh tumbuh, VOC menjaga rempah tetap langka dan mahal di pasar dunia \u2014 inti dari sistem monopoli."}
+    }
+  ];
+
+  var DECOS = [];
+
+  var state = { found:{} };
+  var STORAGE_KEY = "guildSejarawan_pasar_v1";
+
+  function saveProgress(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({found: state.found, total: SITES.length}));
+    }catch(e){ /* localStorage unavailable — progress just won't sync to the hub */ }
+  }
+  function loadProgress(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var data = JSON.parse(raw);
+        if(data && data.found) state.found = data.found;
+      }
+    }catch(e){ /* ignore, start fresh */ }
+  }
+  loadProgress(); // load immediately so "back to guild" from the start screen carries correct progress
+  var CURRENT_BABAK = 1;
+
+  var LEVELS = [
+    {min:0,label:"Pedagang Pemula"},
+    {min:2,label:"Pedagang Berpengalaman"},
+    {min:3,label:"Saudagar Rempah"},
+    {min:5,label:"Juragan Pasar"},
+    {min:7,label:"Tuan Tanah Dagang"}
+  ];
+
+  function $(sel){return document.querySelector(sel);}
+
+  /* ---------- background music ---------- */
+  var MUTE_KEY = "guildSejarawan_audio_muted";
+  var bgm = document.getElementById("bgm");
+  var isMuted = false;
+  try{ isMuted = localStorage.getItem(MUTE_KEY) === "1"; }catch(e){}
+  function applyMuteState(){
+    if(bgm) bgm.muted = isMuted;
+    var t = $("#audio-toggle");
+    if(t) t.textContent = isMuted ? "🔇" : "🔊";
+  }
+  applyMuteState();
+  var audioToggleEl = $("#audio-toggle");
+  if(audioToggleEl){
+    audioToggleEl.addEventListener("click", function(){
+      isMuted = !isMuted;
+      try{ localStorage.setItem(MUTE_KEY, isMuted ? "1" : "0"); }catch(e){}
+      applyMuteState();
+    });
+  }
+  function tryPlayMusic(){
+    if(!bgm) return;
+    try{
+      bgm.volume = 0.45;
+      var p = bgm.play();
+      if(p && p.catch) p.catch(function(){});
+    }catch(e){}
+  }
+  function el(tag,cls){var e=document.createElement(tag); if(cls)e.className=cls; return e;}
+  function foundCount(){return Object.keys(state.found).length;}
+  function foundInBabak(b){return SITES.filter(function(s){return s.babak===b && state.found[s.id];}).length;}
+  function totalInBabak(b){return SITES.filter(function(s){return s.babak===b;}).length;}
+  function babakUnlocked(b){
+    if(b<=1) return true;
+    return foundInBabak(b-1) >= totalInBabak(b-1);
+  }
+
+  function showScreen(id){
+    document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active");});
+    $("#"+id).classList.add("active");
+  }
+
+  function showToast(msg){
+    var t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1800);
+  }
+
+  function buildSite(){
+    var site = $("#site");
+    site.innerHTML = "";
+    DECOS.forEach(function(d){
+      var img = document.createElement("img");
+      img.src = d.img; img.className = "deco";
+      img.style.left = d.x+"%"; img.style.top = d.y+"%";
+      img.style.width = d.size+"px";
+      img.style.transform = "translate(-50%,-50%)";
+      site.appendChild(img);
+    });
+    SITES.forEach(function(s){
+      var m = el("div","marker");
+      m.dataset.id = s.id;
+      m.style.left = s.x+"%"; m.style.top = s.y+"%";
+      var flagHtml = s.flag ? '<div class="flag '+s.flag+'"></div>' : "";
+      m.innerHTML = '<div class="glow"></div>'+flagHtml+
+        '<img src="'+s.img+'" style="width:'+s.size+'px;height:'+s.size+'px;object-fit:contain;">'+
+        '<div class="tag">'+s.title+'</div>';
+      m.addEventListener("click", function(){
+        if(!babakUnlocked(s.babak)){
+          showToast("Selesaikan Babak "+(s.babak-1)+" dulu untuk membuka titik ini");
+          return;
+        }
+        if(state.found[s.id]){ showArtifactCard(s, true); return; }
+        if(s.babak===3){ openStamp(s); } else { openBargain(s); }
+      });
+      site.appendChild(m);
+    });
+    refreshMarkers();
+  }
+
+  function refreshMarkers(){
+    SITES.forEach(function(s){
+      var m = document.querySelector('.marker[data-id="'+s.id+'"]');
+      if(!m) return;
+      m.classList.toggle("found", !!state.found[s.id]);
+      m.classList.toggle("locked", !babakUnlocked(s.babak) && !state.found[s.id]);
+    });
+    var activeBabak = BABAK[0];
+    for(var i=0;i<BABAK.length;i++){
+      if(babakUnlocked(BABAK[i].id) && foundInBabak(BABAK[i].id) < totalInBabak(BABAK[i].id)){
+        activeBabak = BABAK[i]; break;
+      }
+      activeBabak = BABAK[i];
+    }
+    $("#babak-banner").textContent = "Babak "+activeBabak.id+": "+activeBabak.name+" \u2014 "+activeBabak.sub;
+  }
+
+  function buildDock(){
+    var dock = $("#dock");
+    dock.innerHTML = "";
+    SITES.forEach(function(s){
+      var slot = el("div","dock-slot");
+      if(state.found[s.id]){
+        var img = document.createElement("img");
+        img.src = s.img;
+        slot.appendChild(img);
+        slot.addEventListener("click", function(site){ return function(){ showArtifactCard(site, true); }; }(s));
+      } else {
+        slot.classList.add("empty");
+        slot.innerHTML = '<span class="q">?</span>';
+      }
+      dock.appendChild(slot);
+    });
+  }
+
+  function updateHUD(){
+    var fc = foundCount();
+    $("#progress-label").textContent = fc + "/" + SITES.length;
+    $("#xp-fill").style.width = Math.round((fc/SITES.length)*100) + "%";
+    var lvl = LEVELS[0].label;
+    LEVELS.forEach(function(l){ if(fc >= l.min) lvl = l.label; });
+    $("#level-label").textContent = lvl;
+  }
+
+  function openModal(html){ $("#modal-card").innerHTML = html; $("#modal-backdrop").classList.add("active"); }
+  function closeModal(){ $("#modal-backdrop").classList.remove("active"); }
+
+  /* ---- Babak 1 & 2: tawar-menawar meter ---- */
+  function openBargain(site){
+    var dur = (1.1 + Math.random()*0.6).toFixed(2);
+    var html =
+      '<div class="bargain-stage">'+
+        '<div class="era-tag">'+site.era+'</div>'+
+        '<h2 style="margin:0 0 6px;font-family:Georgia,serif;font-size:18px;">Menawar di '+site.title+'</h2>'+
+        '<div id="dig-hint" style="font-size:13px;opacity:.75;">Ketuk <b>Tawar!</b> saat penanda ada di zona hijau.</div>'+
+        '<div class="bargain-track">'+
+          '<div class="bargain-zone" style="left:'+site.zone[0]+'%;width:'+(site.zone[1]-site.zone[0])+'%;"></div>'+
+          '<div class="bargain-cursor running" id="cursor" style="--dur:'+dur+'s;"></div>'+
+        '</div>'+
+        '<div class="bargain-result" id="bargain-result">&nbsp;</div>'+
+        '<button class="btn" id="btn-tawar">Tawar!</button>'+
+      '</div>';
+    openModal(html);
+    var cursor = $("#cursor");
+    var track = $(".bargain-track");
+    $("#btn-tawar").addEventListener("click", function(){
+      var trackRect = track.getBoundingClientRect();
+      var curRect = cursor.getBoundingClientRect();
+      var pos = ((curRect.left + curRect.width/2) - trackRect.left) / trackRect.width * 100;
+      cursor.classList.remove("running");
+      cursor.style.left = pos+"%";
+      var hit = pos >= site.zone[0] && pos <= site.zone[1];
+      var mid = (site.zone[0]+site.zone[1])/2;
+      var close = Math.abs(pos-mid) < (site.zone[1]-site.zone[0]);
+      var label;
+      if(hit) label = "Untung besar! Harga sangat baik.";
+      else if(close) label = "Lumayan \u2014 untung secukupnya.";
+      else label = "Kurang tepat \u2014 untung tipis kali ini.";
+      $("#bargain-result").textContent = label;
+      this.disabled = true;
+      var btn = this;
+      setTimeout(function(){ showArtifactCard(site, false); }, 700);
+    });
+  }
+
+  /* ---- Babak 3: harga ditetapkan sepihak ---- */
+  function openStamp(site){
+    var html =
+      '<div class="stamp-stage">'+
+        '<div class="era-tag voc">'+site.era+'</div>'+
+        '<h2 style="margin:0 0 6px;font-family:Georgia,serif;font-size:18px;">'+site.title+'</h2>'+
+        '<div class="stamp-sub">Kamu mendekati titik dagang ini\u2026 tapi tidak ada ruang untuk tawar-menawar lagi.</div>'+
+        '<div class="stamp-box" id="stampbox">HARGA DITETAPKAN VOC</div>'+
+        '<div class="stamp-sub" style="margin-top:10px;">Sistem <i>verplichte leverantie</i> mewajibkan penyerahan hasil bumi dengan harga yang sudah ditentukan sepihak \u2014 bukan hasil tawar-menawar.</div>'+
+        '<div class="modal-actions" style="justify-content:center;margin-top:16px;">'+
+          '<button class="btn" id="btn-continue-stamp">Lanjutkan</button>'+
+        '</div>'+
+      '</div>';
+    openModal(html);
+    setTimeout(function(){ $("#stampbox").classList.add("show"); }, 120);
+    $("#btn-continue-stamp").addEventListener("click", function(){
+      showArtifactCard(site, false);
+    });
+  }
+
+  function showArtifactCard(site, alreadyKnown){
+    var quizHtml = "";
+    if(!alreadyKnown){
+      quizHtml =
+        '<div class="quiz-q">'+site.quiz.q+'</div>'+
+        '<div id="quiz-opts">'+ site.quiz.opts.map(function(o,i){ return '<button class="quiz-opt" data-i="'+i+'">'+o+'</button>'; }).join("") +'</div>'+
+        '<div class="quiz-feedback" id="quiz-feedback"></div>'+
+        '<div class="modal-actions"><button class="btn secondary" id="btn-close-locked" style="display:none;">Tutup</button></div>';
+    } else {
+      quizHtml = '<div class="fact-box"><b>Sudah tercatat.</b> '+site.quiz.expl+'</div>'+
+        '<div class="modal-actions"><button class="btn" id="btn-close2">Tutup</button></div>';
+    }
+    var html =
+      '<div class="era-tag'+(site.babak===3?' voc':'')+'">'+site.era+'</div>'+
+      '<div class="artifact-header"><img src="'+site.img+'"><div><h2>'+site.title+'</h2></div></div>'+
+      '<p class="artifact-desc">'+site.desc+'</p>'+
+      '<div class="fact-box">'+site.fact+'</div>'+
+      quizHtml;
+    openModal(html);
+
+    if(!alreadyKnown){
+      var opts = document.querySelectorAll(".quiz-opt");
+      var answered = false;
+      opts.forEach(function(btn){
+        btn.addEventListener("click", function(){
+          if(answered) return;
+          answered = true;
+          var i = parseInt(btn.dataset.i,10);
+          opts.forEach(function(o,oi){
+            if(oi === site.quiz.correct) o.classList.add("correct");
+            else if(oi === i) o.classList.add("wrong");
+          });
+          var fb = $("#quiz-feedback");
+          fb.textContent = (i === site.quiz.correct ? "Tepat! " : "Belum tepat. ") + site.quiz.expl;
+          state.found[site.id] = true;
+          saveProgress();
+          refreshMarkers();
+          buildDock();
+          updateHUD();
+          var closeBtn = document.getElementById("btn-close-locked");
+          closeBtn.style.display = "inline-block";
+          closeBtn.addEventListener("click", function(){
+            closeModal();
+            if(foundCount() >= SITES.length){ setTimeout(showReport, 350); }
+          });
+        });
+      });
+    } else {
+      $("#btn-close2").addEventListener("click", closeModal);
+    }
+  }
+
+  function showReport(){
+    var list = $("#report-list");
+    list.innerHTML = "";
+    SITES.forEach(function(s){
+      var row = el("div","report-row");
+      row.innerHTML = '<img src="'+s.img+'"><div><div class="rn">'+s.title+'</div><div class="re">'+s.era+'</div></div>';
+      list.appendChild(row);
+    });
+    $("#report-sub").textContent = "Juragan Pasar \u2014 "+SITES.length+"/"+SITES.length+" transaksi tercatat";
+    $("#report-reflect").innerHTML = "<b>Refleksi:</b> Di Babak 1 dan 2 kamu masih bisa menawar harga sendiri. Begitu masuk Babak 3, tawar-menawar itu hilang \u2014 begitulah cara monopoli VOC bekerja: bukan lewat persaingan harga, tapi lewat kekuasaan sepihak menentukan harga dan jumlah produksi.";
+    showScreen("screen-report");
+  }
+
+  $("#btn-start").addEventListener("click", function(){
+    loadProgress();
+    showScreen("screen-map"); buildSite(); buildDock(); updateHUD();
+    tryPlayMusic();
+    if(foundCount() >= SITES.length){ setTimeout(showReport, 250); }
+  });
+  $("#btn-replay").addEventListener("click", function(){
+    state = { found:{} };
+    saveProgress();
+    showScreen("screen-map"); buildSite(); buildDock(); updateHUD();
+  });
+  function goToGuildHall(e){
+    if(e) e.preventDefault();
+    var qs = "pasar=" + foundCount() + "-" + SITES.length;
+    window.location.href = "../index.html?" + qs;
+  }
+  var backLink1 = document.getElementById("link-back-guild-1");
+  var backLink2 = document.getElementById("link-back-guild-2");
+  if(backLink1) backLink1.addEventListener("click", goToGuildHall);
+  if(backLink2) backLink2.addEventListener("click", goToGuildHall);
+
+  $("#modal-backdrop").addEventListener("click", function(e){
+    if(e.target === $("#modal-backdrop")) closeModal();
+  });
+
+})();
+</script>
+</body>
+</html>
