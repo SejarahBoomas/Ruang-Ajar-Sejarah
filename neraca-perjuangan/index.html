@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neraca Perjuangan — Game Klasifikasi Akun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EBE1C7;
+    --paper-2:#E1D4AF;
+    --ink:#23201A;
+    --navy:#1E3350;
+    --navy-2:#152538;
+    --red:#8B2E22;
+    --olive:#5F6F35;
+    --brass:#9C7A2E;
+    --line:#C7B98E;
+    --card:#F5EEDB;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 27px, #DED0A9 28px),
+      var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 16px 60px;
+  }
+  h1,h2,h3{font-family:"Fraunces", serif; margin:0;}
+  .wrap{width:100%; max-width:860px;}
+
+  /* ===== HEADER STRIP ===== */
+  .masthead{
+    text-align:center;
+    padding:18px 10px 22px;
+    border-bottom:3px double var(--navy);
+    margin-bottom:26px;
+  }
+  .masthead .eyebrow{
+    font-size:12.5px;
+    letter-spacing:.6px;
+    color:var(--brass);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .masthead h1{
+    font-size:clamp(28px,5vw,40px);
+    color:var(--navy);
+    font-weight:700;
+  }
+  .masthead .tagline{
+    font-style:italic;
+    color:#4b4737;
+    margin-top:6px;
+    font-size:15px;
+  }
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* ===== BUTTONS ===== */
+  .btn{
+    font-family:"IBM Plex Sans",sans-serif;
+    font-size:15px;
+    font-weight:600;
+    padding:12px 22px;
+    border-radius:3px;
+    border:2px solid var(--navy);
+    background:var(--navy);
+    color:var(--paper);
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .btn:hover{background:var(--navy-2);}
+  .btn:active{transform:scale(0.97);}
+  .btn.ghost{
+    background:transparent;
+    color:var(--navy);
+  }
+  .btn.ghost:hover{background:rgba(30,51,80,.08);}
+  .btn:disabled{opacity:.45; cursor:default;}
+
+  /* ===== START SCREEN ===== */
+  .intro-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:28px 26px;
+    box-shadow:0 1px 0 var(--line);
+  }
+  .intro-card p{line-height:1.65; font-size:15px; text-align:justify;}
+  .intro-card .role{
+    display:flex; gap:10px; align-items:baseline;
+    font-size:14px; color:#4b4737; margin:4px 0;
+  }
+  .intro-card .role b{color:var(--navy); min-width:118px; display:inline-block;}
+  .rules{
+    margin:18px 0; padding:14px 16px;
+    border-left:3px solid var(--brass);
+    background:rgba(156,122,46,.08);
+    font-size:14.5px;
+  }
+  .rules li{margin:5px 0;}
+  .start-row{text-align:center; margin-top:22px;}
+
+  /* ===== GAME SCREEN ===== */
+  .hud{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:13.5px; color:#4b4737; margin-bottom:12px;
+    font-family:"IBM Plex Mono", monospace;
+  }
+  .progress-track{
+    height:6px; background:var(--paper-2); border-radius:4px; overflow:hidden;
+    margin-bottom:22px; border:1px solid var(--line);
+  }
+  .progress-fill{
+    height:100%; background:var(--navy); width:0%;
+    transition:width .3s ease;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:26px 26px 22px;
+    position:relative;
+    min-height:190px;
+  }
+  .card .tag{
+    font-size:11.5px; letter-spacing:.5px; color:var(--brass); font-weight:600;
+    margin-bottom:10px;
+  }
+  .card h2{
+    font-size:22px; color:var(--navy); line-height:1.3; margin-bottom:10px;
+  }
+  .card .desc{font-size:14.5px; line-height:1.6; color:#3a3626; text-align:justify;}
+  .card .value{
+    margin-top:14px;
+    display:inline-block;
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:600;
+    font-size:15px;
+    color:var(--navy);
+    border:1px dashed var(--brass);
+    padding:5px 12px;
+    border-radius:3px;
+  }
+
+  .stamp{
+    position:absolute;
+    top:18px; right:22px;
+    font-family:"Fraunces", serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:1px;
+    padding:6px 12px;
+    border:3px solid currentColor;
+    border-radius:6px;
+    transform:rotate(-8deg);
+    opacity:0;
+    pointer-events:none;
+  }
+  .stamp.show{opacity:1; animation:stampIn .28s ease;}
+  .stamp.correct{color:var(--olive);}
+  .stamp.wrong{color:var(--red);}
+  @keyframes stampIn{
+    0%{opacity:0; transform:rotate(-8deg) scale(1.6);}
+    70%{opacity:1; transform:rotate(-8deg) scale(0.94);}
+    100%{opacity:1; transform:rotate(-8deg) scale(1);}
+  }
+
+  .options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:20px;
+  }
+  @media(max-width:560px){ .options{grid-template-columns:1fr;} }
+  .opt-btn{
+    font-family:"IBM Plex Sans",sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    text-align:left;
+    padding:12px 14px;
+    border-radius:3px;
+    border:1.5px solid var(--navy);
+    background:var(--paper);
+    color:var(--navy);
+    cursor:pointer;
+    transition:background .15s ease, transform .12s ease;
+  }
+  .opt-btn:hover:not(:disabled){background:#D9CC9F;}
+  .opt-btn:active:not(:disabled){transform:scale(0.98);}
+  .opt-btn:disabled{cursor:default;}
+  .opt-btn.picked-correct{background:var(--olive); border-color:var(--olive); color:#fff;}
+  .opt-btn.picked-wrong{background:var(--red); border-color:var(--red); color:#fff;}
+  .opt-btn.reveal-correct{border-color:var(--olive); box-shadow:inset 0 0 0 2px var(--olive);}
+
+  .explain{
+    display:none;
+    margin-top:18px;
+    padding:14px 16px;
+    background:rgba(30,51,80,.06);
+    border-left:3px solid var(--navy);
+    font-size:14px;
+    line-height:1.6;
+    text-align:justify;
+  }
+  .explain.show{display:block;}
+
+  .next-row{margin-top:18px; text-align:right;}
+
+  /* ===== LIVE NERACA (collapsible) ===== */
+  .neraca-toggle{
+    margin-top:26px;
+    text-align:center;
+  }
+  .mini-neraca{
+    margin-top:14px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:18px 20px;
+    display:none;
+  }
+  .mini-neraca.show{display:block;}
+  .mini-neraca h3{color:var(--navy); font-size:17px; margin-bottom:10px;}
+  table.ledger{width:100%; border-collapse:collapse; font-size:13.5px;}
+  table.ledger td{padding:5px 4px; border-bottom:1px solid var(--line);}
+  table.ledger td.num{
+    text-align:right; font-family:"IBM Plex Mono",monospace; font-weight:600;
+  }
+  table.ledger tr.grp td{
+    font-weight:700; color:var(--navy); padding-top:12px; border-bottom:none;
+  }
+  table.ledger tr.tot td{font-weight:700; border-top:1.5px solid var(--navy); border-bottom:none;}
+
+  /* ===== END SCREEN ===== */
+  .result-banner{
+    text-align:center; padding:22px 10px 26px;
+    border-bottom:3px double var(--navy);
+    margin-bottom:24px;
+  }
+  .result-banner .score-big{
+    font-family:"Fraunces",serif; font-size:46px; color:var(--navy); font-weight:700;
+  }
+  .result-banner .score-label{font-size:14px; color:#4b4737; margin-top:4px;}
+  .result-banner .title-tier{
+    margin-top:10px; font-size:18px; font-weight:600; color:var(--brass);
+  }
+
+  table.neraca{
+    width:100%; border-collapse:collapse; font-size:14.5px; margin-bottom:6px;
+  }
+  table.neraca th{
+    background:var(--navy); color:#fff; text-align:left; padding:9px 12px;
+  }
+  table.neraca th.right, table.neraca td.right{text-align:right;}
+  table.neraca td{padding:7px 12px; border-bottom:1px solid var(--line);}
+  table.neraca tr.section-aset td{background:#D9E1F2; font-weight:700;}
+  table.neraca tr.section-liab td{background:#F3E0D6; font-weight:700;}
+  table.neraca tr.section-ekuitas td{background:#E1EAD6; font-weight:700;}
+  table.neraca tr.sub td{background:#EFE7CF; font-weight:700; font-size:13.5px;}
+  table.neraca tr.subtotal td{background:#E4D9B5; font-weight:700;}
+  table.neraca tr.total td{background:var(--navy); color:#fff; font-weight:700; font-size:15px;}
+  table.neraca td.num, table.neraca th.num{font-family:"IBM Plex Mono",monospace;}
+  td.wrong-flag{color:var(--red); font-size:12px; font-style:italic;}
+
+  .der-box{
+    margin-top:20px; padding:16px 18px;
+    border:1px dashed var(--brass);
+    border-radius:4px;
+    font-size:14.5px; line-height:1.6;
+    background:rgba(156,122,46,.06);
+  }
+  .der-box b{color:var(--navy);}
+
+  .restart-row{text-align:center; margin-top:28px;}
+
+  footer.note{
+    margin-top:36px; font-size:12.5px; color:#6b6650; text-align:center;
+    font-style:italic; max-width:620px; line-height:1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="eyebrow">GAME EDUKASI SEJARAH × AKUNTANSI</div>
+    <h1>Neraca Perjuangan</h1>
+    <div class="tagline">Klasifikasikan arsip peristiwa pendudukan Jepang ke akun yang tepat</div>
+  </div>
+
+  <!-- ===================== SCREEN 1: INTRO ===================== -->
+  <div class="screen active" id="screen-intro">
+    <div class="intro-card">
+      <p>Kamu bertugas sebagai <b>akuntan arsip nasional</b>. Di hadapanmu ada 16 kartu arsip berisi peristiwa dan kondisi bangsa Indonesia pada masa pendudukan Jepang (1942–1945). Tugasmu: klasifikasikan setiap arsip ke dalam kelompok akun yang benar — <b>Aset Lancar</b>, <b>Aset Tidak Lancar</b>, <b>Liabilitas Jangka Pendek</b>, <b>Liabilitas Jangka Panjang</b>, atau <b>Ekuitas</b> — sampai tersusun sebuah Neraca Perjuangan yang lengkap dan seimbang.</p>
+      <div class="rules">
+        <ul>
+          <li>Setiap kartu berisi nama akun, nilai fiktif, dan cuplikan fakta sejarahnya.</li>
+          <li>Pilih satu dari lima kelompok akun yang menurutmu paling tepat.</li>
+          <li>Setelah menjawab, penjelasan sejarah akan muncul — baca sebelum lanjut ke kartu berikutnya.</li>
+          <li>Di akhir permainan, Neraca Perjuangan lengkap akan tersusun otomatis beserta skor dan analisis rasio keuanganmu.</li>
+        </ul>
+      </div>
+      <p style="font-size:13px; color:#6b6650; font-style:italic;">Seluruh nominal bersifat fiktif/simbolis — dipakai sebagai media belajar, bukan data historis sesungguhnya.</p>
+      <div class="start-row">
+        <button class="btn" onclick="startGame()">Mulai Bertugas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SCREEN 2: GAME ===================== -->
+  <div class="screen" id="screen-game">
+    <div class="hud">
+      <span id="hud-progress">Kartu 1 / 16</span>
+      <span id="hud-score">Skor: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <div class="card">
+      <div class="stamp" id="stamp">BENAR</div>
+      <div class="tag" id="card-tag">ARSIP AKUN</div>
+      <h2 id="card-title">—</h2>
+      <div class="desc" id="card-desc">—</div>
+      <div class="value" id="card-value">Rp 0,00</div>
+
+      <div class="options" id="options"></div>
+
+      <div class="explain" id="explain"></div>
+
+      <div class="next-row">
+        <button class="btn" id="btn-next" onclick="nextCard()" disabled>Lanjut →</button>
+      </div>
+    </div>
+
+    <div class="neraca-toggle">
+      <button class="btn ghost" onclick="toggleMini()">Lihat Neraca yang Sedang Tersusun</button>
+    </div>
+    <div class="mini-neraca" id="mini-neraca">
+      <h3>Neraca Perjuangan (Sementara)</h3>
+      <table class="ledger" id="ledger-table"></table>
+    </div>
+  </div>
+
+  <!-- ===================== SCREEN 3: RESULT ===================== -->
+  <div class="screen" id="screen-result">
+    <div class="result-banner">
+      <div class="score-big" id="final-score">0 / 16</div>
+      <div class="score-label">jawaban tepat saat klasifikasi pertama</div>
+      <div class="title-tier" id="tier-title"></div>
+    </div>
+
+    <h3 style="color:var(--navy); margin-bottom:10px;">Neraca Perjuangan Bangsa Indonesia — Per 17 Agustus 1945</h3>
+    <table class="neraca" id="final-neraca"></table>
+
+    <div class="der-box" id="der-box"></div>
+
+    <div class="restart-row">
+      <button class="btn" onclick="resetGame()">Main Lagi dari Awal</button>
+    </div>
+
+    <footer class="note">Catatan untuk Guru: skor "jawaban tepat" mencatat ketepatan klasifikasi siswa pada percobaan pertama; Neraca Perjuangan akhir selalu ditampilkan lengkap dan benar sebagai bahan pembelajaran, dengan tanda pada akun yang sempat salah diklasifikasikan.</footer>
+  </div>
+
+</div>
+
+<script>
+const CATS = {
+  al: "Aset Lancar",
+  atl: "Aset Tidak Lancar",
+  ljp: "Liabilitas Jangka Pendek",
+  ljpj: "Liabilitas Jangka Panjang",
+  ek: "Ekuitas"
+};
+
+const ITEMS = [
+  {id:1, cat:"al", title:"Kas Hasil Setoran Wajib Padi (Kumiai)", nilai:50000000,
+   desc:"Koperasi desa (Kumiai) mewajibkan petani menyetorkan hasil panen padi kepada pemerintah pendudukan untuk kebutuhan perang.",
+   explain:"Dicatat sebagai Aset Lancar karena berupa kas yang terkumpul dan dapat segera digunakan/dicairkan, meski asal-usulnya dari setoran wajib yang memberatkan rakyat dan memicu kelaparan (Hongerodeem) pada 1944–1945."},
+  {id:2, cat:"al", title:"Piutang Janji Kemerdekaan", nilai:25000000,
+   desc:"Perdana Menteri Koiso menjanjikan kemerdekaan \"kelak di kemudian hari\" pada 7 September 1944.",
+   explain:"Dicatat sebagai Piutang (Aset Lancar) karena merupakan hak/klaim atas sesuatu yang dijanjikan pihak lain, meskipun sifatnya politis dan belum sepenuhnya terealisasi."},
+  {id:3, cat:"al", title:"Perlengkapan Hasil Kerja Bakti (Kinrohoshi)", nilai:15000000,
+   desc:"Kinrohoshi adalah kerja bakti/kerja paksa ringan rakyat untuk membangun parit perlindungan dan mengumpulkan logistik perang.",
+   explain:"Termasuk Aset Lancar karena berupa perlengkapan/logistik yang langsung terpakai dalam waktu dekat, bukan aset jangka panjang."},
+  {id:4, cat:"atl", title:"Sumber Daya Alam Tereksploitasi", nilai:300000000,
+   desc:"Jepang mengambil alih dan mengeksploitasi minyak bumi, karet, dan timah Indonesia secara besar-besaran untuk industri perang (ekonomi Kyoeiken).",
+   explain:"Digolongkan Aset Tidak Lancar karena kekayaan alam merupakan sumber daya bernilai jangka panjang, bukan sesuatu yang habis dalam satu periode singkat."},
+  {id:5, cat:"atl", title:"Sumber Daya Manusia — Tenaga Romusha", nilai:200000000,
+   desc:"Ratusan ribu rakyat dikerahkan sebagai romusha untuk membangun jalan, rel kereta, dan lapangan terbang di berbagai wilayah, termasuk luar Jawa.",
+   explain:"Dicatat sebagai Aset Tidak Lancar karena tenaga kerja manusia yang dieksploitasi dipandang sebagai \"modal\" jangka panjang bagi kepentingan penjajah, dengan dampak yang bertahan lama."},
+  {id:6, cat:"atl", title:"Infrastruktur Militer", nilai:150000000,
+   desc:"Jalan raya, rel kereta api, dan lapangan terbang dibangun (sebagian oleh romusha) untuk kepentingan militer Jepang.",
+   explain:"Termasuk Aset Tidak Lancar karena infrastruktur fisik bersifat jangka panjang, meski manfaatnya semula ditujukan bagi penjajah, bukan rakyat."},
+  {id:7, cat:"atl", title:"Pelatihan Semi-Militer (PETA, Heiho, Seinendan)", nilai:100000000,
+   desc:"Jepang membentuk organisasi semi-militer PETA, Heiho, dan Seinendan untuk mendukung pertahanan mereka.",
+   explain:"Digolongkan Aset Tidak Lancar tak berwujud karena pengalaman dan keterampilan militer yang diperoleh bertahan lama dan kelak menjadi bekal perjuangan kemerdekaan."},
+  {id:8, cat:"atl", title:"Semangat Kebangsaan & Bahasa Persatuan", nilai:60000000,
+   desc:"Larangan bahasa Belanda dan dorongan penggunaan bahasa Indonesia di ruang publik tanpa sengaja mempercepat bahasa Indonesia sebagai bahasa persatuan.",
+   explain:"Termasuk Aset Tidak Lancar tak berwujud — nilai dan identitas kebangsaan yang terbentuk bersifat permanen dan terus digunakan hingga masa mendatang."},
+  {id:9, cat:"ljp", title:"Utang Setoran Wajib Padi kepada Rakyat", nilai:80000000,
+   desc:"Hasil panen yang disetorkan rakyat lewat sistem Kumiai sebagian besar tidak pernah dikembalikan secara layak.",
+   explain:"Dicatat sebagai Liabilitas Jangka Pendek karena merupakan kewajiban yang seharusnya diselesaikan/dikembalikan dalam waktu dekat, namun tidak dipenuhi."},
+  {id:10, cat:"ljp", title:"Utang Upah Romusha yang Belum Dibayar", nilai:120000000,
+   desc:"Para romusha dijanjikan upah dan perlakuan layak, namun banyak yang tidak menerima upah sepadan atas kerja paksa mereka.",
+   explain:"Termasuk Liabilitas Jangka Pendek karena upah kerja merupakan kewajiban yang semestinya dibayarkan segera setelah pekerjaan dilakukan."},
+  {id:11, cat:"ljp", title:"Utang atas Barang Sitaan", nilai:40000000,
+   desc:"Pemerintah pendudukan menyita ternak, logam, dan perhiasan milik rakyat untuk mendukung industri perang.",
+   explain:"Digolongkan Liabilitas Jangka Pendek karena barang sitaan merupakan kewajiban ganti-rugi yang bersifat segera, bukan kewajiban jangka panjang."},
+  {id:12, cat:"ljpj", title:"Utang Janji Kemerdekaan", nilai:100000000,
+   desc:"BPUPKI (29 April 1945) dan PPKI (7 Agustus 1945) dibentuk sebagai tindak lanjut janji Koiso, namun kemerdekaan resmi belum ditepati Jepang.",
+   explain:"Dicatat sebagai Liabilitas Jangka Panjang karena janji politik besar ini menyangkut proses panjang yang baru \"lunas\" ketika Indonesia memproklamasikan kemerdekaannya sendiri."},
+  {id:13, cat:"ljpj", title:"Utang Moral atas Penderitaan Rakyat", nilai:260000000,
+   desc:"Kelaparan akibat paceklik, kekerasan, kerja paksa, dan korban jiwa romusha yang jumlahnya tak pernah tercatat pasti.",
+   explain:"Termasuk Liabilitas Jangka Panjang karena beban moral dan trauma kolektif ini bersifat mendalam dan tidak dapat \"dilunasi\" dalam waktu singkat."},
+  {id:14, cat:"ek", title:"Modal Semangat Kebangsaan", nilai:150000000,
+   desc:"Tekanan dan penderitaan pada masa pendudukan justru memperkuat rasa senasib sepenanggungan rakyat Indonesia.",
+   explain:"Digolongkan Ekuitas karena merupakan \"modal\" milik bangsa sendiri — kekuatan internal yang tumbuh dari perjuangan, bukan pinjaman atau kewajiban kepada pihak lain."},
+  {id:15, cat:"ek", title:"Modal Organisasi Pergerakan", nilai:100000000,
+   desc:"BPUPKI, PPKI, dan gerakan Putera memberi ruang bagi tokoh nasional menyusun dasar negara dan mengonsolidasikan kekuatan.",
+   explain:"Termasuk Ekuitas karena organisasi pergerakan adalah modal kelembagaan milik bangsa yang dibangun dan dikendalikan sendiri oleh para pemimpin Indonesia."},
+  {id:16, cat:"ek", title:"Laba Ditahan — Pengalaman Organisasi & Militer", nilai:50000000,
+   desc:"Pengalaman berorganisasi dan berlatih militer selama pendudukan disimpan dan dipakai kembali sebagai bekal revolusi fisik 1945–1949.",
+   explain:"Dicatat sebagai Laba Ditahan (bagian Ekuitas) karena merupakan \"hasil\" dari proses sebelumnya yang tidak dibagikan/hilang, melainkan disimpan sebagai kekuatan cadangan bangsa."}
+];
+
+let order = [];
+let idx = 0;
+let score = 0;
+let answered = false;
+let results = []; // {id, correct}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function fmt(n){ return "Rp " + n.toLocaleString("id-ID") + ",00"; }
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function startGame(){
+  order = shuffle(ITEMS);
+  idx = 0; score = 0; results = [];
+  showScreen("screen-game");
+  renderCard();
+  updateMiniLedger();
+}
+
+function renderCard(){
+  answered = false;
+  const item = order[idx];
+  document.getElementById("hud-progress").textContent = `Kartu ${idx+1} / ${order.length}`;
+  document.getElementById("hud-score").textContent = `Skor: ${score}`;
+  document.getElementById("progress-fill").style.width = ((idx)/order.length*100) + "%";
+
+  document.getElementById("card-title").textContent = item.title;
+  document.getElementById("card-desc").textContent = item.desc;
+  document.getElementById("card-value").textContent = fmt(item.nilai);
+
+  const stamp = document.getElementById("stamp");
+  stamp.className = "stamp";
+  stamp.textContent = "";
+
+  const explain = document.getElementById("explain");
+  explain.classList.remove("show");
+  explain.textContent = "";
+
+  document.getElementById("btn-next").disabled = true;
+
+  const optWrap = document.getElementById("options");
+  optWrap.innerHTML = "";
+  Object.entries(CATS).forEach(([key,label])=>{
+    const b = document.createElement("button");
+    b.className = "opt-btn";
+    b.textContent = label;
+    b.onclick = () => chooseOption(key, b);
+    optWrap.appendChild(b);
+  });
+}
+
+function chooseOption(key, btnEl){
+  if(answered) return;
+  answered = true;
+  const item = order[idx];
+  const correct = key === item.cat;
+
+  document.querySelectorAll(".opt-btn").forEach(b=>b.disabled = true);
+
+  if(correct){
+    btnEl.classList.add("picked-correct");
+    score++;
+  } else {
+    btnEl.classList.add("picked-wrong");
+    document.querySelectorAll(".opt-btn").forEach(b=>{
+      if(b.textContent === CATS[item.cat]) b.classList.add("reveal-correct");
+    });
+  }
+
+  const stamp = document.getElementById("stamp");
+  stamp.classList.add(correct ? "correct" : "wrong", "show");
+  stamp.textContent = correct ? "TEPAT" : "KELIRU";
+
+  const explain = document.getElementById("explain");
+  explain.textContent = item.explain;
+  explain.classList.add("show");
+
+  document.getElementById("hud-score").textContent = `Skor: ${score}`;
+  document.getElementById("btn-next").disabled = false;
+
+  results.push({id:item.id, cat:item.cat, nilai:item.nilai, title:item.title, correct});
+  updateMiniLedger();
+}
+
+function nextCard(){
+  idx++;
+  if(idx >= order.length){
+    showResult();
+  } else {
+    renderCard();
+  }
+}
+
+function toggleMini(){
+  document.getElementById("mini-neraca").classList.toggle("show");
+}
+
+function groupedResults(){
+  const g = {al:[], atl:[], ljp:[], ljpj:[], ek:[]};
+  results.forEach(r => g[r.cat].push(r));
+  return g;
+}
+
+function updateMiniLedger(){
+  const g = groupedResults();
+  const sum = arr => arr.reduce((s,r)=>s+r.nilai,0);
+  const rows = [];
+  const grp = (label, arr) => {
+    rows.push(`<tr class="grp"><td colspan="2">${label}</td></tr>`);
+    arr.forEach(r=> rows.push(`<tr><td>${r.title}${r.correct?"":' <span style="color:var(--red)">*</span>'}</td><td class="num">${fmt(r.nilai)}</td></tr>`));
+  };
+  if(g.al.length) grp("Aset Lancar", g.al);
+  if(g.atl.length) grp("Aset Tidak Lancar", g.atl);
+  if(g.ljp.length) grp("Liabilitas Jangka Pendek", g.ljp);
+  if(g.ljpj.length) grp("Liabilitas Jangka Panjang", g.ljpj);
+  if(g.ek.length) grp("Ekuitas", g.ek);
+
+  const totalAset = sum(g.al)+sum(g.atl);
+  const totalLiab = sum(g.ljp)+sum(g.ljpj);
+  const totalEk = sum(g.ek);
+  rows.push(`<tr class="tot"><td>Total Aset</td><td class="num">${fmt(totalAset)}</td></tr>`);
+  rows.push(`<tr class="tot"><td>Total Liabilitas + Ekuitas</td><td class="num">${fmt(totalLiab+totalEk)}</td></tr>`);
+
+  document.getElementById("ledger-table").innerHTML = rows.join("");
+}
+
+function showResult(){
+  showScreen("screen-result");
+  document.getElementById("progress-fill").style.width = "100%";
+  document.getElementById("final-score").textContent = `${score} / ${order.length}`;
+
+  let tier = "";
+  const pct = score/order.length;
+  if(pct === 1) tier = "🏅 Akuntan Arsip Nasional Sejati — semua akun terklasifikasi sempurna!";
+  else if(pct >= 0.75) tier = "📗 Akuntan Arsip Terampil — pemahamanmu sudah kuat.";
+  else if(pct >= 0.5) tier = "📘 Akuntan Arsip Pemula — pelajari kembali CALK yang terlewat.";
+  else tier = "📙 Baru Mulai Bertugas — coba lagi sambil membaca penjelasan tiap kartu.";
+  document.getElementById("tier-title").textContent = tier;
+
+  const g = groupedResults();
+  const sum = arr => arr.reduce((s,r)=>s+r.nilai,0);
+  const rowLine = (r) => `<tr><td>${r.title}${r.correct?"":' <span class="wrong-flag">(sempat salah klasifikasi)</span>'}</td><td class="right num">${fmt(r.nilai)}</td></tr>`;
+
+  const totalAL = sum(g.al), totalATL = sum(g.atl);
+  const totalAset = totalAL+totalATL;
+  const totalLJP = sum(g.ljp), totalLJPJ = sum(g.ljpj);
+  const totalLiab = totalLJP+totalLJPJ;
+  const totalEk = sum(g.ek);
+
+  let html = `<tr><th>URAIAN AKUN</th><th class="right">JUMLAH</th></tr>`;
+  html += `<tr class="section-aset"><td colspan="2">ASET (AKTIVA)</td></tr>`;
+  html += `<tr class="sub"><td colspan="2">Aset Lancar</td></tr>`;
+  g.al.forEach(r=> html += rowLine(r));
+  html += `<tr class="subtotal"><td>Jumlah Aset Lancar</td><td class="right num">${fmt(totalAL)}</td></tr>`;
+  html += `<tr class="sub"><td colspan="2">Aset Tidak Lancar</td></tr>`;
+  g.atl.forEach(r=> html += rowLine(r));
+  html += `<tr class="subtotal"><td>Jumlah Aset Tidak Lancar</td><td class="right num">${fmt(totalATL)}</td></tr>`;
+  html += `<tr class="total"><td>TOTAL ASET</td><td class="right num">${fmt(totalAset)}</td></tr>`;
+
+  html += `<tr class="section-liab"><td colspan="2">LIABILITAS (KEWAJIBAN)</td></tr>`;
+  html += `<tr class="sub"><td colspan="2">Liabilitas Jangka Pendek</td></tr>`;
+  g.ljp.forEach(r=> html += rowLine(r));
+  html += `<tr class="subtotal"><td>Jumlah Liabilitas Jangka Pendek</td><td class="right num">${fmt(totalLJP)}</td></tr>`;
+  html += `<tr class="sub"><td colspan="2">Liabilitas Jangka Panjang</td></tr>`;
+  g.ljpj.forEach(r=> html += rowLine(r));
+  html += `<tr class="subtotal"><td>Jumlah Liabilitas Jangka Panjang</td><td class="right num">${fmt(totalLJPJ)}</td></tr>`;
+  html += `<tr class="subtotal"><td>Jumlah Liabilitas</td><td class="right num">${fmt(totalLiab)}</td></tr>`;
+
+  html += `<tr class="section-ekuitas"><td colspan="2">EKUITAS (MODAL PERJUANGAN)</td></tr>`;
+  g.ek.forEach(r=> html += rowLine(r));
+  html += `<tr class="subtotal"><td>Jumlah Ekuitas</td><td class="right num">${fmt(totalEk)}</td></tr>`;
+  html += `<tr class="total"><td>TOTAL LIABILITAS + EKUITAS</td><td class="right num">${fmt(totalLiab+totalEk)}</td></tr>`;
+
+  document.getElementById("final-neraca").innerHTML = html;
+
+  const der = totalEk > 0 ? (totalLiab/totalEk) : 0;
+  const balanced = totalAset === (totalLiab+totalEk);
+  document.getElementById("der-box").innerHTML =
+    `<b>Debt to Equity Ratio (DER)</b> = Total Liabilitas ÷ Total Ekuitas = ${fmt(totalLiab)} ÷ ${fmt(totalEk)} = <b>${der.toFixed(2)}</b><br>` +
+    `Status keseimbangan neraca: <b>${balanced ? "SEIMBANG ✓ (Total Aset = Total Liabilitas + Ekuitas)" : "Belum seimbang — coba klasifikasikan ulang."}</b><br>` +
+    `Semakin tinggi DER pada neraca ini, semakin besar "beban" penderitaan dan kewajiban yang ditanggung rakyat dibanding "modal perjuangan" yang tersedia saat itu — namun sejarah membuktikan modal tak berwujud (semangat dan organisasi) tetap cukup untuk melahirkan kemerdekaan.`;
+}
+
+function resetGame(){
+  showScreen("screen-intro");
+}
+</script>
+</body>
+</html>
