@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Benteng Nusantara — Misi 1: Siasat Raden Wijaya</title>
+<style>
+  :root{
+    --field1:#6b8f4e; --field2:#4a6b38; --field3:#33501f;
+    --dirt:#8a6a3f; --dirt-dark:#5c4526;
+    --parchment:#f1e6c9; --parchment-dark:#d8c592;
+    --ink:#2c2418; --gold:#c68a2e; --gold-dark:#8f5f1c;
+    --blood:#a33125; --blood-dark:#6e1f17;
+    --sky:#2b3a2e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;font-family:'Trebuchet MS','Segoe UI',sans-serif;color:var(--ink);overflow:hidden;-webkit-user-select:none;user-select:none;}
+  img{image-rendering:pixelated;image-rendering:crisp-edges;-webkit-user-drag:none;pointer-events:none;}
+  #app{position:relative;width:100vw;height:100vh;background:var(--sky);}
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .35s ease;}
+  .screen.active{opacity:1;pointer-events:auto;}
+
+  .btn{
+    font-family:inherit;font-weight:bold;font-size:15px;color:var(--parchment);
+    background:linear-gradient(180deg,var(--gold),var(--gold-dark));border:3px solid var(--dirt-dark);border-radius:8px;
+    padding:11px 24px;cursor:pointer;box-shadow:0 4px 0 #6b430f,0 8px 14px rgba(0,0,0,.35);transition:transform .08s ease;
+  }
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #6b430f;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn.secondary{background:linear-gradient(180deg,#8a8574,#6c6858);box-shadow:0 4px 0 #4a4638,0 8px 14px rgba(0,0,0,.3);}
+  .btn.danger{background:linear-gradient(180deg,var(--blood),var(--blood-dark));box-shadow:0 4px 0 #4a140f,0 8px 14px rgba(0,0,0,.3);}
+
+  /* ---------- START ---------- */
+  #screen-start{
+    background:radial-gradient(ellipse at 50% 20%,rgba(198,138,46,.18),transparent 60%),linear-gradient(180deg,#243a1c 0%,#182814 60%,#101c0d 100%);
+    text-align:center;padding:24px;
+  }
+  .title-badge{font-size:12.5px;letter-spacing:3px;color:var(--gold);margin-bottom:10px;font-weight:bold;}
+  #screen-start h1{font-size:clamp(24px,5.2vw,42px);margin:0 0 6px;color:var(--parchment);text-shadow:3px 3px 0 var(--dirt-dark);font-family:Georgia,serif;}
+  #screen-start .subtitle{color:var(--parchment-dark);font-size:clamp(13px,2.2vw,17px);max-width:520px;margin:0 0 20px;line-height:1.5;}
+  .carved-panel{background:linear-gradient(180deg,#e9dcb2,#d3c091);border:4px solid var(--dirt-dark);border-radius:10px;box-shadow:inset 0 0 0 2px #fff6dd,0 8px 0 var(--dirt-dark),0 14px 24px rgba(0,0,0,.4);padding:18px 22px;}
+  .brief-list{text-align:left;max-width:440px;margin:14px auto 0;font-size:12.5px;line-height:1.6;}
+  .brief-list b{color:var(--gold-dark);}
+
+  /* ---------- PROLOG ---------- */
+  #screen-prolog{background:linear-gradient(180deg,#1c2814,#101c0d);padding:20px;}
+  #prolog-card{width:min(520px,100%);background:linear-gradient(180deg,#f1e6c9,#d8c592);border:4px solid var(--dirt-dark);border-radius:12px;padding:24px;box-shadow:0 10px 24px rgba(0,0,0,.4);text-align:center;}
+  #prolog-card .era{display:inline-block;font-size:11px;font-weight:bold;background:var(--blood-dark);color:#fff;padding:3px 10px;border-radius:5px;margin-bottom:10px;letter-spacing:.5px;}
+  #prolog-card h2{margin:0 0 10px;font-family:Georgia,serif;font-size:19px;}
+  #prolog-card p{font-size:14px;line-height:1.65;margin:0 0 16px;}
+  #prolog-dots{display:flex;justify-content:center;gap:6px;margin-bottom:16px;}
+  #prolog-dots span{width:7px;height:7px;border-radius:50%;background:var(--parchment-dark);}
+  #prolog-dots span.on{background:var(--gold-dark);}
+  .prolog-actions{display:flex;justify-content:center;gap:10px;}
+
+  /* ---------- BATTLE ---------- */
+  #screen-battle{
+    background:#2b3a1f url("assets/image/battlefield_bg.jpg") center center/cover no-repeat;
+  }
+  #hud{position:absolute;top:0;left:0;right:0;display:flex;gap:8px;padding:9px 10px;z-index:30;background:linear-gradient(180deg,rgba(16,20,10,.85),rgba(16,20,10,0));pointer-events:none;flex-wrap:wrap;}
+  #hud>*{pointer-events:auto;}
+  .hud-chip{background:linear-gradient(180deg,#e9dcb2,#cdb885);border:3px solid var(--dirt-dark);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:bold;color:var(--ink);display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 var(--dirt-dark);}
+  #hp-track{width:80px;height:9px;background:#4c1a14;border-radius:5px;overflow:hidden;border:1px solid var(--dirt-dark);}
+  #hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#a33125,#e8895a);transition:width .25s ease;}
+  #wave-chip{margin-left:auto;}
+
+  #battlefield{position:relative;width:100%;height:100%;overflow:hidden;touch-action:none;}
+  .deco{position:absolute;pointer-events:none;filter:drop-shadow(0 4px 3px rgba(0,0,0,.3));}
+  #path-svg{position:absolute;inset:0;width:100%;height:100%;}
+  #path-svg polyline{fill:none;stroke:var(--dirt);stroke-width:26;stroke-linecap:round;stroke-linejoin:round;opacity:.9;}
+  #path-svg polyline.edge{stroke:var(--dirt-dark);stroke-width:33;opacity:.7;}
+
+  .buildspot{
+    position:absolute;width:46px;height:46px;transform:translate(-50%,-50%);
+    border-radius:50%;cursor:pointer;z-index:8;
+  }
+  .buildspot.filled{display:none;}
+
+  .tower{position:absolute;width:70px;height:130px;transform:translate(-50%,-88%) scale(.78);transform-origin:bottom center;z-index:9;pointer-events:none;filter:drop-shadow(0 5px 3px rgba(0,0,0,.4));overflow:hidden;}
+  .tower img{display:block;}
+
+  .enemy{position:absolute;width:48px;height:48px;transform:translate(-50%,-70%) scale(.92);z-index:10;pointer-events:none;overflow:visible;}
+  .enemy img{display:block;filter:drop-shadow(0 3px 2px rgba(0,0,0,.4));}
+  .enemy .ehp{position:absolute;top:-8px;left:4px;right:4px;height:5px;background:#3a1410;border-radius:3px;overflow:hidden;border:1px solid rgba(0,0,0,.4);}
+  .enemy .ehp-fill{height:100%;background:linear-gradient(90deg,#c1531f,#e89a4a);}
+
+  .hero{position:absolute;width:64px;height:64px;transform:translate(-50%,-72%) scale(.85);transform-origin:bottom center;z-index:12;filter:drop-shadow(0 4px 3px rgba(0,0,0,.5));overflow:visible;}
+  .hero .name-tag{
+    position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:2px;
+    background:rgba(20,16,10,.82);color:var(--parchment);font-size:11px;font-weight:bold;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;filter:none;
+  }
+  .hero img{display:block;}
+
+  .beam{position:absolute;height:3px;background:linear-gradient(90deg,rgba(255,230,150,.1),rgba(255,230,150,.95));transform-origin:0 50%;z-index:11;border-radius:2px;pointer-events:none;}
+  .swing-ring{position:absolute;width:90px;height:90px;border:3px solid rgba(255,230,150,.85);border-radius:50%;transform:translate(-50%,-50%) scale(.3);opacity:.9;pointer-events:none;z-index:11;animation:swing-out .28s ease-out forwards;}
+  @keyframes swing-out{to{transform:translate(-50%,-50%) scale(1);opacity:0;}}
+
+  .village-goal, .enemy-camp{position:absolute;transform:translate(-50%,-80%);z-index:6;pointer-events:none;filter:drop-shadow(0 6px 4px rgba(0,0,0,.35));}
+  .village-goal img{width:110px;} .enemy-camp img{width:70px;}
+  .goal-label,.camp-label{position:absolute;top:100%;left:50%;transform:translateX(-50%);font-size:10px;font-weight:bold;background:rgba(20,16,10,.8);color:var(--parchment);padding:2px 7px;border-radius:5px;white-space:nowrap;}
+
+  #dpad{position:absolute;left:14px;bottom:14px;z-index:35;width:126px;height:126px;display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px 42px;}
+  .dbtn{background:rgba(20,26,14,.55);border:2px solid rgba(241,230,201,.5);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#f1e6c9;font-size:17px;touch-action:none;}
+  .dbtn:active,.dbtn.pressed{background:rgba(198,138,46,.75);}
+  #dbtn-up{grid-column:2;grid-row:1;border-radius:8px 8px 4px 4px;}
+  #dbtn-down{grid-column:2;grid-row:3;border-radius:4px 4px 8px 8px;}
+  #dbtn-left{grid-column:1;grid-row:2;border-radius:8px 4px 4px 8px;}
+  #dbtn-right{grid-column:3;grid-row:2;border-radius:4px 8px 8px 4px;}
+
+  #wave-btn-wrap{position:absolute;right:14px;bottom:14px;z-index:35;text-align:right;}
+  #wave-btn-wrap .btn{font-size:13px;padding:10px 16px;}
+
+  .toast{position:absolute;left:50%;top:70px;transform:translateX(-50%) translateY(-14px);background:rgba(35,20,6,.92);color:#fff6e0;font-size:12.5px;font-weight:bold;padding:8px 15px;border-radius:8px;z-index:60;opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ---------- MODAL (fact/quiz) ---------- */
+  #modal-backdrop{position:absolute;inset:0;background:rgba(10,12,7,.72);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:70;padding:16px;}
+  #modal-backdrop.active{opacity:1;pointer-events:auto;}
+  #modal-card{width:min(460px,100%);max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#f4ead0,#e3d1a4);border:4px solid var(--dirt-dark);border-radius:12px;box-shadow:inset 0 0 0 2px #fff8e4,0 10px 0 var(--dirt-dark),0 18px 30px rgba(0,0,0,.5);padding:20px;transform:scale(.92);transition:transform .25s ease;}
+  #modal-backdrop.active #modal-card{transform:scale(1);}
+  .era-tag{display:inline-block;font-size:11px;font-weight:bold;background:var(--blood-dark);color:#fff;padding:3px 9px;border-radius:5px;margin-bottom:8px;}
+  #modal-card h2{margin:0 0 10px;font-family:Georgia,serif;font-size:18px;}
+  .fact-box{background:rgba(138,90,48,.14);border-left:4px solid var(--gold-dark);padding:9px 12px;font-size:13px;line-height:1.55;border-radius:0 6px 6px 0;margin-bottom:14px;}
+  .quiz-q{font-size:14px;font-weight:bold;margin-bottom:10px;line-height:1.4;}
+  .quiz-opt{display:block;width:100%;text-align:left;background:#fffaef;border:2px solid var(--parchment-dark);border-radius:7px;padding:10px 12px;margin-bottom:8px;font-family:inherit;font-size:13px;cursor:pointer;color:var(--ink);}
+  .quiz-opt:hover{border-color:var(--gold);}
+  .quiz-opt.correct{background:#dcefd0;border-color:#3f7d3a;}
+  .quiz-opt.wrong{background:#f4d9d3;border-color:var(--blood);}
+  .quiz-feedback{font-size:12.5px;margin:8px 0 4px;line-height:1.5;min-height:18px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+
+  /* ---------- RESULT ---------- */
+  #screen-result{background:linear-gradient(180deg,#1c2814,#101c0d);padding:20px;}
+  #result-card{width:min(460px,100%);background:linear-gradient(180deg,#f4ead0,#e3d1a4);border:4px solid var(--dirt-dark);border-radius:12px;padding:24px;text-align:center;box-shadow:0 10px 24px rgba(0,0,0,.45);}
+  #result-card h2{margin:0 0 6px;font-family:Georgia,serif;font-size:21px;}
+  .stars{font-size:32px;margin:8px 0;letter-spacing:4px;}
+  #result-sub{font-size:13px;color:#5a4a30;margin-bottom:16px;}
+  .result-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+
+  #audio-toggle{
+    position:absolute;top:10px;right:10px;z-index:40;
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(20,26,14,.6);border:2px solid rgba(241,230,201,.5);
+    display:flex;align-items:center;justify-content:center;
+    color:#f1e6c9;font-size:16px;cursor:pointer;
+  }
+
+  @media (max-width:560px){
+    .hero,.enemy{width:40px;height:40px;}
+    .tower{width:46px;height:86px;}
+    #dpad{left:10px;bottom:10px;width:112px;height:112px;grid-template-columns:37px 37px 37px;grid-template-rows:37px 37px 37px;}
+    .village-goal img{width:86px;} .enemy-camp img{width:56px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="audio-toggle">🔊</div>
+  <audio id="bgm" src="../assets/audio/bgm.mp3" loop preload="auto"></audio>
+  <audio id="sfx-click" src="../assets/audio/click.mp3" preload="auto"></audio>
+
+  <!-- START -->
+  <div class="screen active" id="screen-start">
+    <div class="title-badge">BENTENG NUSANTARA &middot; SEJARAH KELAS XI</div>
+    <h1>Misi 1: Siasat<br>Raden Wijaya</h1>
+    <p class="subtitle">Tahun 1293. Bertahanlah dari serangan balik pasukan Kediri sambil menyusun siasat besar yang kelak melahirkan Kerajaan Majapahit.</p>
+    <div class="carved-panel">
+      <button class="btn" id="btn-start">Mulai</button>
+      <div class="brief-list">
+        <div><b>Gerakkan</b> Raden Wijaya dengan panah/WASD atau pad arah, dekati musuh untuk menyerang.</div>
+        <div><b>Bangun menara</b> pemanah di titik bertanda lingkaran putus-putus (butuh emas).</div>
+        <div><b>Jangan biarkan</b> musuh mencapai perkemahan &mdash; HP perkemahan akan berkurang.</div>
+      </div>
+    </div>
+    <a href="../index.html" id="link-menu-start" style="display:inline-block;margin-top:16px;color:var(--parchment-dark);font-size:12.5px;text-decoration:underline;">&larr; Kembali ke Menu</a>
+  </div>
+
+  <!-- PROLOG -->
+  <div class="screen" id="screen-prolog">
+    <div id="prolog-card">
+      <div class="era" id="prolog-era">1292</div>
+      <h2 id="prolog-title"></h2>
+      <p id="prolog-text"></p>
+      <div id="prolog-dots"></div>
+      <div class="prolog-actions">
+        <button class="btn secondary" id="btn-prolog-back">&larr; Kembali</button>
+        <button class="btn" id="btn-prolog-next">Lanjut &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATTLE -->
+  <div class="screen" id="screen-battle">
+    <div id="hud">
+      <div class="hud-chip">💰 <span id="gold-label">150</span></div>
+      <div class="hud-chip">🏕 <div id="hp-track"><div id="hp-fill"></div></div></div>
+      <div class="hud-chip" id="wave-chip">Gelombang <span id="wave-label">0/3</span></div>
+    </div>
+    <div id="battlefield"></div>
+    <div id="dpad">
+      <div class="dbtn" id="dbtn-up">▲</div>
+      <div class="dbtn" id="dbtn-down">▼</div>
+      <div class="dbtn" id="dbtn-left">◀</div>
+      <div class="dbtn" id="dbtn-right">▶</div>
+    </div>
+    <div id="wave-btn-wrap"><button class="btn" id="btn-wave">⚔ Mulai Gelombang</button></div>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result">
+    <div id="result-card">
+      <h2 id="result-title">Kemenangan!</h2>
+      <div class="stars" id="result-stars">★★★</div>
+      <div id="result-sub"></div>
+      <div class="result-actions">
+        <button class="btn secondary" id="btn-retry">Ulangi Misi</button>
+        <button class="btn" id="btn-next-mission" style="display:none;">Lanjut ke Misi 2 &rarr;</button>
+        <button class="btn secondary" id="btn-to-start">Kembali ke Awal</button>
+      </div>
+      <a href="../index.html" id="link-menu-result" style="display:inline-block;margin-top:14px;color:#5a4a30;font-size:12px;text-decoration:underline;">&larr; Kembali ke Menu</a>
+    </div>
+  </div>
+
+  <div id="modal-backdrop"><div id="modal-card"></div></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var IMG = "assets/image/";
+  function $(sel){ return document.querySelector(sel); }
+
+  /* ---------- audio: bgm + click sfx ---------- */
+  var MUTE_KEY = "bentengNusantara_audio_muted";
+  var bgm = document.getElementById("bgm");
+  var sfxClick = document.getElementById("sfx-click");
+  var isMuted = false;
+  try{ isMuted = localStorage.getItem(MUTE_KEY) === "1"; }catch(e){}
+  function applyMuteState(){
+    if(bgm) bgm.muted = isMuted;
+    var t = document.getElementById("audio-toggle");
+    if(t) t.textContent = isMuted ? "🔇" : "🔊";
+  }
+  applyMuteState();
+  var audioToggleEl = document.getElementById("audio-toggle");
+  if(audioToggleEl){
+    audioToggleEl.addEventListener("click", function(e){
+      e.stopPropagation();
+      isMuted = !isMuted;
+      try{ localStorage.setItem(MUTE_KEY, isMuted ? "1" : "0"); }catch(e2){}
+      applyMuteState();
+    });
+  }
+  function tryPlayMusic(){
+    if(!bgm) return;
+    try{
+      bgm.volume = 0.4;
+      var p = bgm.play();
+      if(p && p.catch) p.catch(function(){});
+    }catch(e){}
+  }
+  function playClick(){
+    if(!sfxClick || isMuted) return;
+    try{
+      var c = sfxClick.cloneNode(true);
+      c.volume = 0.6;
+      c.play().catch(function(){});
+    }catch(e){}
+  }
+  document.addEventListener("click", function(e){
+    if(e.target.closest("#audio-toggle")) return;
+    if(e.target.closest("button, .buildspot, .dbtn, a")) playClick();
+  }, true);
+  document.addEventListener("click", function(){ tryPlayMusic(); }, {once:true});
+  function el(tag,cls){ var e=document.createElement(tag); if(cls) e.className=cls; return e; }
+  function showScreen(id){
+    document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); });
+    $("#"+id).classList.add("active");
+  }
+  function showToast(msg){
+    var t = $("#toast"); t.textContent = msg; t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1600);
+  }
+
+  /* ================= PROLOG ================= */
+  var PROLOG = [
+    {era:"1292", title:"Pemberontakan Jayakatwang", text:"Adipati Jayakatwang dari Kediri, bawahan Singhasari, memberontak dan menyerbu ibu kota saat sebagian besar pasukan Singhasari sedang dikirim jauh dalam Ekspedisi Pamalayu."},
+    {era:"1292", title:"Gugurnya Kertanagara", text:"Istana Singhasari jatuh dan Raja Kertanagara gugur. Menantunya, Raden Wijaya, berhasil meloloskan diri bersama sisa pengikutnya yang setia."},
+    {era:"1293", title:"Siasat Bertahan Hidup", text:"Alih-alih melawan langsung dengan pasukan yang jauh lebih kecil, Raden Wijaya berpura-pura tunduk kepada Jayakatwang dan meminta izin membuka lahan di Hutan Tarik \u2014 cikal bakal Majapahit."},
+    {era:"1293", title:"Kabar dari Lautan", text:"Tak lama kemudian, kabar datang: armada besar Kekaisaran Mongol berlayar ke Jawa untuk menghukum Kertanagara \u2014 tanpa tahu ia telah tiada. Namun sebelum siasat besar itu berjalan, Jayakatwang mengirim pasukan untuk membungkam perkemahan Raden Wijaya lebih dulu."}
+  ];
+  var prologIdx = 0;
+  function renderProlog(){
+    var p = PROLOG[prologIdx];
+    $("#prolog-era").textContent = p.era;
+    $("#prolog-title").textContent = p.title;
+    $("#prolog-text").textContent = p.text;
+    var dots = $("#prolog-dots"); dots.innerHTML = "";
+    PROLOG.forEach(function(_,i){
+      var d = document.createElement("span");
+      if(i===prologIdx) d.className = "on";
+      dots.appendChild(d);
+    });
+    $("#btn-prolog-back").style.visibility = prologIdx===0 ? "hidden" : "visible";
+    $("#btn-prolog-next").textContent = prologIdx===PROLOG.length-1 ? "Ke Medan Perang \u2694" : "Lanjut \u2192";
+  }
+  $("#btn-prolog-next").addEventListener("click", function(){
+    if(prologIdx < PROLOG.length-1){ prologIdx++; renderProlog(); }
+    else { showScreen("screen-battle"); initBattle(); }
+  });
+  $("#btn-prolog-back").addEventListener("click", function(){
+    if(prologIdx>0){ prologIdx--; renderProlog(); }
+  });
+  $("#btn-start").addEventListener("click", function(){
+    tryPlayMusic();
+    prologIdx = 0; renderProlog(); showScreen("screen-prolog");
+  });
+
+  /* ================= BATTLE CONFIG ================= */
+  var WAYPOINTS = [
+    {x:3,y:55},{x:24,y:55},{x:24,y:80},{x:52,y:80},
+    {x:52,y:30},{x:76,y:30},{x:76,y:58},{x:92,y:58}
+  ];
+  var BUILD_SPOTS = [
+    {id:"b1", x:24, y:32}, {id:"b2", x:40, y:80},
+    {id:"b3", x:64, y:58}, {id:"b4", x:76, y:14}
+  ];
+  var WAVES = [
+    {count:5, hp:30, speed:52, dmg:10, gap:900},
+    {count:7, hp:42, speed:58, dmg:10, gap:780},
+    {count:9, hp:55, speed:64, dmg:12, gap:680}
+  ];
+  var TOWER_COST=60, TOWER_RANGE=130, TOWER_DMG=14, TOWER_CD=700;
+  var HERO_RANGE=52, HERO_DMG=20, HERO_CD=520, HERO_SPEED=115;
+  var KILL_REWARD=15;
+
+  var battle = null; // reset each run
+
+  function initBattle(){
+    battle = {
+      gold:150, villageHP:100, villageMaxHP:100,
+      waveIndex:0, waveActive:false, enemiesAlive:0, spawning:false,
+      towers:[], enemies:[], enemySeq:1,
+      hero:{xFrac:14, yFrac:55, dir:0, frame:0, animAcc:0, moving:false,
+            attacking:false, attackAcc:0, attackCd:0},
+      keys:{up:false,down:false,left:false,right:false},
+      lastTime:null, rafId:null
+    };
+    var bf = $("#battlefield");
+    bf.innerHTML = "";
+
+    var camp = el("div","enemy-camp");
+    camp.style.left=WAYPOINTS[0].x+"%"; camp.style.top=WAYPOINTS[0].y+"%";
+    camp.innerHTML = '<div class="camp-label">Kediri</div>';
+    bf.appendChild(camp);
+
+    var lastWp = WAYPOINTS[WAYPOINTS.length-1];
+    var goal = el("div","village-goal");
+    goal.style.left=lastWp.x+"%"; goal.style.top=lastWp.y+"%";
+    goal.innerHTML = '<div class="goal-label">Perkemahan</div>';
+    bf.appendChild(goal);
+
+    BUILD_SPOTS.forEach(function(s){
+      var d = el("div","buildspot");
+      d.dataset.id = s.id;
+      d.style.left = s.x+"%"; d.style.top = s.y+"%";
+      d.addEventListener("click", function(){ placeTower(s, d); });
+      bf.appendChild(d);
+    });
+
+    var heroEl = el("div","hero"); heroEl.id="hero-el";
+    heroEl.innerHTML = '<div class="name-tag">Wijaya</div><img id="hero-img" src="'+IMG+'hero_idle.png">';
+    bf.appendChild(heroEl);
+
+    updateHUD();
+    renderHero();
+    if(battle.rafId) cancelAnimationFrame(battle.rafId);
+    battle.lastTime = null;
+    battle.rafId = requestAnimationFrame(tick);
+  }
+
+  function updateHUD(){
+    $("#gold-label").textContent = battle.gold;
+    $("#hp-fill").style.width = Math.max(0,(battle.villageHP/battle.villageMaxHP*100))+"%";
+    $("#wave-label").textContent = Math.min(battle.waveIndex,WAVES.length)+"/"+WAVES.length;
+  }
+
+  function placeTower(spot, spotEl){
+    if(spotEl.classList.contains("filled")) return;
+    if(battle.gold < TOWER_COST){ showToast("Emas tidak cukup (butuh "+TOWER_COST+")"); return; }
+    battle.gold -= TOWER_COST; updateHUD();
+    spotEl.classList.add("filled");
+    var t = el("div","tower");
+    t.style.left = spot.x+"%"; t.style.top = spot.y+"%";
+    t.innerHTML = '<img id="tw-'+spot.id+'" src="'+IMG+'tower_idle.png">';
+    $("#battlefield").appendChild(t);
+    var twImg = t.querySelector("img");
+    twImg.style.objectFit="none"; twImg.style.width="70px"; twImg.style.height="130px"; twImg.style.objectPosition="0px 0px";
+    battle.towers.push({id:spot.id, x:spot.x, y:spot.y, el:t, imgEl:twImg,
+      cd:0, animAcc:0, frame:0});
+  }
+
+  /* ---------- wave / enemy spawning ---------- */
+  $("#btn-wave").addEventListener("click", function(){
+    if(battle.waveActive || battle.waveIndex >= WAVES.length) return;
+    startWave();
+  });
+
+  function startWave(){
+    var w = WAVES[battle.waveIndex];
+    battle.waveActive = true; battle.spawning = true;
+    $("#btn-wave").disabled = true;
+    $("#btn-wave").textContent = "Gelombang berjalan\u2026";
+    var spawned = 0;
+    var timer = setInterval(function(){
+      spawnEnemy(w);
+      spawned++;
+      if(spawned >= w.count){ clearInterval(timer); battle.spawning = false; }
+    }, w.gap);
+  }
+
+  function spawnEnemy(w){
+    var e = {
+      id: battle.enemySeq++, wpIndex:0, x:WAYPOINTS[0].x, y:WAYPOINTS[0].y,
+      hp:w.hp, maxHp:w.hp, speed:w.speed, dmg:w.dmg,
+      el:null, imgEl:null, hpFillEl:null, dir:"s", flip:false, animAcc:0, frame:0
+    };
+    var d = el("div","enemy");
+    d.style.left = e.x+"%"; d.style.top = e.y+"%";
+    d.innerHTML = '<div class="ehp"><div class="ehp-fill" style="width:100%"></div></div><img src="'+IMG+'enemy_walk_s.png">';
+    $("#battlefield").appendChild(d);
+    e.el = d; e.imgEl = d.querySelector("img"); e.hpFillEl = d.querySelector(".ehp-fill");
+    battle.enemies.push(e);
+    battle.enemiesAlive++;
+  }
+
+  function waveClearedCheck(){
+    if(battle.waveActive && !battle.spawning && battle.enemiesAlive<=0){
+      battle.waveActive = false;
+      battle.waveIndex++;
+      updateHUD();
+      if(battle.waveIndex >= WAVES.length){
+        endBattle(true);
+      } else {
+        $("#btn-wave").disabled = false;
+        $("#btn-wave").textContent = "⚔ Mulai Gelombang "+(battle.waveIndex+1);
+        battle.gold += 25; updateHUD();
+        showToast("Gelombang berhasil dihalau! +25 emas");
+      }
+    }
+  }
+
+  /* ---------- input ---------- */
+  var KEY_MAP = {"ArrowUp":"up","w":"up","W":"up","ArrowDown":"down","s":"down","S":"down",
+    "ArrowLeft":"left","a":"left","A":"left","ArrowRight":"right","d":"right","D":"right"};
+  window.addEventListener("keydown", function(e){
+    if(!battle) return;
+    var k = KEY_MAP[e.key];
+    if(k){ battle.keys[k]=true; e.preventDefault(); }
+  });
+  window.addEventListener("keyup", function(e){
+    if(!battle) return;
+    var k = KEY_MAP[e.key];
+    if(k){ battle.keys[k]=false; e.preventDefault(); }
+  });
+  function bindDpad(id,key){
+    var b = document.getElementById(id);
+    function on(e){ e.preventDefault(); if(battle) battle.keys[key]=true; b.classList.add("pressed"); }
+    function off(){ if(battle) battle.keys[key]=false; b.classList.remove("pressed"); }
+    b.addEventListener("pointerdown", on);
+    b.addEventListener("pointerup", off);
+    b.addEventListener("pointerleave", off);
+    b.addEventListener("pointercancel", off);
+  }
+  bindDpad("dbtn-up","up"); bindDpad("dbtn-down","down");
+  bindDpad("dbtn-left","left"); bindDpad("dbtn-right","right");
+
+  /* ---------- render helpers ---------- */
+  function renderHero(){
+    var h = battle.hero;
+    var hEl = $("#hero-el");
+    if(!hEl) return;
+    hEl.style.left = h.xFrac+"%"; hEl.style.top = h.yFrac+"%";
+    var img = $("#hero-img");
+    var fw = 64;
+    if(h.attacking){
+      img.src = IMG+"hero_attack.png";
+      img.style.backgroundPosition = "";
+      img.style.objectPosition = (-h.frame*fw)+"px "+(-h.dir*fw)+"px";
+    } else if(h.moving){
+      img.src = IMG+"hero_walk.png";
+      img.style.objectPosition = (-h.frame*fw)+"px "+(-h.dir*fw)+"px";
+    } else {
+      img.src = IMG+"hero_idle.png";
+      img.style.objectPosition = "0px "+(-h.dir*fw)+"px";
+    }
+    img.style.objectFit = "none";
+    img.style.width = fw+"px"; img.style.height = fw+"px";
+  }
+
+  function renderEnemy(e){
+    e.el.style.left = e.x+"%"; e.el.style.top = e.y+"%";
+    e.hpFillEl.style.width = Math.max(0,(e.hp/e.maxHp*100))+"%";
+    var src = IMG+"enemy_walk_"+e.dir+".png";
+    if(e.imgEl.getAttribute("data-dir") !== e.dir){
+      e.imgEl.src = src; e.imgEl.setAttribute("data-dir", e.dir);
+    }
+    var fw = 48;
+    e.imgEl.style.width = fw+"px"; e.imgEl.style.height = fw+"px";
+    e.imgEl.style.objectFit = "none";
+    e.imgEl.style.objectPosition = (-e.frame*fw)+"px 0px";
+    e.imgEl.style.transform = e.flip ? "scaleX(-1)" : "scaleX(1)";
+  }
+
+  function spawnBeam(x1,y1,x2,y2){
+    var bf = $("#battlefield"); var r = bf.getBoundingClientRect();
+    var dx = x2-x1, dy = y2-y1;
+    var len = Math.hypot(dx,dy);
+    var ang = Math.atan2(dy,dx) * 180/Math.PI;
+    var b = el("div","beam");
+    b.style.left = (x1-r.left)+"px"; b.style.top = (y1-r.top)+"px";
+    b.style.width = len+"px";
+    b.style.transform = "rotate("+ang+"deg)";
+    bf.appendChild(b);
+    setTimeout(function(){ b.remove(); }, 140);
+  }
+  function spawnSwing(x,y){
+    var bf = $("#battlefield"); var r = bf.getBoundingClientRect();
+    var s = el("div","swing-ring");
+    s.style.left=(x-r.left)+"px"; s.style.top=(y-r.top)+"px";
+    bf.appendChild(s);
+    setTimeout(function(){ s.remove(); }, 300);
+  }
+
+  /* ---------- main loop ---------- */
+  function tick(t){
+    if(!battle) return;
+    if(battle.lastTime===null) battle.lastTime = t;
+    var dt = Math.min(48, t-battle.lastTime)/1000;
+    battle.lastTime = t;
+
+    if(!modalActive()){
+      updateHero(dt);
+      updateEnemies(dt);
+      updateTowers(dt);
+      waveClearedCheck();
+    }
+    battle.rafId = requestAnimationFrame(tick);
+  }
+
+  function modalActive(){ return $("#modal-backdrop").classList.contains("active"); }
+
+  function updateHero(dt){
+    var h = battle.hero;
+    var bf = $("#battlefield"); var w = bf.clientWidth, hgt = bf.clientHeight;
+
+    if(h.attackCd>0) h.attackCd -= dt*1000;
+
+    if(h.attacking){
+      h.attackAcc += dt;
+      if(h.attackAcc > 0.05){ h.attackAcc=0; h.frame++; if(h.frame>=8){ h.attacking=false; h.frame=0; } }
+    } else {
+      var dx=(battle.keys.right?1:0)-(battle.keys.left?1:0);
+      var dy=(battle.keys.down?1:0)-(battle.keys.up?1:0);
+      var moving = dx!==0||dy!==0;
+      if(moving){
+        var len=Math.sqrt(dx*dx+dy*dy); dx/=len; dy/=len;
+        h.xFrac += (dx*HERO_SPEED*dt/w)*100;
+        h.yFrac += (dy*HERO_SPEED*dt/hgt)*100;
+        h.xFrac = Math.max(3, Math.min(97, h.xFrac));
+        h.yFrac = Math.max(8, Math.min(93, h.yFrac));
+        if(Math.abs(dx)>Math.abs(dy)) h.dir = dx>0?2:1; else h.dir = dy>0?0:3;
+        h.animAcc += dt;
+        if(h.animAcc>0.11){ h.animAcc=0; h.frame=(h.frame+1)%6; }
+      } else { h.frame=0; h.animAcc=0; }
+      h.moving = moving;
+
+      // auto-attack nearest enemy in range
+      if(h.attackCd<=0){
+        var bfRect = bf.getBoundingClientRect();
+        var hx = bfRect.left + (h.xFrac/100)*bfRect.width;
+        var hy = bfRect.top + (h.yFrac/100)*bfRect.height;
+        var nearest=null, nearestD=1e9;
+        battle.enemies.forEach(function(e){
+          var er = e.el.getBoundingClientRect();
+          var ex=er.left+er.width/2, ey=er.top+er.height/2;
+          var d=Math.hypot(hx-ex,hy-ey);
+          if(d<HERO_RANGE && d<nearestD){ nearest=e; nearestD=d; }
+        });
+        if(nearest){
+          damageEnemy(nearest, HERO_DMG);
+          h.attacking=true; h.frame=0; h.attackAcc=0; h.attackCd=HERO_CD;
+          spawnSwing(hx,hy);
+        }
+      }
+    }
+    renderHero();
+  }
+
+  function updateEnemies(dt){
+    var bf = $("#battlefield"); var w = bf.clientWidth, hgt = bf.clientHeight;
+    for(var i=battle.enemies.length-1;i>=0;i--){
+      var e = battle.enemies[i];
+      var target = WAYPOINTS[e.wpIndex+1];
+      if(!target){
+        // reached goal
+        battle.villageHP -= e.dmg;
+        updateHUD();
+        removeEnemy(i);
+        if(battle.villageHP<=0){ endBattle(false); }
+        continue;
+      }
+      var dxp = target.x - e.x, dyp = target.y - e.y;
+      var distPct = Math.hypot(dxp,dyp);
+      var stepXpct = (e.speed*dt/w)*100;
+      var stepYpct = (e.speed*dt/hgt)*100;
+      var stepPct = Math.hypot(stepXpct,stepYpct);
+      if(distPct < Math.max(stepPct,0.3)){
+        e.x = target.x; e.y = target.y; e.wpIndex++;
+      } else {
+        var ux = dxp/distPct, uy = dyp/distPct;
+        e.x += ux*stepPct; e.y += uy*stepPct;
+      }
+      if(Math.abs(dyp) > Math.abs(dxp)*1.15){ e.dir = dyp>0 ? "d":"u"; e.flip=false; }
+      else { e.dir="s"; e.flip = dxp<0; }
+      e.animAcc += dt;
+      if(e.animAcc>0.13){ e.animAcc=0; e.frame=(e.frame+1)%6; }
+      renderEnemy(e);
+    }
+  }
+
+  function damageEnemy(e, dmg){
+    e.hp -= dmg;
+    if(e.hp<=0){
+      var idx = battle.enemies.indexOf(e);
+      if(idx>=0){
+        battle.gold += KILL_REWARD; updateHUD();
+        removeEnemy(idx);
+      }
+    }
+  }
+  function removeEnemy(idx){
+    var e = battle.enemies[idx];
+    if(e && e.el) e.el.remove();
+    battle.enemies.splice(idx,1);
+    battle.enemiesAlive = battle.enemies.length;
+  }
+
+  function updateTowers(dt){
+    var bf = $("#battlefield"); var rect = bf.getBoundingClientRect();
+    battle.towers.forEach(function(tw){
+      tw.animAcc += dt;
+      if(tw.animAcc>0.15){ tw.animAcc=0; tw.frame=(tw.frame+1)%6;
+        tw.imgEl.style.objectFit="none"; tw.imgEl.style.width="70px"; tw.imgEl.style.height="130px";
+        tw.imgEl.style.objectPosition = (-tw.frame*70)+"px 0px";
+      }
+      if(tw.cd>0){ tw.cd -= dt*1000; return; }
+      var tx = rect.left + (tw.x/100)*rect.width;
+      var ty = rect.top + (tw.y/100)*rect.height;
+      var nearest=null, nearestD=1e9;
+      battle.enemies.forEach(function(e){
+        var er = e.el.getBoundingClientRect();
+        var ex=er.left+er.width/2, ey=er.top+er.height/2;
+        var d=Math.hypot(tx-ex,ty-ey);
+        if(d<TOWER_RANGE && d<nearestD){ nearest=e; nearestD=d; }
+      });
+      if(nearest){
+        var er = nearest.el.getBoundingClientRect();
+        spawnBeam(tx,ty, er.left+er.width/2, er.top+er.height/2);
+        damageEnemy(nearest, TOWER_DMG);
+        tw.cd = TOWER_CD;
+      }
+    });
+  }
+
+  /* ---------- end of battle ---------- */
+  function endBattle(won){
+    if(battle.rafId) cancelAnimationFrame(battle.rafId);
+    if(won){
+      openFactQuiz();
+    } else {
+      showResult(false);
+    }
+  }
+
+  function openFactQuiz(){
+    var html =
+      '<div class="era-tag">1293</div>'+
+      '<h2>Siasat yang Berhasil</h2>'+
+      '<div class="fact-box">Raden Wijaya menggunakan siasat adu domba: berpura-pura tunduk kepada Jayakatwang, lalu memanfaatkan kedatangan pasukan Mongol yang hendak menghukum Kertanagara untuk bersama-sama menyerang Kediri.</div>'+
+      '<div class="quiz-q">Mengapa Raden Wijaya awalnya memilih tunduk kepada Jayakatwang alih-alih melawan langsung?</div>'+
+      '<div id="quiz-opts">'+
+        '<button class="quiz-opt" data-i="0">Karena pasukannya saat itu jauh lebih kecil dan ia butuh waktu menyusun kekuatan</button>'+
+        '<button class="quiz-opt" data-i="1">Karena ia sebenarnya setuju dengan pemberontakan Jayakatwang</button>'+
+        '<button class="quiz-opt" data-i="2">Karena diperintahkan langsung oleh penguasa Mongol</button>'+
+      '</div>'+
+      '<div class="quiz-feedback" id="quiz-feedback"></div>'+
+      '<div class="modal-actions"><button class="btn" id="btn-quiz-close" style="display:none;">Lanjutkan</button></div>';
+    $("#modal-card").innerHTML = html;
+    $("#modal-backdrop").classList.add("active");
+    var opts = document.querySelectorAll(".quiz-opt");
+    var answered=false;
+    opts.forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(answered) return; answered=true;
+        var i = parseInt(btn.dataset.i,10);
+        opts.forEach(function(o,oi){
+          if(oi===0) o.classList.add("correct");
+          else if(oi===i) o.classList.add("wrong");
+        });
+        var fb = $("#quiz-feedback");
+        fb.textContent = (i===0 ? "Tepat! " : "Belum tepat. ") +
+          "Dengan pasukan yang jauh lebih kecil, tunduk sementara adalah siasat bertahan hidup sambil menyusun kekuatan dan mencari sekutu, sebelum akhirnya berbalik menyerang.";
+        $("#btn-quiz-close").style.display = "inline-block";
+      });
+    });
+    $("#btn-quiz-close").addEventListener("click", function(){
+      $("#modal-backdrop").classList.remove("active");
+      showResult(true);
+    });
+  }
+
+  function showResult(won){
+    var hpFrac = battle.villageHP/battle.villageMaxHP;
+    var stars = won ? (hpFrac>=0.7?3:hpFrac>=0.4?2:1) : 0;
+    $("#result-title").textContent = won ? "Kediri Berhasil Dihalau!" : "Perkemahan Jatuh\u2026";
+    $("#result-stars").textContent = won ? "★".repeat(stars)+"☆".repeat(3-stars) : "☆☆☆";
+    $("#result-sub").textContent = won ?
+      "Sisa HP perkemahan: "+Math.max(0,Math.round(battle.villageHP))+"/"+battle.villageMaxHP+". Siasat Raden Wijaya membuahkan hasil \u2014 jalan menuju Majapahit terbuka." :
+      "Perkemahan Raden Wijaya jatuh sebelum sempat menyusun siasat. Coba atur ulang posisi menara dan gerakanmu.";
+    if(won){
+      try{ localStorage.setItem("bentengNusantara_misi1_won", "1"); }catch(e){}
+    }
+    $("#btn-next-mission").style.display = won ? "inline-block" : "none";
+    showScreen("screen-result");
+  }
+
+  $("#btn-next-mission").addEventListener("click", function(){
+    window.location.href = "../misi2/index.html";
+  });
+
+  $("#btn-retry").addEventListener("click", function(){
+    showScreen("screen-battle"); initBattle();
+  });
+  $("#btn-to-start").addEventListener("click", function(){
+    showScreen("screen-start");
+  });
+  $("#modal-backdrop").addEventListener("click", function(e){
+    if(e.target===$("#modal-backdrop")){ /* keep open during quiz on purpose */ }
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Benteng Nusantara — Misi 2: Mengusir Pasukan Mongol</title>
+<style>
+  :root{
+    --field1:#6b8f4e; --field2:#4a6b38; --field3:#33501f;
+    --dirt:#8a6a3f; --dirt-dark:#5c4526;
+    --parchment:#f1e6c9; --parchment-dark:#d8c592;
+    --ink:#2c2418; --gold:#c68a2e; --gold-dark:#8f5f1c;
+    --blood:#a33125; --blood-dark:#6e1f17;
+    --sky:#2b3a2e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;font-family:'Trebuchet MS','Segoe UI',sans-serif;color:var(--ink);overflow:hidden;-webkit-user-select:none;user-select:none;}
+  img{image-rendering:pixelated;image-rendering:crisp-edges;-webkit-user-drag:none;pointer-events:none;}
+  #app{position:relative;width:100vw;height:100vh;background:var(--sky);}
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .35s ease;}
+  .screen.active{opacity:1;pointer-events:auto;}
+
+  .btn{
+    font-family:inherit;font-weight:bold;font-size:15px;color:var(--parchment);
+    background:linear-gradient(180deg,var(--gold),var(--gold-dark));border:3px solid var(--dirt-dark);border-radius:8px;
+    padding:11px 24px;cursor:pointer;box-shadow:0 4px 0 #6b430f,0 8px 14px rgba(0,0,0,.35);transition:transform .08s ease;
+  }
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #6b430f;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn.secondary{background:linear-gradient(180deg,#8a8574,#6c6858);box-shadow:0 4px 0 #4a4638,0 8px 14px rgba(0,0,0,.3);}
+  .btn.danger{background:linear-gradient(180deg,var(--blood),var(--blood-dark));box-shadow:0 4px 0 #4a140f,0 8px 14px rgba(0,0,0,.3);}
+
+  /* ---------- START ---------- */
+  #screen-start{
+    background:radial-gradient(ellipse at 50% 20%,rgba(198,138,46,.18),transparent 60%),linear-gradient(180deg,#243a1c 0%,#182814 60%,#101c0d 100%);
+    text-align:center;padding:24px;
+  }
+  .title-badge{font-size:12.5px;letter-spacing:3px;color:var(--gold);margin-bottom:10px;font-weight:bold;}
+  #screen-start h1{font-size:clamp(24px,5.2vw,42px);margin:0 0 6px;color:var(--parchment);text-shadow:3px 3px 0 var(--dirt-dark);font-family:Georgia,serif;}
+  #screen-start .subtitle{color:var(--parchment-dark);font-size:clamp(13px,2.2vw,17px);max-width:520px;margin:0 0 20px;line-height:1.5;}
+  .carved-panel{background:linear-gradient(180deg,#e9dcb2,#d3c091);border:4px solid var(--dirt-dark);border-radius:10px;box-shadow:inset 0 0 0 2px #fff6dd,0 8px 0 var(--dirt-dark),0 14px 24px rgba(0,0,0,.4);padding:18px 22px;}
+  .brief-list{text-align:left;max-width:440px;margin:14px auto 0;font-size:12.5px;line-height:1.6;}
+  .brief-list b{color:var(--gold-dark);}
+
+  /* ---------- PROLOG ---------- */
+  #screen-prolog{background:linear-gradient(180deg,#1c2814,#101c0d);padding:20px;}
+  #prolog-card{width:min(520px,100%);background:linear-gradient(180deg,#f1e6c9,#d8c592);border:4px solid var(--dirt-dark);border-radius:12px;padding:24px;box-shadow:0 10px 24px rgba(0,0,0,.4);text-align:center;}
+  #prolog-card .era{display:inline-block;font-size:11px;font-weight:bold;background:var(--blood-dark);color:#fff;padding:3px 10px;border-radius:5px;margin-bottom:10px;letter-spacing:.5px;}
+  #prolog-card h2{margin:0 0 10px;font-family:Georgia,serif;font-size:19px;}
+  #prolog-card p{font-size:14px;line-height:1.65;margin:0 0 16px;}
+  #prolog-dots{display:flex;justify-content:center;gap:6px;margin-bottom:16px;}
+  #prolog-dots span{width:7px;height:7px;border-radius:50%;background:var(--parchment-dark);}
+  #prolog-dots span.on{background:var(--gold-dark);}
+  .prolog-actions{display:flex;justify-content:center;gap:10px;}
+
+  /* ---------- BATTLE ---------- */
+  #screen-battle{
+    background:#2b3a1f url("assets/image/battlefield_bg.jpg") center center/cover no-repeat;
+  }
+  #hud{position:absolute;top:0;left:0;right:0;display:flex;gap:8px;padding:9px 10px;z-index:30;background:linear-gradient(180deg,rgba(16,20,10,.85),rgba(16,20,10,0));pointer-events:none;flex-wrap:wrap;}
+  #hud>*{pointer-events:auto;}
+  .hud-chip{background:linear-gradient(180deg,#e9dcb2,#cdb885);border:3px solid var(--dirt-dark);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:bold;color:var(--ink);display:flex;align-items:center;gap:5px;box-shadow:0 3px 0 var(--dirt-dark);}
+  #hp-track{width:80px;height:9px;background:#4c1a14;border-radius:5px;overflow:hidden;border:1px solid var(--dirt-dark);}
+  #hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#a33125,#e8895a);transition:width .25s ease;}
+  #wave-chip{margin-left:auto;}
+
+  #battlefield{position:relative;width:100%;height:100%;overflow:hidden;touch-action:none;}
+  .deco{position:absolute;pointer-events:none;filter:drop-shadow(0 4px 3px rgba(0,0,0,.3));}
+  #path-svg{position:absolute;inset:0;width:100%;height:100%;}
+  #path-svg polyline{fill:none;stroke:var(--dirt);stroke-width:26;stroke-linecap:round;stroke-linejoin:round;opacity:.9;}
+  #path-svg polyline.edge{stroke:var(--dirt-dark);stroke-width:33;opacity:.7;}
+
+  .buildspot{
+    position:absolute;width:38px;height:38px;transform:translate(-50%,-50%);
+    border-radius:50%;border:3px dashed rgba(255,255,255,.65);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:bold;
+    background:rgba(20,26,14,.35);cursor:pointer;z-index:8;animation:spot-pulse 1.8s ease-in-out infinite;
+  }
+  .buildspot.filled{display:none;}
+  .buildspot.diversion{border-color:rgba(255,214,120,.9);}
+  @keyframes spot-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.35);}50%{box-shadow:0 0 0 8px rgba(255,255,255,0);}}
+
+  .tower{position:absolute;width:70px;height:130px;transform:translate(-50%,-88%) scale(.78);transform-origin:bottom center;z-index:9;pointer-events:none;filter:drop-shadow(0 5px 3px rgba(0,0,0,.4));overflow:hidden;}
+  .tower img{display:block;}
+
+  .garrison{position:absolute;width:90px;height:64px;transform:translate(-50%,-60%);z-index:9;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;gap:-6px;}
+  .garrison .g-unit{width:64px;height:64px;display:block;filter:drop-shadow(0 3px 2px rgba(0,0,0,.4));}
+  .garrison .g-unit-a{margin-right:-22px;}
+  .garrison .g-unit-b{transform:scaleX(-1);}
+  .garrison-mark{position:absolute;transform:translate(-50%,-50%);z-index:7;pointer-events:none;}
+
+  .gm-label{position:absolute;left:50%;bottom:-16px;transform:translateX(-50%);background:rgba(20,16,10,.82);color:var(--parchment);font-size:9.5px;font-weight:bold;padding:2px 6px;border-radius:5px;white-space:nowrap;}
+
+  .escort{position:absolute;width:40px;height:40px;transform:translate(-50%,-60%);z-index:11;pointer-events:none;opacity:.92;filter:drop-shadow(0 3px 2px rgba(0,0,0,.45));}
+  .escort img{display:block;width:100%;height:100%;}
+
+  .enemy{position:absolute;width:48px;height:48px;transform:translate(-50%,-70%) scale(.92);z-index:10;pointer-events:none;overflow:visible;}
+  .enemy img{display:block;filter:drop-shadow(0 3px 2px rgba(0,0,0,.4));}
+  .enemy .ehp{position:absolute;top:-8px;left:4px;right:4px;height:5px;background:#3a1410;border-radius:3px;overflow:hidden;border:1px solid rgba(0,0,0,.4);}
+  .enemy .ehp-fill{height:100%;background:linear-gradient(90deg,#c1531f,#e89a4a);}
+
+  .hero{position:absolute;width:64px;height:64px;transform:translate(-50%,-72%) scale(.85);transform-origin:bottom center;z-index:12;filter:drop-shadow(0 4px 3px rgba(0,0,0,.5));overflow:visible;}
+  .hero .name-tag{
+    position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:2px;
+    background:rgba(20,16,10,.82);color:var(--parchment);font-size:11px;font-weight:bold;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;filter:none;
+  }
+  .hero img{display:block;}
+
+  .beam{position:absolute;height:3px;background:linear-gradient(90deg,rgba(255,230,150,.1),rgba(255,230,150,.95));transform-origin:0 50%;z-index:11;border-radius:2px;pointer-events:none;}
+  .swing-ring{position:absolute;width:90px;height:90px;border:3px solid rgba(255,230,150,.85);border-radius:50%;transform:translate(-50%,-50%) scale(.3);opacity:.9;pointer-events:none;z-index:11;animation:swing-out .28s ease-out forwards;}
+  @keyframes swing-out{to{transform:translate(-50%,-50%) scale(1);opacity:0;}}
+
+  .village-goal, .enemy-camp{position:absolute;transform:translate(-50%,-80%);z-index:6;pointer-events:none;filter:drop-shadow(0 6px 4px rgba(0,0,0,.35));}
+  .village-goal img{width:110px;} .enemy-camp img{width:70px;}
+  .goal-label,.camp-label{position:absolute;top:100%;left:50%;transform:translateX(-50%);font-size:10px;font-weight:bold;background:rgba(20,16,10,.8);color:var(--parchment);padding:2px 7px;border-radius:5px;white-space:nowrap;}
+
+  #dpad{position:absolute;left:14px;bottom:14px;z-index:35;width:126px;height:126px;display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px 42px;}
+  .dbtn{background:rgba(20,26,14,.55);border:2px solid rgba(241,230,201,.5);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#f1e6c9;font-size:17px;touch-action:none;}
+  .dbtn:active,.dbtn.pressed{background:rgba(198,138,46,.75);}
+  #dbtn-up{grid-column:2;grid-row:1;border-radius:8px 8px 4px 4px;}
+  #dbtn-down{grid-column:2;grid-row:3;border-radius:4px 4px 8px 8px;}
+  #dbtn-left{grid-column:1;grid-row:2;border-radius:8px 4px 4px 8px;}
+  #dbtn-right{grid-column:3;grid-row:2;border-radius:4px 8px 8px 4px;}
+
+  #wave-btn-wrap{position:absolute;right:14px;bottom:14px;z-index:35;text-align:right;}
+  #wave-btn-wrap .btn{font-size:13px;padding:10px 16px;}
+
+  .toast{position:absolute;left:50%;top:70px;transform:translateX(-50%) translateY(-14px);background:rgba(35,20,6,.92);color:#fff6e0;font-size:12.5px;font-weight:bold;padding:8px 15px;border-radius:8px;z-index:60;opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ---------- MODAL (fact/quiz) ---------- */
+  #modal-backdrop{position:absolute;inset:0;background:rgba(10,12,7,.72);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:70;padding:16px;}
+  #modal-backdrop.active{opacity:1;pointer-events:auto;}
+  #modal-card{width:min(460px,100%);max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#f4ead0,#e3d1a4);border:4px solid var(--dirt-dark);border-radius:12px;box-shadow:inset 0 0 0 2px #fff8e4,0 10px 0 var(--dirt-dark),0 18px 30px rgba(0,0,0,.5);padding:20px;transform:scale(.92);transition:transform .25s ease;}
+  #modal-backdrop.active #modal-card{transform:scale(1);}
+  .era-tag{display:inline-block;font-size:11px;font-weight:bold;background:var(--blood-dark);color:#fff;padding:3px 9px;border-radius:5px;margin-bottom:8px;}
+  #modal-card h2{margin:0 0 10px;font-family:Georgia,serif;font-size:18px;}
+  .fact-box{background:rgba(138,90,48,.14);border-left:4px solid var(--gold-dark);padding:9px 12px;font-size:13px;line-height:1.55;border-radius:0 6px 6px 0;margin-bottom:14px;}
+  .quiz-q{font-size:14px;font-weight:bold;margin-bottom:10px;line-height:1.4;}
+  .quiz-opt{display:block;width:100%;text-align:left;background:#fffaef;border:2px solid var(--parchment-dark);border-radius:7px;padding:10px 12px;margin-bottom:8px;font-family:inherit;font-size:13px;cursor:pointer;color:var(--ink);}
+  .quiz-opt:hover{border-color:var(--gold);}
+  .quiz-opt.correct{background:#dcefd0;border-color:#3f7d3a;}
+  .quiz-opt.wrong{background:#f4d9d3;border-color:var(--blood);}
+  .quiz-feedback{font-size:12.5px;margin:8px 0 4px;line-height:1.5;min-height:18px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+
+  /* ---------- RESULT ---------- */
+  #screen-result{background:linear-gradient(180deg,#1c2814,#101c0d);padding:20px;}
+  #result-card{width:min(460px,100%);background:linear-gradient(180deg,#f4ead0,#e3d1a4);border:4px solid var(--dirt-dark);border-radius:12px;padding:24px;text-align:center;box-shadow:0 10px 24px rgba(0,0,0,.45);}
+  #result-card h2{margin:0 0 6px;font-family:Georgia,serif;font-size:21px;}
+  .stars{font-size:32px;margin:8px 0;letter-spacing:4px;}
+  #result-sub{font-size:13px;color:#5a4a30;margin-bottom:16px;}
+  .result-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+
+  /* ---------- EPILOGUE / PIAGAM ---------- */
+  #screen-epilogue{background:radial-gradient(ellipse at 50% 20%,rgba(198,138,46,.18),transparent 60%),linear-gradient(180deg,#243a1c 0%,#182814 60%,#101c0d 100%);padding:20px;}
+  #epilogue-card{width:min(480px,100%);background:linear-gradient(180deg,#f1e6c9,#d8c592);border:4px solid var(--dirt-dark);border-radius:12px;padding:24px;box-shadow:0 10px 24px rgba(0,0,0,.4);text-align:center;max-height:90vh;overflow-y:auto;}
+  #epilogue-card h2{margin:0 0 10px;font-family:Georgia,serif;font-size:20px;}
+  #epilogue-card p{font-size:13.5px;line-height:1.65;margin:0 0 16px;}
+  .cert-input{width:100%;padding:9px 10px;font-family:inherit;font-size:14px;border:2px solid var(--parchment-dark);border-radius:6px;margin-bottom:12px;text-align:center;}
+  .cert-view{
+    position:relative;border:3px solid var(--gold-dark);border-radius:8px;padding:28px 16px 20px;margin-bottom:14px;
+    background:radial-gradient(ellipse at 50% 0%, rgba(198,138,46,.12), transparent 60%),linear-gradient(180deg,#fffaf0,#f2e4bf);
+    box-shadow:inset 0 0 0 6px #fdf6e3, inset 0 0 0 8px var(--gold-dark);
+  }
+  .cert-view::before,.cert-view::after{content:"✦";position:absolute;color:var(--gold-dark);font-size:13px;top:14px;}
+  .cert-view::before{left:14px;} .cert-view::after{right:14px;}
+  .cert-medal{
+    width:70px;height:70px;border-radius:50%;margin:0 auto 4px;position:relative;
+    background:radial-gradient(circle at 35% 30%, #fff2c4, #e8b84a 45%, #a86f1e 90%);
+    border:3px solid #7a4f14;box-shadow:0 3px 0 #6b430f,0 6px 10px rgba(0,0,0,.35),inset 0 0 0 3px #fff6d9;
+    display:flex;align-items:center;justify-content:center;font-size:28px;
+  }
+  .cert-medal::after{
+    content:"";position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);width:0;height:0;
+    border-left:15px solid transparent;border-right:15px solid transparent;border-top:15px solid var(--blood-dark);
+    filter:drop-shadow(0 2px 0 #4a140f);
+  }
+  .cert-ribbons{display:flex;justify-content:center;gap:24px;margin:14px 0 2px;position:relative;z-index:1;}
+  .cert-ribbons .rb{width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:24px solid var(--gold-dark);}
+  .cert-ribbons .rb.alt{border-top-color:var(--blood);}
+  .cert-title{font-family:Georgia,serif;font-size:15.5px;font-weight:bold;color:var(--gold-dark);margin:6px 0 10px;letter-spacing:.5px;}
+  .cert-name{font-family:Georgia,serif;font-size:21px;font-weight:bold;margin:6px 0;color:var(--ink);border-bottom:2px solid var(--gold-dark);display:inline-block;padding:0 10px 4px;}
+  .cert-sub{font-size:12px;line-height:1.55;color:#5a4a30;margin-top:10px;}
+  .cert-seal{margin-top:14px;padding-top:10px;border-top:1px dashed var(--parchment-dark);display:flex;align-items:center;justify-content:center;gap:8px;font-family:Georgia,serif;font-style:italic;font-size:11.5px;color:#5a4a30;}
+  .cert-seal .seal-dot{width:24px;height:24px;border-radius:50%;flex-shrink:0;background:radial-gradient(circle at 35% 30%, #e8b84a, #8f5f1c 85%);border:1.5px solid #6b430f;display:flex;align-items:center;justify-content:center;color:#fff8e4;font-size:10px;}
+  @media print{
+    body *{visibility:hidden;}
+    .cert-view, .cert-view *{visibility:visible;}
+    .cert-view{position:fixed;left:0;top:0;width:100%;}
+  }
+
+  #audio-toggle{
+    position:absolute;top:10px;right:10px;z-index:40;
+    width:36px;height:36px;border-radius:50%;
+    background:rgba(20,26,14,.6);border:2px solid rgba(241,230,201,.5);
+    display:flex;align-items:center;justify-content:center;
+    color:#f1e6c9;font-size:16px;cursor:pointer;
+  }
+
+  @media (max-width:560px){
+    .hero,.enemy{width:40px;height:40px;}
+    .tower{width:46px;height:86px;}
+    #dpad{left:10px;bottom:10px;width:112px;height:112px;grid-template-columns:37px 37px 37px;grid-template-rows:37px 37px 37px;}
+    .village-goal img{width:86px;} .enemy-camp img{width:56px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="audio-toggle">🔊</div>
+  <audio id="bgm" src="../assets/audio/bgm.mp3" loop preload="auto"></audio>
+  <audio id="sfx-click" src="../assets/audio/click.mp3" preload="auto"></audio>
+
+  <!-- START -->
+  <div class="screen active" id="screen-start">
+    <div class="title-badge">BENTENG NUSANTARA &middot; SEJARAH KELAS XI</div>
+    <h1>Misi 2: Mengusir<br>Pasukan Mongol</h1>
+    <p class="subtitle">Tahun 1293. Arahkan pasukan Mongol untuk menghancurkan Istana Jayakatwang lebih dulu, lalu hadang mereka sebelum mencapai Alas Terik &mdash; pertempuran terakhir sebelum Majapahit lahir.</p>
+    <div class="carved-panel">
+      <button class="btn" id="btn-start">Mulai</button>
+      <div class="brief-list">
+        <div><b>Fase 1:</b> bangun Pos Pengalih di persimpangan agar Mongol berbelok menghancurkan Istana Jayakatwang.</div>
+        <div><b>Fase 2:</b> setelah istana hancur, bangun Menara Panah / Pos Pertahanan untuk menghadang sisa pasukan Mongol sebelum mencapai Alas Terik.</div>
+        <div><b>Gerakkan</b> Raden Wijaya (kini lebih kuat, ditemani pasukan) dengan panah/WASD atau pad arah, dekati musuh untuk menyerang.</div>
+      </div>
+    </div>
+    <a href="../index.html" id="link-menu-start" style="display:inline-block;margin-top:16px;color:var(--parchment-dark);font-size:12.5px;text-decoration:underline;">&larr; Kembali ke Menu</a>
+  </div>
+  <div class="screen" id="screen-prolog">
+    <div id="prolog-card">
+      <div class="era" id="prolog-era">1293</div>
+      <h2 id="prolog-title"></h2>
+      <p id="prolog-text"></p>
+      <div id="prolog-dots"></div>
+      <div class="prolog-actions">
+        <button class="btn secondary" id="btn-prolog-back">&larr; Kembali</button>
+        <button class="btn" id="btn-prolog-next">Lanjut &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATTLE -->
+  <div class="screen" id="screen-battle">
+    <div id="hud">
+      <div class="hud-chip">💰 <span id="gold-label">150</span></div>
+      <div class="hud-chip">🏕 <div id="hp-track"><div id="hp-fill"></div></div></div>
+      <div class="hud-chip" id="wave-chip">Gelombang <span id="wave-label">0/3</span></div>
+    </div>
+    <div id="battlefield"></div>
+    <div id="dpad">
+      <div class="dbtn" id="dbtn-up">▲</div>
+      <div class="dbtn" id="dbtn-down">▼</div>
+      <div class="dbtn" id="dbtn-left">◀</div>
+      <div class="dbtn" id="dbtn-right">▶</div>
+    </div>
+    <div id="wave-btn-wrap"><button class="btn" id="btn-wave">⚔ Mulai Gelombang</button></div>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="screen-result">
+    <div id="result-card">
+      <h2 id="result-title">Kemenangan!</h2>
+      <div class="stars" id="result-stars">★★★</div>
+      <div id="result-sub"></div>
+      <div class="result-actions">
+        <button class="btn secondary" id="btn-retry">Ulangi Misi</button>
+        <button class="btn" id="btn-epilogue" style="display:none;">Lanjutkan &rarr;</button>
+        <button class="btn secondary" id="btn-to-start">Kembali ke Awal</button>
+      </div>
+      <a href="../index.html" id="link-menu-result" style="display:inline-block;margin-top:14px;color:#5a4a30;font-size:12px;text-decoration:underline;">&larr; Kembali ke Menu</a>
+    </div>
+  </div>
+
+  <!-- EPILOGUE / PIAGAM -->
+  <div class="screen" id="screen-epilogue">
+    <div id="epilogue-card">
+      <div class="era-tag">1293</div>
+      <h2>Lahirnya Majapahit</h2>
+      <p>Dengan Kediri tunduk dan pasukan Mongol terusir kembali ke lautan, Raden Wijaya kini bebas dari ancaman. Ia dinobatkan sebagai raja pertama, membangun ibu kota baru di atas bekas hutan Tarik yang dulu ia buka sendiri \u2014 dan menamainya <b>Majapahit</b>.</p>
+      <div id="cert-area">
+        <input type="text" class="cert-input" id="cert-name" placeholder="Tulis namamu di sini">
+        <button class="btn" id="btn-claim-cert">🏅 Klaim Piagam Pendiri</button>
+      </div>
+      <div class="modal-actions" style="justify-content:center;margin-top:16px;">
+        <button class="btn secondary" id="btn-epilogue-done">Selesai</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-backdrop"><div id="modal-card"></div></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var IMG = "assets/image/";
+  function $(sel){ return document.querySelector(sel); }
+
+  /* ---------- audio: bgm + click sfx ---------- */
+  var MUTE_KEY = "bentengNusantara_audio_muted";
+  var bgm = document.getElementById("bgm");
+  var sfxClick = document.getElementById("sfx-click");
+  var isMuted = false;
+  try{ isMuted = localStorage.getItem(MUTE_KEY) === "1"; }catch(e){}
+  function applyMuteState(){
+    if(bgm) bgm.muted = isMuted;
+    var t = document.getElementById("audio-toggle");
+    if(t) t.textContent = isMuted ? "🔇" : "🔊";
+  }
+  applyMuteState();
+  var audioToggleEl = document.getElementById("audio-toggle");
+  if(audioToggleEl){
+    audioToggleEl.addEventListener("click", function(e){
+      e.stopPropagation();
+      isMuted = !isMuted;
+      try{ localStorage.setItem(MUTE_KEY, isMuted ? "1" : "0"); }catch(e2){}
+      applyMuteState();
+    });
+  }
+  function tryPlayMusic(){
+    if(!bgm) return;
+    try{
+      bgm.volume = 0.4;
+      var p = bgm.play();
+      if(p && p.catch) p.catch(function(){});
+    }catch(e){}
+  }
+  function playClick(){
+    if(!sfxClick || isMuted) return;
+    try{
+      var c = sfxClick.cloneNode(true);
+      c.volume = 0.6;
+      c.play().catch(function(){});
+    }catch(e){}
+  }
+  document.addEventListener("click", function(e){
+    if(e.target.closest("#audio-toggle")) return;
+    if(e.target.closest("button, .buildspot, .dbtn, a")) playClick();
+  }, true);
+  document.addEventListener("click", function(){ tryPlayMusic(); }, {once:true});
+  function el(tag,cls){ var e=document.createElement(tag); if(cls) e.className=cls; return e; }
+  function showScreen(id){
+    document.querySelectorAll(".screen").forEach(function(s){ s.classList.remove("active"); });
+    $("#"+id).classList.add("active");
+  }
+
+  // Direct-link support: menu can send the player straight to the epilogue once both missions are won
+  try{
+    var qp = new URLSearchParams(window.location.search);
+    if(qp.get("epilogue") === "1"){
+      showScreen("screen-epilogue");
+    }
+  }catch(e){}
+  function showToast(msg){
+    var t = $("#toast"); t.textContent = msg; t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 1600);
+  }
+
+  /* ================= PROLOG ================= */
+  var PROLOG = [
+    {era:"1293", title:"Sekutu di Pesisir", text:"Armada besar Kekaisaran Mongol merapat di pesisir Jawa untuk menghukum Kertanagara. Raden Wijaya menyambut mereka sebagai sekutu \u2014 seolah masih setia kepada mendiang rajanya."},
+    {era:"1293", title:"Menuding ke Kediri", text:"Wijaya meyakinkan para panglima Mongol bahwa musuh sesungguhnya bersembunyi di Istana Jayakatwang, Kediri \u2014 bukan di perkemahannya sendiri di Alas Terik."},
+    {era:"1293", title:"Saatnya Mengalihkan Pasukan", text:"Kini giliran siasat itu dibuktikan: Wijaya harus mendirikan pos pengalih di persimpangan jalan, memastikan pasukan Mongol benar-benar berbelok menuju Kediri \u2014 bukan ke Alas Terik."}
+  ];
+  var prologIdx = 0;
+  function renderProlog(){
+    var p = PROLOG[prologIdx];
+    $("#prolog-era").textContent = p.era;
+    $("#prolog-title").textContent = p.title;
+    $("#prolog-text").textContent = p.text;
+    var dots = $("#prolog-dots"); dots.innerHTML = "";
+    PROLOG.forEach(function(_,i){
+      var d = document.createElement("span");
+      if(i===prologIdx) d.className = "on";
+      dots.appendChild(d);
+    });
+    $("#btn-prolog-back").style.visibility = prologIdx===0 ? "hidden" : "visible";
+    $("#btn-prolog-next").textContent = prologIdx===PROLOG.length-1 ? "Ke Medan Perang \u2694" : "Lanjut \u2192";
+  }
+  $("#btn-prolog-next").addEventListener("click", function(){
+    if(prologIdx < PROLOG.length-1){ prologIdx++; renderProlog(); }
+    else { showScreen("screen-battle"); initBattle(); }
+  });
+  $("#btn-prolog-back").addEventListener("click", function(){
+    if(prologIdx>0){ prologIdx--; renderProlog(); }
+  });
+  $("#btn-start").addEventListener("click", function(){
+    tryPlayMusic();
+    prologIdx = 0; renderProlog(); showScreen("screen-prolog");
+  });
+
+  /* ================= BATTLE CONFIG ================= */
+  var PATH_A = [ {x:3,y:50}, {x:28,y:50}, {x:28,y:16}, {x:55,y:16} ];   // Markas Mongol -> percabangan -> Istana Jayakatwang
+  var PATH_C = [ {x:55,y:16}, {x:55,y:46}, {x:76,y:46}, {x:92,y:64} ];  // Istana Jayakatwang -> Alas Terik
+  var DIVERSION_SPOT = {id:"div", x:28, y:50};
+  var BUILD_SPOTS = [
+    {id:"g1", x:64, y:46}, {id:"g2", x:84, y:52},
+    {id:"g3", x:70, y:30}, {id:"g4", x:50, y:56}
+  ];
+  var DECOS = [
+    {img:"deco_stone.png", x:10, y:30, size:34},
+    {img:"deco_stone.png", x:86, y:80, size:30},
+    {img:"deco_bush.png", x:34, y:20, size:40},
+    {img:"deco_bush2.png", x:60, y:88, size:38},
+    {img:"deco_bush.png", x:88, y:34, size:36},
+    {img:"deco_fence.png", x:14, y:70, size:46},
+    {img:"deco_fence.png", x:66, y:22, size:46},
+    {img:"deco_flower.png", x:44, y:60, size:26},
+    {img:"deco_flower.png", x:30, y:46, size:24},
+    {img:"deco_tree1.png", x:6, y:12, size:58},
+    {img:"deco_tree1.png", x:46, y:9, size:54},
+    {img:"deco_tree1.png", x:91, y:10, size:56},
+    {img:"deco_tree1.png", x:8, y:88, size:56},
+    {img:"deco_grass1.png", x:16, y:14, size:22},
+    {img:"deco_grass2.png", x:36, y:16, size:20},
+    {img:"deco_grass3.png", x:56, y:12, size:22},
+    {img:"deco_grass1.png", x:14, y:44, size:20},
+    {img:"deco_grass2.png", x:34, y:42, size:20},
+    {img:"deco_grass3.png", x:84, y:42, size:22},
+    {img:"deco_grass1.png", x:18, y:92, size:20},
+    {img:"deco_grass2.png", x:58, y:92, size:22},
+    {img:"deco_log.png", x:12, y:26, size:34},
+    {img:"deco_log.png", x:86, y:88, size:36},
+    {img:"deco_lamp.png", x:8, y:64, size:30},
+    {img:"deco_lamp.png", x:88, y:50, size:30}
+  ];
+  var WAVES = [
+    {phase:1, count:6, hp:40, speed:60, dmg:0,  gap:750, path:"A"},
+    {phase:2, count:8, hp:52, speed:64, dmg:12, gap:720, path:"C"},
+    {phase:2, count:11,hp:66, speed:70, dmg:14, gap:620, path:"C"}
+  ];
+  var TOWER_COST=60, TOWER_RANGE=130, TOWER_DMG=15, TOWER_CD=650;
+  var GARRISON_COST=55, GARRISON_RANGE=76, GARRISON_DMG=24, GARRISON_CD=560;
+  var DIVERSION_COST=50;
+  var HERO_RANGE=54, HERO_DMG=24, HERO_CD=480, HERO_SPEED=120;
+  var KILL_REWARD=15;
+
+  var battle = null; // reset each run
+
+  function initBattle(){
+    battle = {
+      gold:160, villageHP:100, villageMaxHP:100,
+      waveIndex:0, waveActive:false, enemiesAlive:0, spawning:false,
+      phase:1, istanaDestroyed:false,
+      towers:[], enemies:[], enemySeq:1,
+      hero:{xFrac:10, yFrac:50, dir:0, frame:0, animAcc:0, moving:false,
+            attacking:false, attackAcc:0, attackCd:0},
+      keys:{up:false,down:false,left:false,right:false},
+      lastTime:null, rafId:null
+    };
+    var bf = $("#battlefield");
+    bf.innerHTML = "";
+
+    var camp = el("div","enemy-camp");
+    camp.style.left=PATH_A[0].x+"%"; camp.style.top=PATH_A[0].y+"%";
+    camp.innerHTML = '<img src="'+IMG+'enemy_camp.png"><div class="camp-label">Markas Mongol</div>';
+    bf.appendChild(camp);
+
+    var istWp = PATH_A[PATH_A.length-1];
+    var istana = el("div","village-goal"); istana.id="istana-el";
+    istana.style.left=istWp.x+"%"; istana.style.top=istWp.y+"%";
+    istana.innerHTML = '<img id="istana-img" src="'+IMG+'village_house.png" style="filter:sepia(1) saturate(3) hue-rotate(-40deg) brightness(.9);"><div class="goal-label">Istana Jayakatwang</div>';
+    bf.appendChild(istana);
+
+    var alasWp = PATH_C[PATH_C.length-1];
+    var alas = el("div","village-goal");
+    alas.style.left=alasWp.x+"%"; alas.style.top=alasWp.y+"%";
+    alas.innerHTML = '<img src="'+IMG+'village_house.png"><div class="goal-label">Alas Terik</div>';
+    bf.appendChild(alas);
+
+    var divEl = el("div","buildspot diversion");
+    divEl.dataset.id = DIVERSION_SPOT.id;
+    divEl.style.left = DIVERSION_SPOT.x+"%"; divEl.style.top = DIVERSION_SPOT.y+"%";
+    divEl.textContent = "+";
+    divEl.title = "Pos Pengalih ("+DIVERSION_COST+" emas)";
+    divEl.addEventListener("click", function(){ placeDiversion(divEl); });
+    bf.appendChild(divEl);
+
+    BUILD_SPOTS.forEach(function(s){
+      var d = el("div","buildspot phase2");
+      d.dataset.id = s.id;
+      d.style.left = s.x+"%"; d.style.top = s.y+"%";
+      d.style.display = "none";
+      d.textContent = "+";
+      d.addEventListener("click", function(){ openStructureChoice(s, d); });
+      bf.appendChild(d);
+    });
+
+    var heroEl = el("div","hero"); heroEl.id="hero-el";
+    heroEl.innerHTML = '<div class="name-tag">Wijaya</div><img id="hero-img" src="'+IMG+'hero_idle.png">';
+    bf.appendChild(heroEl);
+
+    ["e1","e2"].forEach(function(id, i){
+      var esc = el("div","escort"); esc.id=id;
+      esc.innerHTML = '<img src="'+IMG+'troop_idle.png" style="object-fit:none;width:64px;height:64px;object-position:0px 0px;">';
+      bf.appendChild(esc);
+    });
+
+    updateHUD();
+    renderHero();
+    $("#btn-wave").disabled = true;
+    $("#btn-wave").textContent = "Bangun Pos Pengalih dulu";
+    if(battle.rafId) cancelAnimationFrame(battle.rafId);
+    battle.lastTime = null;
+    battle.rafId = requestAnimationFrame(tick);
+  }
+
+  function updateHUD(){
+    $("#gold-label").textContent = battle.gold;
+    $("#hp-fill").style.width = Math.max(0,(battle.villageHP/battle.villageMaxHP*100))+"%";
+    $("#wave-label").textContent = Math.min(battle.waveIndex,WAVES.length)+"/"+WAVES.length;
+  }
+
+  function placeDiversion(spotEl){
+    if(spotEl.classList.contains("filled")) return;
+    if(battle.gold < DIVERSION_COST){ showToast("Emas tidak cukup (butuh "+DIVERSION_COST+")"); return; }
+    battle.gold -= DIVERSION_COST; updateHUD();
+    spotEl.classList.add("filled");
+    var t = el("div","garrison-mark");
+    t.style.left = DIVERSION_SPOT.x+"%"; t.style.top = DIVERSION_SPOT.y+"%";
+    t.innerHTML = '<div class="gm-label">Pos Pengalih</div>';
+    $("#battlefield").appendChild(t);
+    $("#btn-wave").disabled = false;
+    $("#btn-wave").textContent = "⚔ Mulai Gelombang 1";
+    showToast("Pos Pengalih berdiri! Pasukan Mongol akan berbelok ke Kediri.");
+  }
+
+  function openStructureChoice(spot, spotEl){
+    if(spotEl.classList.contains("filled")) return;
+    $("#modal-card").innerHTML =
+      '<h2>Bangun di Titik Ini</h2>'+
+      '<p style="font-size:13px;line-height:1.6;margin:0 0 14px;">Pilih jenis pertahanan untuk menghadang pasukan Mongol menuju Alas Terik.</p>'+
+      '<button class="btn" id="btn-pick-tower" style="width:100%;margin-bottom:8px;">🏹 Menara Panah &mdash; '+TOWER_COST+' emas<br><span style="font-weight:normal;font-size:11.5px;">Jangkauan jauh, damage sedang</span></button>'+
+      '<button class="btn" id="btn-pick-garrison" style="width:100%;">🛡 Pos Pertahanan &mdash; '+GARRISON_COST+' emas<br><span style="font-weight:normal;font-size:11.5px;">Jangkauan pendek, damage besar</span></button>'+
+      '<div class="modal-actions"><button class="btn secondary" id="btn-pick-cancel">Batal</button></div>';
+    $("#modal-backdrop").classList.add("active");
+    $("#btn-pick-cancel").addEventListener("click", function(){ $("#modal-backdrop").classList.remove("active"); });
+    $("#btn-pick-tower").addEventListener("click", function(){
+      $("#modal-backdrop").classList.remove("active");
+      placeStructure("tower", spot, spotEl);
+    });
+    $("#btn-pick-garrison").addEventListener("click", function(){
+      $("#modal-backdrop").classList.remove("active");
+      placeStructure("garrison", spot, spotEl);
+    });
+  }
+
+  function placeStructure(type, spot, spotEl){
+    var cost = type==="tower" ? TOWER_COST : GARRISON_COST;
+    if(battle.gold < cost){ showToast("Emas tidak cukup (butuh "+cost+")"); return; }
+    battle.gold -= cost; updateHUD();
+    spotEl.classList.add("filled");
+    var entry = {id:spot.id, x:spot.x, y:spot.y, type:type, cd:0, animAcc:0, frame:0,
+      attacking:false, atkFrame:0, atkAcc:0, idleFrame:0, idleAcc:0};
+    if(type==="tower"){
+      var t = el("div","tower");
+      t.style.left = spot.x+"%"; t.style.top = spot.y+"%";
+      t.innerHTML = '<img id="tw-'+spot.id+'" src="'+IMG+'tower_idle.png">';
+      $("#battlefield").appendChild(t);
+      var twImg = t.querySelector("img");
+      twImg.style.objectFit="none"; twImg.style.width="70px"; twImg.style.height="130px"; twImg.style.objectPosition="0px 0px";
+      entry.el = t; entry.imgEl = twImg;
+    } else {
+      var g = el("div","garrison");
+      g.style.left = spot.x+"%"; g.style.top = spot.y+"%";
+      g.innerHTML =
+        '<img class="g-unit g-unit-a" src="'+IMG+'troop_idle.png">'+
+        '<img class="g-unit g-unit-b" src="'+IMG+'troop_idle.png">'+
+        '<div class="gm-label">Pos Pertahanan</div>';
+      $("#battlefield").appendChild(g);
+      var gUnits = g.querySelectorAll(".g-unit");
+      gUnits.forEach(function(im){
+        im.style.objectFit="none"; im.style.width="64px"; im.style.height="64px"; im.style.objectPosition="0px 0px";
+      });
+      entry.el = g; entry.gUnits = gUnits;
+    }
+    battle.towers.push(entry);
+  }
+
+  /* ---------- wave / enemy spawning ---------- */
+  $("#btn-wave").addEventListener("click", function(){
+    if(battle.waveActive || battle.waveIndex >= WAVES.length) return;
+    startWave();
+  });
+
+  function startWave(){
+    var w = WAVES[battle.waveIndex];
+    battle.waveActive = true; battle.spawning = true;
+    $("#btn-wave").disabled = true;
+    $("#btn-wave").textContent = "Gelombang berjalan\u2026";
+    var spawned = 0;
+    var timer = setInterval(function(){
+      spawnEnemy(w);
+      spawned++;
+      if(spawned >= w.count){ clearInterval(timer); battle.spawning = false; }
+    }, w.gap);
+  }
+
+  function spawnEnemy(w){
+    var path = w.path==="A" ? PATH_A : PATH_C;
+    var start = path[0];
+    var e = {
+      id: battle.enemySeq++, wpIndex:0, x:start.x, y:start.y, path:path, endAction: w.path==="A" ? "istana" : "goal",
+      hp:w.hp, maxHp:w.hp, speed:w.speed, dmg:w.dmg,
+      el:null, imgEl:null, hpFillEl:null, dir:"s", flip:false, animAcc:0, frame:0
+    };
+    var d = el("div","enemy");
+    d.style.left = e.x+"%"; d.style.top = e.y+"%";
+    d.innerHTML = '<div class="ehp"><div class="ehp-fill" style="width:100%"></div></div><img src="'+IMG+'enemy_walk_s.png">';
+    $("#battlefield").appendChild(d);
+    e.el = d; e.imgEl = d.querySelector("img"); e.hpFillEl = d.querySelector(".ehp-fill");
+    battle.enemies.push(e);
+    battle.enemiesAlive++;
+  }
+
+  function destroyIstana(){
+    battle.istanaDestroyed = true; battle.phase = 2;
+    var img = document.getElementById("istana-img");
+    if(img) img.style.filter = "grayscale(1) brightness(.55) sepia(1) hue-rotate(-40deg)";
+    document.querySelectorAll(".buildspot.phase2").forEach(function(el2){ el2.style.display = ""; });
+    showToast("Istana Jayakatwang hancur! Sisa pasukan Mongol berbalik menuju Alas Terik.");
+  }
+
+  function waveClearedCheck(){
+    if(battle.waveActive && !battle.spawning && battle.enemiesAlive<=0){
+      battle.waveActive = false;
+      battle.waveIndex++;
+      updateHUD();
+      if(battle.waveIndex === 1 && !battle.istanaDestroyed){
+        destroyIstana();
+      }
+      if(battle.waveIndex >= WAVES.length){
+        endBattle(true);
+      } else {
+        $("#btn-wave").disabled = false;
+        $("#btn-wave").textContent = "⚔ Mulai Gelombang "+(battle.waveIndex+1);
+        battle.gold += 25; updateHUD();
+        showToast(battle.waveIndex===1 ? "Kediri berhasil dialihkan! +25 emas" : "Gelombang berhasil dihalau! +25 emas");
+      }
+    }
+  }
+
+  /* ---------- input ---------- */
+  var KEY_MAP = {"ArrowUp":"up","w":"up","W":"up","ArrowDown":"down","s":"down","S":"down",
+    "ArrowLeft":"left","a":"left","A":"left","ArrowRight":"right","d":"right","D":"right"};
+  window.addEventListener("keydown", function(e){
+    if(!battle) return;
+    var k = KEY_MAP[e.key];
+    if(k){ battle.keys[k]=true; e.preventDefault(); }
+  });
+  window.addEventListener("keyup", function(e){
+    if(!battle) return;
+    var k = KEY_MAP[e.key];
+    if(k){ battle.keys[k]=false; e.preventDefault(); }
+  });
+  function bindDpad(id,key){
+    var b = document.getElementById(id);
+    function on(e){ e.preventDefault(); if(battle) battle.keys[key]=true; b.classList.add("pressed"); }
+    function off(){ if(battle) battle.keys[key]=false; b.classList.remove("pressed"); }
+    b.addEventListener("pointerdown", on);
+    b.addEventListener("pointerup", off);
+    b.addEventListener("pointerleave", off);
+    b.addEventListener("pointercancel", off);
+  }
+  bindDpad("dbtn-up","up"); bindDpad("dbtn-down","down");
+  bindDpad("dbtn-left","left"); bindDpad("dbtn-right","right");
+
+  /* ---------- render helpers ---------- */
+  function renderHero(){
+    var h = battle.hero;
+    var hEl = $("#hero-el");
+    if(!hEl) return;
+    hEl.style.left = h.xFrac+"%"; hEl.style.top = h.yFrac+"%";
+    var img = $("#hero-img");
+    var fw = 64;
+    if(h.attacking){
+      img.src = IMG+"hero_attack.png";
+      img.style.backgroundPosition = "";
+      img.style.objectPosition = (-h.frame*fw)+"px "+(-h.dir*fw)+"px";
+    } else if(h.moving){
+      img.src = IMG+"hero_walk.png";
+      img.style.objectPosition = (-h.frame*fw)+"px "+(-h.dir*fw)+"px";
+    } else {
+      img.src = IMG+"hero_idle.png";
+      img.style.objectPosition = "0px "+(-h.dir*fw)+"px";
+    }
+    img.style.objectFit = "none";
+    img.style.width = fw+"px"; img.style.height = fw+"px";
+
+    var offsets = [[0,0],[0,0],[0,0],[0,0]];
+    offsets[0]=[-5,-4]; offsets[1]=[4,0]; offsets[2]=[-4,0]; offsets[3]=[0,4]; // opposite of facing dir, per down/left/right/up
+    var e1 = document.getElementById("e1"), e2 = document.getElementById("e2");
+    var escSrc, escPos;
+    if(h.attacking){ escSrc = IMG+"troop_attack.png"; escPos = (-h.frame*fw)+"px "+(-h.dir*fw)+"px"; }
+    else if(h.moving){ escSrc = IMG+"troop_walk.png"; escPos = (-h.frame*fw)+"px "+(-h.dir*fw)+"px"; }
+    else { escSrc = IMG+"troop_idle.png"; escPos = "0px "+(-h.dir*fw)+"px"; }
+    [e1,e2].forEach(function(esc){
+      if(!esc) return;
+      var eimg = esc.querySelector("img");
+      if(eimg.getAttribute("data-src") !== escSrc){ eimg.src = escSrc; eimg.setAttribute("data-src", escSrc); }
+      eimg.style.objectFit = "none"; eimg.style.width = fw+"px"; eimg.style.height = fw+"px";
+      eimg.style.objectPosition = escPos;
+    });
+    if(e1){ e1.style.left = (h.xFrac+offsets[h.dir][0]-2.2)+"%"; e1.style.top = (h.yFrac+offsets[h.dir][1])+"%"; }
+    if(e2){ e2.style.left = (h.xFrac+offsets[h.dir][0]+2.2)+"%"; e2.style.top = (h.yFrac+offsets[h.dir][1])+"%"; }
+  }
+
+  function renderEnemy(e){
+    e.el.style.left = e.x+"%"; e.el.style.top = e.y+"%";
+    e.hpFillEl.style.width = Math.max(0,(e.hp/e.maxHp*100))+"%";
+    var src = IMG+"enemy_walk_"+e.dir+".png";
+    if(e.imgEl.getAttribute("data-dir") !== e.dir){
+      e.imgEl.src = src; e.imgEl.setAttribute("data-dir", e.dir);
+    }
+    var fw = 48;
+    e.imgEl.style.width = fw+"px"; e.imgEl.style.height = fw+"px";
+    e.imgEl.style.objectFit = "none";
+    e.imgEl.style.objectPosition = (-e.frame*fw)+"px 0px";
+    e.imgEl.style.transform = e.flip ? "scaleX(-1)" : "scaleX(1)";
+  }
+
+  function spawnBeam(x1,y1,x2,y2){
+    var bf = $("#battlefield"); var r = bf.getBoundingClientRect();
+    var dx = x2-x1, dy = y2-y1;
+    var len = Math.hypot(dx,dy);
+    var ang = Math.atan2(dy,dx) * 180/Math.PI;
+    var b = el("div","beam");
+    b.style.left = (x1-r.left)+"px"; b.style.top = (y1-r.top)+"px";
+    b.style.width = len+"px";
+    b.style.transform = "rotate("+ang+"deg)";
+    bf.appendChild(b);
+    setTimeout(function(){ b.remove(); }, 140);
+  }
+  function spawnSwing(x,y){
+    var bf = $("#battlefield"); var r = bf.getBoundingClientRect();
+    var s = el("div","swing-ring");
+    s.style.left=(x-r.left)+"px"; s.style.top=(y-r.top)+"px";
+    bf.appendChild(s);
+    setTimeout(function(){ s.remove(); }, 300);
+  }
+
+  /* ---------- main loop ---------- */
+  function tick(t){
+    if(!battle) return;
+    if(battle.lastTime===null) battle.lastTime = t;
+    var dt = Math.min(48, t-battle.lastTime)/1000;
+    battle.lastTime = t;
+
+    if(!modalActive()){
+      updateHero(dt);
+      updateEnemies(dt);
+      updateTowers(dt);
+      waveClearedCheck();
+    }
+    battle.rafId = requestAnimationFrame(tick);
+  }
+
+  function modalActive(){ return $("#modal-backdrop").classList.contains("active"); }
+
+  function updateHero(dt){
+    var h = battle.hero;
+    var bf = $("#battlefield"); var w = bf.clientWidth, hgt = bf.clientHeight;
+
+    if(h.attackCd>0) h.attackCd -= dt*1000;
+
+    if(h.attacking){
+      h.attackAcc += dt;
+      if(h.attackAcc > 0.05){ h.attackAcc=0; h.frame++; if(h.frame>=8){ h.attacking=false; h.frame=0; } }
+    } else {
+      var dx=(battle.keys.right?1:0)-(battle.keys.left?1:0);
+      var dy=(battle.keys.down?1:0)-(battle.keys.up?1:0);
+      var moving = dx!==0||dy!==0;
+      if(moving){
+        var len=Math.sqrt(dx*dx+dy*dy); dx/=len; dy/=len;
+        h.xFrac += (dx*HERO_SPEED*dt/w)*100;
+        h.yFrac += (dy*HERO_SPEED*dt/hgt)*100;
+        h.xFrac = Math.max(3, Math.min(97, h.xFrac));
+        h.yFrac = Math.max(8, Math.min(93, h.yFrac));
+        if(Math.abs(dx)>Math.abs(dy)) h.dir = dx>0?2:1; else h.dir = dy>0?0:3;
+        h.animAcc += dt;
+        if(h.animAcc>0.11){ h.animAcc=0; h.frame=(h.frame+1)%6; }
+      } else { h.frame=0; h.animAcc=0; }
+      h.moving = moving;
+
+      // auto-attack nearest enemy in range
+      if(h.attackCd<=0){
+        var bfRect = bf.getBoundingClientRect();
+        var hx = bfRect.left + (h.xFrac/100)*bfRect.width;
+        var hy = bfRect.top + (h.yFrac/100)*bfRect.height;
+        var nearest=null, nearestD=1e9;
+        battle.enemies.forEach(function(e){
+          var er = e.el.getBoundingClientRect();
+          var ex=er.left+er.width/2, ey=er.top+er.height/2;
+          var d=Math.hypot(hx-ex,hy-ey);
+          if(d<HERO_RANGE && d<nearestD){ nearest=e; nearestD=d; }
+        });
+        if(nearest){
+          damageEnemy(nearest, HERO_DMG);
+          h.attacking=true; h.frame=0; h.attackAcc=0; h.attackCd=HERO_CD;
+          spawnSwing(hx,hy);
+        }
+      }
+    }
+    renderHero();
+  }
+
+  function updateEnemies(dt){
+    var bf = $("#battlefield"); var w = bf.clientWidth, hgt = bf.clientHeight;
+    for(var i=battle.enemies.length-1;i>=0;i--){
+      var e = battle.enemies[i];
+      var target = e.path[e.wpIndex+1];
+      if(!target){
+        // reached end of its path
+        if(e.endAction === "goal"){
+          battle.villageHP -= e.dmg;
+          updateHUD();
+          if(battle.villageHP<=0){ removeEnemy(i); endBattle(false); continue; }
+        }
+        // "istana" endAction: just despawn silently, counted via waveClearedCheck
+        removeEnemy(i);
+        continue;
+      }
+      var dxp = target.x - e.x, dyp = target.y - e.y;
+      var distPct = Math.hypot(dxp,dyp);
+      var stepXpct = (e.speed*dt/w)*100;
+      var stepYpct = (e.speed*dt/hgt)*100;
+      var stepPct = Math.hypot(stepXpct,stepYpct);
+      if(distPct < Math.max(stepPct,0.3)){
+        e.x = target.x; e.y = target.y; e.wpIndex++;
+      } else {
+        var ux = dxp/distPct, uy = dyp/distPct;
+        e.x += ux*stepPct; e.y += uy*stepPct;
+      }
+      if(Math.abs(dyp) > Math.abs(dxp)*1.15){ e.dir = dyp>0 ? "d":"u"; e.flip=false; }
+      else { e.dir="s"; e.flip = dxp<0; }
+      e.animAcc += dt;
+      if(e.animAcc>0.13){ e.animAcc=0; e.frame=(e.frame+1)%6; }
+      renderEnemy(e);
+    }
+  }
+
+  function damageEnemy(e, dmg){
+    e.hp -= dmg;
+    if(e.hp<=0){
+      var idx = battle.enemies.indexOf(e);
+      if(idx>=0){
+        battle.gold += KILL_REWARD; updateHUD();
+        removeEnemy(idx);
+      }
+    }
+  }
+  function removeEnemy(idx){
+    var e = battle.enemies[idx];
+    if(e && e.el) e.el.remove();
+    battle.enemies.splice(idx,1);
+    battle.enemiesAlive = battle.enemies.length;
+  }
+
+  function updateTowers(dt){
+    var bf = $("#battlefield"); var rect = bf.getBoundingClientRect();
+    battle.towers.forEach(function(tw){
+      var isTower = tw.type === "tower";
+      var range = isTower ? TOWER_RANGE : GARRISON_RANGE;
+      var dmg = isTower ? TOWER_DMG : GARRISON_DMG;
+      var cdMax = isTower ? TOWER_CD : GARRISON_CD;
+
+      tw.animAcc += dt;
+      if(isTower){
+        if(tw.animAcc>0.15){ tw.animAcc=0; tw.frame=(tw.frame+1)%6;
+          tw.imgEl.style.objectFit="none"; tw.imgEl.style.width="70px"; tw.imgEl.style.height="130px";
+          tw.imgEl.style.objectPosition = (-tw.frame*70)+"px 0px";
+        }
+      } else {
+        var fw2 = 64, gSrc, gPos;
+        if(tw.attacking){
+          tw.atkAcc += dt;
+          if(tw.atkAcc>0.05){ tw.atkAcc=0; tw.atkFrame++; if(tw.atkFrame>=8){ tw.attacking=false; tw.atkFrame=0; } }
+          gSrc = IMG+"troop_attack.png"; gPos = (-tw.atkFrame*fw2)+"px 0px";
+        } else {
+          tw.idleAcc += dt;
+          if(tw.idleAcc>0.22){ tw.idleAcc=0; tw.idleFrame=(tw.idleFrame+1)%12; }
+          gSrc = IMG+"troop_idle.png"; gPos = (-tw.idleFrame*fw2)+"px 0px";
+        }
+        if(tw.gUnits){
+          tw.gUnits.forEach(function(im){
+            if(im.getAttribute("data-src") !== gSrc){ im.src = gSrc; im.setAttribute("data-src", gSrc); }
+            im.style.objectPosition = gPos;
+          });
+        }
+      }
+      if(tw.cd>0){ tw.cd -= dt*1000; return; }
+      var tx = rect.left + (tw.x/100)*rect.width;
+      var ty = rect.top + (tw.y/100)*rect.height;
+      var nearest=null, nearestD=1e9;
+      battle.enemies.forEach(function(e){
+        var er = e.el.getBoundingClientRect();
+        var ex=er.left+er.width/2, ey=er.top+er.height/2;
+        var d=Math.hypot(tx-ex,ty-ey);
+        if(d<range && d<nearestD){ nearest=e; nearestD=d; }
+      });
+      if(nearest){
+        var er = nearest.el.getBoundingClientRect();
+        if(isTower){
+          spawnBeam(tx,ty, er.left+er.width/2, er.top+er.height/2);
+        } else {
+          spawnSwing(tx,ty);
+          tw.attacking = true; tw.atkFrame = 0; tw.atkAcc = 0;
+        }
+        damageEnemy(nearest, dmg);
+        tw.cd = cdMax;
+      }
+    });
+  }
+
+  /* ---------- end of battle ---------- */
+  function endBattle(won){
+    if(battle.rafId) cancelAnimationFrame(battle.rafId);
+    if(won){
+      openFactQuiz();
+    } else {
+      showResult(false);
+    }
+  }
+
+  function openFactQuiz(){
+    var html =
+      '<div class="era-tag">1293</div>'+
+      '<h2>Siasat Ganda</h2>'+
+      '<div class="fact-box">Raden Wijaya mengarahkan pasukan Mongol untuk menumpas Jayakatwang di Kediri terlebih dahulu, memanfaatkan tenaga mereka untuk melenyapkan ancaman lamanya. Begitu Kediri jatuh dan pasukan Mongol lengah, giliran Wijaya dan pasukannya balik menghadang sebelum mereka mencapai Alas Terik.</div>'+
+      '<div class="quiz-q">Apa keuntungan utama Raden Wijaya mengarahkan pasukan Mongol untuk menghancurkan Kediri lebih dulu?</div>'+
+      '<div id="quiz-opts">'+
+        '<button class="quiz-opt" data-i="0">Musuh lamanya (Kediri) tertumpas oleh tangan Mongol sendiri, tanpa mengorbankan banyak pasukannya sendiri</button>'+
+        '<button class="quiz-opt" data-i="1">Karena Wijaya ingin menyerahkan Alas Terik kepada Mongol sebagai balas jasa</button>'+
+        '<button class="quiz-opt" data-i="2">Karena pasukan Mongol memaksa Wijaya melakukannya</button>'+
+      '</div>'+
+      '<div class="quiz-feedback" id="quiz-feedback"></div>'+
+      '<div class="modal-actions"><button class="btn" id="btn-quiz-close" style="display:none;">Lanjutkan</button></div>';
+    $("#modal-card").innerHTML = html;
+    $("#modal-backdrop").classList.add("active");
+    var opts = document.querySelectorAll(".quiz-opt");
+    var answered=false;
+    opts.forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(answered) return; answered=true;
+        var i = parseInt(btn.dataset.i,10);
+        opts.forEach(function(o,oi){
+          if(oi===0) o.classList.add("correct");
+          else if(oi===i) o.classList.add("wrong");
+        });
+        var fb = $("#quiz-feedback");
+        fb.textContent = (i===0 ? "Tepat! " : "Belum tepat. ") +
+          "Dengan mengarahkan pasukan Mongol untuk menumpas Kediri, Raden Wijaya melenyapkan musuh lamanya tanpa mengorbankan banyak pasukannya sendiri \u2014 lalu memanfaatkan kelengahan Mongol setelahnya untuk mengusir mereka juga.";
+        $("#btn-quiz-close").style.display = "inline-block";
+      });
+    });
+    $("#btn-quiz-close").addEventListener("click", function(){
+      $("#modal-backdrop").classList.remove("active");
+      showResult(true);
+    });
+  }
+
+  function showResult(won){
+    var hpFrac = battle.villageHP/battle.villageMaxHP;
+    var stars = won ? (hpFrac>=0.7?3:hpFrac>=0.4?2:1) : 0;
+    $("#result-title").textContent = won ? "Pasukan Mongol Terusir!" : "Alas Terik Jatuh\u2026";
+    $("#result-stars").textContent = won ? "★".repeat(stars)+"☆".repeat(3-stars) : "☆☆☆";
+    $("#result-sub").textContent = won ?
+      "Sisa HP Alas Terik: "+Math.max(0,Math.round(battle.villageHP))+"/"+battle.villageMaxHP+". Jalan menuju berdirinya Kerajaan Majapahit kini terbuka." :
+      "Alas Terik jatuh sebelum pasukan Mongol berhasil diusir. Coba atur ulang posisi Pos Pengalih, menara, dan pos pertahananmu.";
+    if(won){
+      try{ localStorage.setItem("bentengNusantara_misi2_won", "1"); }catch(e){}
+    }
+    $("#btn-epilogue").style.display = won ? "inline-block" : "none";
+    showScreen("screen-result");
+  }
+
+  $("#btn-retry").addEventListener("click", function(){
+    showScreen("screen-battle"); initBattle();
+  });
+  $("#btn-to-start").addEventListener("click", function(){
+    showScreen("screen-start");
+  });
+  $("#btn-epilogue").addEventListener("click", function(){
+    showScreen("screen-epilogue");
+  });
+  $("#btn-epilogue-done").addEventListener("click", function(){
+    window.location.href = "../index.html";
+  });
+  $("#modal-backdrop").addEventListener("click", function(e){
+    if(e.target===$("#modal-backdrop")){ /* keep open during quiz on purpose */ }
+  });
+
+  /* ================= EPILOGUE / PIAGAM ================= */
+  $("#btn-claim-cert").addEventListener("click", function(){
+    var name = ($("#cert-name").value || "Sejarawan Muda").trim();
+    var todayStr = new Date().toLocaleDateString("id-ID", {day:"numeric",month:"long",year:"numeric"});
+    $("#cert-area").innerHTML =
+      '<div class="cert-view">'+
+        '<div class="cert-medal">👑</div>'+
+        '<div class="cert-ribbons"><div class="rb"></div><div class="rb alt"></div></div>'+
+        '<div class="cert-title">PIAGAM PENDIRI MAJAPAHIT</div>'+
+        '<div style="font-size:12.5px;">dengan bangga diberikan kepada</div>'+
+        '<div class="cert-name">'+name+'</div>'+
+        '<div class="cert-sub">atas keberhasilan menuntaskan siasat Raden Wijaya \u2014 menumpas Kediri dan mengusir pasukan Mongol \u2014 hingga lahirnya Kerajaan Majapahit</div>'+
+        '<div class="cert-seal"><div class="seal-dot">✦</div>Diberikan oleh Sang Guildmaster &middot; '+todayStr+'</div>'+
+      '</div>'+
+      '<button class="btn" id="btn-print-cert">🖨 Cetak</button>';
+    document.getElementById("btn-print-cert").addEventListener("click", function(){ window.print(); });
+  });
+
+})();
+</script>
+</body>
+</html>
